@@ -174,6 +174,32 @@ class Validation(unittest.TestCase):
         self.assertEqual(r["status"], "ok")
 
 
+class FailedExtraction(unittest.TestCase):
+    """A sign whose takes all failed is in the manifest, unplayable, flagged."""
+
+    def test_failed_takes_are_not_playable(self):
+        import tempfile
+        sys.path.insert(0, str(HERE / "scripts"))
+        import build_library as bl
+        catalog = {"source": "test", "keys": {"ZEBRA": ["zebra"]},
+                   "signs": {"zebra": {"gloss": "ZEBRA", "kind": "plain", "keys": ["ZEBRA"],
+                                       "head": "ZEBRA", "sense": None,
+                                       "takes": [{"clip": "t1", "frames": 40}, {"clip": "t2", "frames": 30}]}}}
+        log = {"t1": {"clip": "t1", "ok": False, "error": "RuntimeError: decode"},
+               "t2": {"clip": "t2", "ok": False, "error": "RuntimeError: decode"}}
+        saved = bl.MANIFEST
+        with tempfile.TemporaryDirectory() as d:
+            bl.MANIFEST = Path(d) / "manifest.json"          # never touch the real one
+            try:
+                counts = bl.build_manifest(catalog, log)
+                entry = json.loads(bl.MANIFEST.read_text())["signs"]["zebra"]
+            finally:
+                bl.MANIFEST = saved
+        self.assertIsNone(entry["clip"])
+        self.assertTrue(entry["failed"])
+        self.assertEqual((counts["available"], counts["failed"]), (0, 1))
+
+
 class Keywords(unittest.TestCase):
     """The dictionary keyword index (scripts/build_keywords.py) keeps the
     gloss names' safety rules."""

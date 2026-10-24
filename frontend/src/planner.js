@@ -6,8 +6,9 @@
 // rules model. What they do is the defensible minimum, each step labelled
 // with the rule that produced it so a reviewer can see and undo it:
 //
-//   omit      articles, copula, "to"/"of": Auslan has no signs for these
-//             grammatical roles.
+//   omit      articles, forms of "be", "to"/"of" are left out by the current
+//             rules (a simplification, not a claim that Auslan never
+//             expresses them); a person can restore any omitted word.
 //   negation  "don't want" -> NOT WANT, using the corpus's own negated
 //             signs where it has one; auxiliary "do" dropped.
 //   phrases   longest match first, so "thank you", "next week" and
@@ -40,14 +41,15 @@
 // stays in the step's menu for a person to choose.
 // ======================================================
 
+// Words the current rules leave out. Shown as "omitted by the current
+// planner" -- a choice of these rules, not a statement about Auslan.
 const OMIT = {
     a: "article", an: "article", the: "article",
-    am: "copula (no sign in Auslan)", is: "copula (no sign in Auslan)",
-    are: "copula (no sign in Auslan)", was: "copula (no sign in Auslan)",
-    were: "copula (no sign in Auslan)", be: "copula (no sign in Auslan)",
-    been: "copula (no sign in Auslan)", being: "copula (no sign in Auslan)",
-    to: "preposition / infinitive marker", of: "preposition",
+    am: "form of 'be'", is: "form of 'be'", are: "form of 'be'", was: "form of 'be'",
+    were: "form of 'be'", be: "form of 'be'", been: "form of 'be'", being: "form of 'be'",
+    to: "'to'", of: "'of'",
 };
+const omitted = reason => `${reason} -- omitted by the current planner`;
 
 const CONTRACTIONS = {
     "i'm": ["i", "am"], "you're": ["you", "are"], "we're": ["we", "are"],
@@ -336,13 +338,13 @@ export function plan(text, lex, opts = {}) {
 
         // auxiliary "do" in a negation: "don't want" -> NOT WANT
         if (["do", "does", "did"].includes(w.w) && words[i + 1]?.w === "not") {
-            push({ kind: "omit", why: "auxiliary 'do' in a negation" }, [w]);
+            push({ kind: "omit", why: omitted("auxiliary 'do' in a negation") }, [w]);
             i++; continue;
         }
         // do-support opening a question: "do you want ...?" -- Auslan
         // marks the question on the face, not with a sign
         if (question && i === 0 && ["do", "does", "did"].includes(w.w)) {
-            push({ kind: "omit", why: "'do' opening a question (English do-support)" }, [w]);
+            push({ kind: "omit", why: omitted("'do' opening a question") }, [w]);
             i++; continue;
         }
 
@@ -373,7 +375,7 @@ export function plan(text, lex, opts = {}) {
         // grammatical words Auslan does not sign -- unless they start a
         // longer phrase that IS a sign ("to do" isn't, but check anyway)
         if (OMIT[w.w] && (!hit || hit.n === 1)) {
-            push({ kind: "omit", why: OMIT[w.w] }, [w]);
+            push({ kind: "omit", why: omitted(OMIT[w.w]) }, [w]);
             i++; continue;
         }
 
@@ -400,6 +402,7 @@ export function plan(text, lex, opts = {}) {
                 const standIn = glossChoice && glossChoice.sign;
                 push({ kind: "sign", id: c.sign.id, gloss: c.sign.gloss, key: kw.key, match: "keyword",
                        uncertain: c.uncertain || !!standIn, low: !!c.sign.low || !!c.sign.status,
+                       status: c.sign.status || null,
                        flags: c.sign.flags || [],
                        why: `"${spanWord}" -> ${c.sign.gloss}` +
                             (kw.stem ? ` (via "${kw.stem}")` : "") + `: ${c.why}` +
@@ -422,6 +425,7 @@ export function plan(text, lex, opts = {}) {
                 push({ kind: "sign", id: c.sign.id, gloss: c.sign.gloss, key: hit.key,
                        match: stemNote ? "stem" : c.match,
                        uncertain: c.uncertain, low: !!c.sign.low || !!c.sign.status,
+                       status: c.sign.status || null,
                        flags: c.sign.flags || [],
                        why: (stemNote ? `"${w.w}" -> ${stemNote.toUpperCase()}; ` : "") +
                             (hit.span[0].why ? hit.span[0].why + "; " : "") + c.why + deferNote,
@@ -455,7 +459,7 @@ export function plan(text, lex, opts = {}) {
                    pending: kwSign && !kwSign.available ? kwSign.id : (deferred ? deferred.id : null) },
                  [w]);
         } else {
-            push({ kind: "omit", why: "nothing to sign or spell" }, [w]);
+            push({ kind: "omit", why: omitted("no letters to sign or spell") }, [w]);
         }
         i++;
     }
@@ -525,9 +529,18 @@ export function fromGlossLine(line, lex) {
             info = cands.find(c => c.kind === "plain") || null;
             if (!info && cands.length) problems.push(`${tok}: only specific senses (${cands.map(c => c.id).join(", ")})`);
         }
-        if (info && info.available) {
+        if (info && info.available && info.status === "unreliable") {
+            problems.push(`${tok}: unreliable tracking -- fingerspelled`);
+            steps.push({ kind: "spell", letters: lettersOf(info.keys[0]), en: tok.toLowerCase(),
+                         uncertain: true, src: [],
+                         options: [{ id: info.id, gloss: info.gloss, sense: info.sense,
+                                     available: true, low: info.low, status: info.status }],
+                         why: `sign ${info.gloss} has unreliable tracking (${info.flags.join(", ")}) ` +
+                              `-- fingerspelled; choose it from the menu to show it with a warning` });
+        } else if (info && info.available) {
             steps.push({ kind: "sign", id: info.id, gloss: info.gloss, key: info.keys[0],
                          match: "exact", uncertain: false, low: !!info.low || !!info.status,
+                         status: info.status || null,
                          flags: info.flags || [], en: tok.toLowerCase(),
                          why: "from gloss line", options: [], src: [],
                          letters: lettersOf(info.keys[0]) });

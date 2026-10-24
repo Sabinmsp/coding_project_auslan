@@ -55,15 +55,20 @@
     .chip select option { background: #1e222b; color: var(--ink); }
     .chip.sign { border-left-color: var(--ok); }
     .chip.spell { border-left-color: var(--spell); }
-    .chip.uncertain { border-left-color: var(--warn); background: #29231a; }
+    .chip.uncertain, .chip.check { border-left-color: var(--warn); background: #29231a; }
     .chip.omit { opacity: .5; }
     .chip.omit select { text-decoration: line-through; }
-    .chip.low .en::after { content: " · low tracking"; color: var(--warn); }
+    .chip .st { font-weight: 600; color: var(--ink); }
     .chip.reviewed .en::after { content: " · reviewed ✓"; color: var(--ok); }
     .chip.active { outline: 2px solid var(--ink); outline-offset: 1px; }
     .legend { display: flex; flex-wrap: wrap; gap: 2px 10px; font-size: 11px; color: var(--dim); margin-bottom: 10px; }
     .legend i { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
-    .legend .sign { background: var(--ok); } .legend .uncertain { background: var(--warn); }
+    .legend .sign { background: var(--ok); } .legend .check { background: var(--warn); }
+    .legend-note { font-size: 11px; color: var(--dim); margin: -6px 0 10px; }
+    #warn { position: absolute; left: 30px; top: 92px; right: 300px; padding: 6px 10px;
+            border: 1px solid #d0675f; border-radius: 6px; background: #3a1d1d; color: #ffd9d4;
+            font-size: 13px; }
+    #warn[hidden] { display: none; }
     .legend .spell { background: var(--spell); } .legend .omit { background: #3a3f4a; }
     .glabel { display: block; font-size: 11px; color: var(--dim); margin-bottom: 3px; }
     #plan-notes { font-size: 11.5px; color: #d9b36c; margin-top: 6px; }
@@ -78,6 +83,7 @@
     .words button:hover { border-color: #3d4556; background: #242935; }
     .words button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); }
     .words button.pending { color: #5d6575; border-style: dashed; }
+    .words button.flagged::after { content: " ⚠"; color: var(--warn); }
     main { position: relative; display: flex; flex-direction: column; min-width: 0; }
     #stage { flex: 1; position: relative; min-height: 0; }
     canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
@@ -86,7 +92,8 @@
         letter-spacing: .06em; text-transform: uppercase; right: 300px;
         white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
-    #sub { position: absolute; left: 30px; top: 66px; right: 300px; color: var(--dim); font-size: 12.5px; }
+    #sub { position: absolute; left: 30px; top: 66px; right: 300px; color: var(--dim); font-size: 12.5px;
+           white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }   /* full reason: chip tooltip */
     #sentence { position: absolute; left: 30px; bottom: 18px; right: 310px; font-size: 16px;
                 letter-spacing: .01em; line-height: 1.5; }
     #sentence .w { color: #4a5266; margin-right: 7px; }
@@ -147,8 +154,10 @@
 
     <h2>Sign plan <span class="tag">rule-based · not verified by a signer</span></h2>
     <div id="plan" class="plan"><span class="empty">Type something above, or pick a sign below.</span></div>
-    <div class="legend"><span><i class="sign"></i>sign</span><span><i class="uncertain"></i>check the sense</span>
-        <span><i class="spell"></i>fingerspelled</span><span><i class="omit"></i>omitted</span></div>
+    <div class="legend"><span><i class="sign"></i>✓ Sign</span><span><i class="check"></i>⚠ Check</span>
+        <span><i class="spell"></i>✋ Fingerspelled</span><span><i class="omit"></i>— Omitted</span></div>
+    <p class="legend-note">✓ means the motion data passed automated checks. No sign or plan here has
+        been verified by Auslan users.</p>
     <label class="glabel" for="glossline">Gloss line — edit, then Enter to play exactly this</label>
     <input id="glossline" class="glossline" spellcheck="false" autocomplete="off"
            placeholder="hello my fs:NAME fs:SABIN">
@@ -166,6 +175,7 @@
         <canvas id="canvas"></canvas>
         <div id="word">—</div>
         <div id="sub">select a sign</div>
+        <div id="warn" role="alert" hidden></div>
         <div id="sentence"></div>
         <div id="reflabel">SOURCE VIDEO</div>
         <video id="reference" muted playsinline preload="auto"></video>
@@ -549,6 +559,10 @@ async function playPlan(p) {
         return;
     }
     tl = buildTimeline(clips);
+    // captions must read the plan THIS timeline was built from: while the
+    // next sentence loads, the old timeline keeps drawing but currentPlan
+    // already holds the new one (rapid switching)
+    tl.plan = p;
     layout = computeLayout({ width: 1, height: 1, frames: [...allFrames(tl)] });
     scrub.max = Math.round(tl.duration * 1000);
     scrubStep = Math.max(1, scrub.max / Math.max(1, scrub.clientWidth));
@@ -645,8 +659,17 @@ function syncVideo(s) {
 // ======================================================
 function caption(s) {
     const c = tl.clips[s.clip];
-    const step = currentPlan.steps[c.step];
-    if (step.n !== activeStep) setActiveStep(step.n);
+    const step = tl.plan.steps[c.step];
+    if (!step) return;
+    if (tl.plan === currentPlan && step.n !== activeStep) setActiveStep(step.n);
+
+    // an unreliable sign plays ONLY when a person chose it from the menu,
+    // and never without this warning on the stage
+    const warn = $("warn");
+    const unreliable = step.kind === "sign" && step.status === "unreliable";
+    if (warn.hidden === unreliable) warn.hidden = !unreliable;
+    if (unreliable) setText(warn, `⚠ Unreliable tracking: this sign's motion data failed automated ` +
+        `checks (${(step.flags || []).join(", ")}). Shown only because it was chosen from the menu.`);
 
     if (c.kind === "phrase") {
         const m = c.motion;
@@ -660,7 +683,7 @@ function caption(s) {
     }
     if (step.kind === "sign") {
         setText(wordEl, step.gloss);
-        const notes = [];
+        const notes = [`${stateText(step)} — ${STATES[stateOf(step)].note}`];
         if (step.uncertain) notes.push("⚠ check: " + step.why);
         else if (step.match === "stem" || step.match === "keyword" || step.reviewed) notes.push(step.why);
         if (step.flags && step.flags.length) notes.push("⚠ tracking: " + step.flags.join(", "));
@@ -669,7 +692,7 @@ function caption(s) {
         setText(subEl, notes.join(" · "));
     } else if (step.kind === "spell") {
         setText(wordEl, step.letters.join(""));
-        setText(subEl, "fingerspelled: " + step.letters
+        setText(subEl, `${stateText(step)}: ` + step.letters
             .map((l, i) => i === c.li ? l : l.toLowerCase()).join(" – "));
     }
 }
@@ -710,10 +733,23 @@ function setActiveStep(n) {
 // "reviewed" and replays. This is the human-correction path: the planner
 // proposes, a person who knows Auslan decides.
 // ======================================================
+// One indicator for every step, with icon AND text (never colour alone).
+// "Sign" means AUTOMATED checks passed -- not that a signer verified it.
+const STATES = {
+    sign:  { icon: "✓", label: "Sign", note: "automated checks passed" },
+    check: { icon: "⚠", label: "Check", note: "review required" },
+    spell: { icon: "✋", label: "Fingerspelled", note: "no usable sign available" },
+    omit:  { icon: "—", label: "Omitted", note: "omitted by the current planner" },
+};
+function stateOf(step) {
+    if (step.kind === "omit") return "omit";
+    if (step.kind === "spell" || step.kind === "phrase") return "spell";
+    return (step.status || step.uncertain || step.low) ? "check" : "sign";
+}
+const stateText = step => { const st = STATES[stateOf(step)]; return `${st.icon} ${st.label}`; };
+
 function chipClass(step) {
-    return ["chip", step.kind, step.uncertain ? "uncertain" : "",
-            step.low && step.kind === "sign" ? "low" : "",
-            step.reviewed ? "reviewed" : ""].filter(Boolean).join(" ");
+    return ["chip", stateOf(step), step.reviewed ? "reviewed" : ""].filter(Boolean).join(" ");
 }
 
 function renderPlan() {
@@ -727,9 +763,12 @@ function renderPlan() {
         chip.title = step.why || "";
         const en = document.createElement("span");
         en.className = "en";
-        en.textContent = (step.moved ? `↔ ${step.moved}: ` : "") + (step.en || " ");
+        const st = document.createElement("span");
+        st.className = "st";
+        st.textContent = stateText(step);
+        en.append(st, ` · ${step.moved ? `↔ ${step.moved}: ` : ""}${step.en || ""}`);
         const sel = document.createElement("select");
-        sel.setAttribute("aria-label", `sign for "${step.en || ""}"`);
+        sel.setAttribute("aria-label", `${STATES[stateOf(step)].label}: "${step.en || ""}"`);
         const add = (value, text, disabled = false) => {
             const o = document.createElement("option");
             o.value = value; o.textContent = text; o.disabled = disabled;
@@ -764,11 +803,9 @@ function renderPlan() {
 
     const notes = $("plan-notes");
     notes.innerHTML = "";
-    const n = k => p.steps.filter(s => s.kind === k).length;
-    const flagged = p.steps.filter(s => s.uncertain).length;
-    const summary = [`${n("sign")} sign${n("sign") === 1 ? "" : "s"}`,
-                     `${n("spell")} fingerspelled`, `${n("omit")} omitted`];
-    if (flagged) summary.push(`${flagged} to check`);
+    const n = k => p.steps.filter(s => stateOf(s) === k).length;
+    const summary = [`✓ ${n("sign")} signed`, `⚠ ${n("check")} to check`,
+                     `✋ ${n("spell")} fingerspelled`, `— ${n("omit")} omitted`];
     if (!hasPhrase) addNote(summary.join(" · "), "summary");
     for (const s of p.notes || []) addNote(s);
     const pending = p.steps.filter(s => s.pending);
@@ -790,8 +827,8 @@ function edit(n, value) {
     if (value.startsWith("sign:")) {
         const info = lib.byId(value.slice(5));
         Object.assign(s, { kind: "sign", id: info.id, gloss: info.gloss, key: info.keys[0],
-                           low: info.low || !!info.status, flags: info.flags || [],
-                           letters: lettersFor(s) });
+                           low: info.low || !!info.status, status: info.status || null,
+                           flags: info.flags || [], letters: lettersFor(s) });
     } else if (value === "spell") {
         Object.assign(s, { kind: "spell", letters: lettersFor(s) });
     } else if (value === "omit") {
@@ -831,6 +868,12 @@ function quickPlan(name) {
         const info = lib.byId(e.library);
         const options = lib.candidates(info.keys[0]).map(o => ({ id: o.id, gloss: o.gloss,
             sense: o.sense, available: o.available, low: o.low, status: o.status }));
+        if (info.available && info.status === "unreliable") {
+            return { ...base, steps: [{ n: 0, kind: "spell", letters: lettersOf(info.keys[0]),
+                en: name.toLowerCase(), src: [], options, uncertain: true,
+                why: `sign ${info.gloss} has unreliable tracking (${info.flags.join(", ")}) -- ` +
+                     `fingerspelled; choose it from the menu to show it with a warning` }] };
+        }
         if (!info.available) {
             return { ...base, steps: [{ n: 0, kind: "spell", letters: lettersOf(info.keys[0]),
                 en: name.toLowerCase(), src: [], options, pending: info.id,
@@ -838,7 +881,7 @@ function quickPlan(name) {
         }
         return { ...base, steps: [{ n: 0, kind: "sign", id: info.id, gloss: info.gloss,
             key: info.keys[0], match: "exact", uncertain: false,
-            low: info.low || !!info.status, flags: info.flags || [],
+            low: info.low || !!info.status, status: info.status || null, flags: info.flags || [],
             en: name.toLowerCase(), src: [], options, letters: lettersOf(info.keys[0]),
             why: "quick pick" }] };
     }
@@ -933,7 +976,8 @@ window.auslan = {
         ? "assets/signs/manifest.json missing — run: python3 scripts/build_library.py"
         : `${c.available.toLocaleString()} of ${c.signs.toLocaleString()} corpus signs extracted` +
           (c.available < c.signs ? " (extraction in progress — reload for more)" : "") +
-          ` · A–Z fingerspelling` + (c.low_quality ? ` · ${c.low_quality} flagged low tracking` : "");
+          ` · A–Z fingerspelling` +
+          (c.review || c.unreliable ? ` · ${c.review || 0} to check, ${c.unreliable || 0} unreliable (fingerspelled)` : "");
 
     const grid = $("words"), fsGrid = $("fingerspell-words");
     for (const name of Object.keys(signs)) {
@@ -941,9 +985,15 @@ window.auslan = {
         button.textContent = name;
         button.dataset.word = name;
         button.setAttribute("aria-pressed", "false");
-        if (signs[name].library && !lib.byId(signs[name].library)?.available) {
+        const info = signs[name].library ? lib.byId(signs[name].library) : null;
+        if (info && !info.available) {
             button.classList.add("pending");
             button.title = "not extracted yet — plays fingerspelled";
+        } else if (info && info.status) {
+            button.classList.add("flagged");
+            button.title = info.status === "unreliable"
+                ? "unreliable tracking — plays fingerspelled; the sign is in the menu"
+                : `review required: ${info.flags.join(", ")}`;
         }
         button.addEventListener("click", () => playQuick(name));
         (signs[name].fingerspell ? fsGrid : grid).appendChild(button);

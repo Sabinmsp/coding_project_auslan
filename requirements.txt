@@ -1,0 +1,17 @@
+# Production pipeline (scripts/, backend/). Versions are the ones the
+# working environment (.venv-1) actually runs; extraction output was
+# verified with exactly these. Python 3.10.
+mediapipe==0.10.21
+opencv-python==4.11.0.86
+numpy==1.26.4
+
+# Not Python, also required:
+#   ffmpeg   (transcoding; tested with 8.1)       brew install ffmpeg
+#   node     (JS tests only; tested with 24.13)   https://nodejs.org
+
+# Optional: backend/llm_plan.py only
+# anthropic
+
+# Experiments only (experiments/2d, experiments/3d) -- not needed by the app:
+#   torch==2.14.0  pandas==2.3.3  matplotlib==3.10.9  pygame  pillow==12.3.0  openpyxl==3.1.5
+#   Blender (experiments/3d/blender, headless: Blender --background --python ...)

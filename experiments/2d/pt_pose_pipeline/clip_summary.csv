@@ -1,0 +1,95 @@
+Video_Clip_Name,Subtitle,Frames,Keypoints,Values_Per_Keypoint,KPS_Shape,BBOX_Shape,NPY_File
+video_1_0,hello .,54,136,3,"(54, 136, 3)","(54, 4)",extracted_keypoints/video_1_0.npy
+video_1_1,look .,25,136,3,"(25, 136, 3)","(25, 4)",extracted_keypoints/video_1_1.npy
+video_1_2,look .,23,136,3,"(23, 136, 3)","(23, 4)",extracted_keypoints/video_1_2.npy
+video_1_3,i am sally .,88,136,3,"(88, 136, 3)","(88, 4)",extracted_keypoints/video_1_3.npy
+video_1_4,i am possum .,54,136,3,"(54, 136, 3)","(54, 4)",extracted_keypoints/video_1_4.npy
+video_1_5,hello .,54,136,3,"(54, 136, 3)","(54, 4)",extracted_keypoints/video_1_5.npy
+video_1_6,hello .,49,136,3,"(49, 136, 3)","(49, 4)",extracted_keypoints/video_1_6.npy
+video_1_7,hold on .,32,136,3,"(32, 136, 3)","(32, 4)",extracted_keypoints/video_1_7.npy
+video_1_8,my fingers were stuck together .,72,136,3,"(72, 136, 3)","(72, 4)",extracted_keypoints/video_1_8.npy
+video_1_9,i could not say hello properly .,57,136,3,"(57, 136, 3)","(57, 4)",extracted_keypoints/video_1_9.npy
+video_1_10,now they are nice and clean hello everyone .,55,136,3,"(55, 136, 3)","(55, 4)",extracted_keypoints/video_1_10.npy
+video_1_11,i am making some glue it is very sticky .,149,136,3,"(149, 136, 3)","(149, 4)",extracted_keypoints/video_1_11.npy
+video_1_12,i am making this glue because i want to make a paper ball and i am going to use the glue to stick the paper together .,293,136,3,"(293, 136, 3)","(293, 4)",extracted_keypoints/video_1_12.npy
+video_1_13,i am sure possum would love to help make this ball .,133,136,3,"(133, 136, 3)","(133, 4)",extracted_keypoints/video_1_13.npy
+video_1_14,i wonder if he is awake .,105,136,3,"(105, 136, 3)","(105, 4)",extracted_keypoints/video_1_14.npy
+video_1_15,i will go and see .,20,136,3,"(20, 136, 3)","(20, 4)",extracted_keypoints/video_1_15.npy
+video_1_16,come on let us have a look .,42,136,3,"(42, 136, 3)","(42, 4)",extracted_keypoints/video_1_16.npy
+video_1_17,where is possum .,55,136,3,"(55, 136, 3)","(55, 4)",extracted_keypoints/video_1_17.npy
+video_1_18,sally my door was so hard to open i do not know why .,166,136,3,"(166, 136, 3)","(166, 4)",extracted_keypoints/video_1_18.npy
+video_1_19,was it stuck possum .,51,136,3,"(51, 136, 3)","(51, 4)",extracted_keypoints/video_1_19.npy
+video_1_20,sally what does stuck mean .,49,136,3,"(49, 136, 3)","(49, 4)",extracted_keypoints/video_1_20.npy
+video_1_21,it is like your door was so hard to open it was sticking .,154,136,3,"(154, 136, 3)","(154, 4)",extracted_keypoints/video_1_21.npy
+video_1_22,like this morning when i was making glue my fingers were sticking together .,183,136,3,"(183, 136, 3)","(183, 4)",extracted_keypoints/video_1_22.npy
+video_1_23,i could not open them because they were all sticky .,96,136,3,"(96, 136, 3)","(96, 4)",extracted_keypoints/video_1_23.npy
+video_1_24,that was because of the sticky glue .,15,136,3,"(15, 136, 3)","(15, 4)",extracted_keypoints/video_1_24.npy
+video_1_25,did you get glue on your door possum .,110,136,3,"(110, 136, 3)","(110, 4)",extracted_keypoints/video_1_25.npy
+video_1_26,i remember .,50,136,3,"(50, 136, 3)","(50, 4)",extracted_keypoints/video_1_26.npy
+video_1_27,last night i got into my comfy bed i got a jar of honey and i was eating it and i got it all over me and all over the tree house .,300,136,3,"(300, 136, 3)","(300, 4)",extracted_keypoints/video_1_27.npy
+video_1_28,possum did you have a jar of honey and did not give me any .,166,136,3,"(166, 136, 3)","(166, 4)",extracted_keypoints/video_1_28.npy
+video_1_29,you know i love sticky honey .,161,136,3,"(161, 136, 3)","(161, 4)",extracted_keypoints/video_1_29.npy
+video_1_30,well .,57,136,3,"(57, 136, 3)","(57, 4)",extracted_keypoints/video_1_30.npy
+video_1_31,well never mind .,33,136,3,"(33, 136, 3)","(33, 4)",extracted_keypoints/video_1_31.npy
+video_1_32,inside i was making a paper ball do you want to come and help me .,161,136,3,"(161, 136, 3)","(161, 4)",extracted_keypoints/video_1_32.npy
+video_1_33,yeah i will help but how do you make the paper ball stick together .,195,136,3,"(195, 136, 3)","(195, 4)",extracted_keypoints/video_1_33.npy
+video_1_34,the glue that i was making was very sticky .,122,136,3,"(122, 136, 3)","(122, 4)",extracted_keypoints/video_1_34.npy
+video_1_35,so i dip the paper in the glue and used that to make the ball .,192,136,3,"(192, 136, 3)","(192, 4)",extracted_keypoints/video_1_35.npy
+video_1_36,i will help yeah .,76,136,3,"(76, 136, 3)","(76, 4)",extracted_keypoints/video_1_36.npy
+video_1_37,well come on then .,40,136,3,"(40, 136, 3)","(40, 4)",extracted_keypoints/video_1_37.npy
+video_1_38,possum .,15,136,3,"(15, 136, 3)","(15, 4)",extracted_keypoints/video_1_38.npy
+video_1_39,what is it .,22,136,3,"(22, 136, 3)","(22, 4)",extracted_keypoints/video_1_39.npy
+video_1_40,i have an idea .,38,136,3,"(38, 136, 3)","(38, 4)",extracted_keypoints/video_1_40.npy
+video_1_41,why do not we pretend that our feet are really sticky and that the grass is all sticky all the way back to the kitchen .,233,136,3,"(233, 136, 3)","(233, 4)",extracted_keypoints/video_1_41.npy
+video_1_42,yeah come on copy us kids .,58,136,3,"(58, 136, 3)","(58, 4)",extracted_keypoints/video_1_42.npy
+video_1_43,well sally i am ready to make the glue how do we make it .,96,136,3,"(96, 136, 3)","(96, 4)",extracted_keypoints/video_1_43.npy
+video_1_44,well to make our sticky sticky glue we need four things .,75,136,3,"(75, 136, 3)","(75, 4)",extracted_keypoints/video_1_44.npy
+video_1_45,we need four things .,55,136,3,"(55, 136, 3)","(55, 4)",extracted_keypoints/video_1_45.npy
+video_1_46,we need flour .,56,136,3,"(56, 136, 3)","(56, 4)",extracted_keypoints/video_1_46.npy
+video_1_47,yep .,30,136,3,"(30, 136, 3)","(30, 4)",extracted_keypoints/video_1_47.npy
+video_1_48,we need water .,63,136,3,"(63, 136, 3)","(63, 4)",extracted_keypoints/video_1_48.npy
+video_1_49,there it is .,22,136,3,"(22, 136, 3)","(22, 4)",extracted_keypoints/video_1_49.npy
+video_1_50,we need a bowl .,52,136,3,"(52, 136, 3)","(52, 4)",extracted_keypoints/video_1_50.npy
+video_1_51,we need a spoon .,66,136,3,"(66, 136, 3)","(66, 4)",extracted_keypoints/video_1_51.npy
+video_1_52,no that is too small .,54,136,3,"(54, 136, 3)","(54, 4)",extracted_keypoints/video_1_52.npy
+video_1_53,we need a bigger spoon .,60,136,3,"(60, 136, 3)","(60, 4)",extracted_keypoints/video_1_53.npy
+video_1_54,yes that is right .,61,136,3,"(61, 136, 3)","(61, 4)",extracted_keypoints/video_1_54.npy
+video_1_55,we have our four things that means we can start making our glue .,94,136,3,"(94, 136, 3)","(94, 4)",extracted_keypoints/video_1_55.npy
+video_1_56,we need one cup of flour in the bowl .,92,136,3,"(92, 136, 3)","(92, 4)",extracted_keypoints/video_1_56.npy
+video_1_57,now we need a cup of water .,77,136,3,"(77, 136, 3)","(77, 4)",extracted_keypoints/video_1_57.npy
+video_1_59,look possum you can see there the flour is sitting on the bottom and the water is on the top .,171,136,3,"(171, 136, 3)","(171, 4)",extracted_keypoints/video_1_59.npy
+video_1_61,we need to use our spoon to mix it all together and make it nice and sticky .,225,136,3,"(225, 136, 3)","(225, 4)",extracted_keypoints/video_1_61.npy
+video_1_63,can you do that please while you are doing that i am going to tear up some strips of paper .,160,136,3,"(160, 136, 3)","(160, 4)",extracted_keypoints/video_1_63.npy
+video_1_64,possum are you stuck .,67,136,3,"(67, 136, 3)","(67, 4)",extracted_keypoints/video_1_64.npy
+video_1_66,you are playing tricks on me .,85,136,3,"(85, 136, 3)","(85, 4)",extracted_keypoints/video_1_66.npy
+video_1_67,that glue looks ready possum .,86,136,3,"(86, 136, 3)","(86, 4)",extracted_keypoints/video_1_67.npy
+video_1_68,now we need to blow up a balloon .,80,136,3,"(80, 136, 3)","(80, 4)",extracted_keypoints/video_1_68.npy
+video_1_69,ok that is enough .,44,136,3,"(44, 136, 3)","(44, 4)",extracted_keypoints/video_1_69.npy
+video_1_70,now place it in the bowl .,68,136,3,"(68, 136, 3)","(68, 4)",extracted_keypoints/video_1_70.npy
+video_1_71,what we do is we get our paper .,93,136,3,"(93, 136, 3)","(93, 4)",extracted_keypoints/video_1_71.npy
+video_1_72,we dip it in the glue and then we stick it on the balloon .,83,136,3,"(83, 136, 3)","(83, 4)",extracted_keypoints/video_1_72.npy
+video_1_73,that is looking good .,47,136,3,"(47, 136, 3)","(47, 4)",extracted_keypoints/video_1_73.npy
+video_1_74,why do not we watch some children making papiermâché balloons .,135,136,3,"(135, 136, 3)","(135, 4)",extracted_keypoints/video_1_74.npy
+video_1_75,yeah let us watch .,36,136,3,"(36, 136, 3)","(36, 4)",extracted_keypoints/video_1_75.npy
+video_1_76,those children make great papiermâché balloons .,115,136,3,"(115, 136, 3)","(115, 4)",extracted_keypoints/video_1_76.npy
+video_1_77,yes they were beautiful were not they possum .,100,136,3,"(100, 136, 3)","(100, 4)",extracted_keypoints/video_1_77.npy
+video_1_78,yours is beautiful too though .,82,136,3,"(82, 136, 3)","(82, 4)",extracted_keypoints/video_1_78.npy
+video_1_79,we should paint ours as well but it is still wet .,75,136,3,"(75, 136, 3)","(75, 4)",extracted_keypoints/video_1_79.npy
+video_1_80,but it is still wet .,102,136,3,"(102, 136, 3)","(102, 4)",extracted_keypoints/video_1_80.npy
+video_1_81,why do not we go outside and hang it up so it can dry .,134,136,3,"(134, 136, 3)","(134, 4)",extracted_keypoints/video_1_81.npy
+video_1_82,yeah good idea come on let us go .,67,136,3,"(67, 136, 3)","(67, 4)",extracted_keypoints/video_1_82.npy
+video_1_83,hello .,29,136,3,"(29, 136, 3)","(29, 4)",extracted_keypoints/video_1_83.npy
+video_1_85,possum your ball looks great .,73,136,3,"(73, 136, 3)","(73, 4)",extracted_keypoints/video_1_85.npy
+video_1_86,it is not sticky anymore it is nice and dry and when it is painted it will look beautiful .,150,136,3,"(150, 136, 3)","(150, 4)",extracted_keypoints/video_1_86.npy
+video_1_87,hey sally have a look at my door .,66,136,3,"(66, 136, 3)","(66, 4)",extracted_keypoints/video_1_87.npy
+video_1_88,it is not sticky anymore i have cleaned it .,74,136,3,"(74, 136, 3)","(74, 4)",extracted_keypoints/video_1_88.npy
+video_1_89,yes i saw you mopping and now all the honey is gone .,91,136,3,"(91, 136, 3)","(91, 4)",extracted_keypoints/video_1_89.npy
+video_1_90,sally i do love eating honey and playing with sticky sticky things .,200,136,3,"(200, 136, 3)","(200, 4)",extracted_keypoints/video_1_90.npy
+video_1_91,yes i know you do possum and i have something else that is sticky for you just wait .,100,136,3,"(100, 136, 3)","(100, 4)",extracted_keypoints/video_1_91.npy
+video_1_92,sally what does it say .,65,136,3,"(65, 136, 3)","(65, 4)",extracted_keypoints/video_1_92.npy
+video_1_93,it says do not get honey on the door .,103,136,3,"(103, 136, 3)","(103, 4)",extracted_keypoints/video_1_93.npy
+video_1_95,sally you are funny .,46,136,3,"(46, 136, 3)","(46, 4)",extracted_keypoints/video_1_95.npy
+video_1_96,well our time is up .,91,136,3,"(91, 136, 3)","(91, 4)",extracted_keypoints/video_1_96.npy
+video_1_97,thanks for watching .,57,136,3,"(57, 136, 3)","(57, 4)",extracted_keypoints/video_1_97.npy
+video_1_98,see you next time .,35,136,3,"(35, 136, 3)","(35, 4)",extracted_keypoints/video_1_98.npy
+video_1_99,bye bye .,45,136,3,"(45, 136, 3)","(45, 4)",extracted_keypoints/video_1_99.npy

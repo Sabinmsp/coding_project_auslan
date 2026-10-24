@@ -1,0 +1,40 @@
+{
+  "entries": {
+    "HELLO": {
+      "file": "HELLO.pt",
+      "source_clip": "video_1_6",
+      "frames": 49,
+      "quality": 0.571,
+      "alternatives": 3
+    },
+    "LOOK": {
+      "file": "LOOK.pt",
+      "source_clip": "video_1_1",
+      "frames": 25,
+      "quality": 0.421,
+      "alternatives": 3
+    },
+    "POSSUM": {
+      "file": "POSSUM.pt",
+      "source_clip": "video_1_38",
+      "frames": 15,
+      "quality": 0.467,
+      "alternatives": 1
+    },
+    "WELL": {
+      "file": "WELL.pt",
+      "source_clip": "video_1_30",
+      "frames": 57,
+      "quality": 0.429,
+      "alternatives": 1
+    },
+    "YEP": {
+      "file": "YEP.pt",
+      "source_clip": "video_1_47",
+      "frames": 30,
+      "quality": 0.445,
+      "alternatives": 1
+    }
+  },
+  "source": "Auslan_Daily_Communication"
+}

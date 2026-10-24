@@ -1,0 +1,91 @@
+{
+  "SABIN": {
+    "motion": "assets/fingerspelling/phrases/sabin.json",
+    "video": "assets/fingerspelling/phrases/sabin.mp4",
+    "fingerspell": true
+  },
+  "BILL DUE DATE": {
+    "motion": "assets/fingerspelling/phrases/pay_bill.json",
+    "video": "assets/fingerspelling/phrases/pay_bill.mp4",
+    "fingerspell": true,
+    "sentence": true
+  },
+  "PAY YOUR BILL": {
+    "motion": "assets/fingerspelling/phrases/pay_bill_full.json",
+    "video": "assets/fingerspelling/phrases/pay_bill_full.mp4",
+    "fingerspell": true,
+    "sentence": true
+  },
+  "AGAIN": {
+    "library": "again"
+  },
+  "BAD": {
+    "library": "bad"
+  },
+  "BILL": {
+    "library": "bill"
+  },
+  "DOCTOR": {
+    "library": "doctor"
+  },
+  "FINISH": {
+    "library": "finish"
+  },
+  "FRIEND": {
+    "library": "friend"
+  },
+  "NO GOOD": {
+    "library": "good-no-good"
+  },
+  "HELLO": {
+    "library": "hello"
+  },
+  "HELP": {
+    "library": "help"
+  },
+  "HOME": {
+    "library": "home"
+  },
+  "LEARN": {
+    "library": "learn"
+  },
+  "NO": {
+    "library": "no"
+  },
+  "PAY": {
+    "library": "pay"
+  },
+  "QUESTION": {
+    "library": "question"
+  },
+  "SCHOOL": {
+    "library": "school"
+  },
+  "SICK": {
+    "library": "sick"
+  },
+  "STUDENT": {
+    "library": "student"
+  },
+  "THANKS": {
+    "library": "thanks"
+  },
+  "TIME": {
+    "library": "time"
+  },
+  "TOMORROW": {
+    "library": "tomorrow"
+  },
+  "WAIT": {
+    "library": "wait"
+  },
+  "WATER (HOSE)": {
+    "library": "water-hose"
+  },
+  "WORK": {
+    "library": "work"
+  },
+  "ZEBRA": {
+    "library": "zebra"
+  }
+}

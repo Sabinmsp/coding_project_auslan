@@ -1,0 +1,1470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auslan 3D Motion Test</title>
+<style>
+    * { box-sizing: border-box; }
+
+    body {
+        margin: 0;
+        background: #151515;
+        color: #eee;
+        font: 13px/1.5 ui-sans-serif, system-ui, Arial, sans-serif;
+        overflow: hidden;
+    }
+
+    #panel {
+        position: fixed;
+        bottom: 16px;
+        left: 16px;
+        z-index: 10;
+        background: rgba(0,0,0,0.66);
+        backdrop-filter: blur(6px);
+        padding: 14px 16px;
+        border-radius: 10px;
+        max-width: 290px;
+    }
+
+    button {
+        padding: 8px 14px;
+        margin: 0 6px 8px 0;
+        cursor: pointer;
+        font-size: 14px;
+        border: 0;
+        border-radius: 6px;
+        background: #2f6fd0;
+        color: white;
+    }
+
+    button.secondary { background: #3a3a3a; }
+    button:hover { filter: brightness(1.15); }
+
+    #status {
+        margin-top: 6px;
+        font-family: ui-monospace, monospace;
+        font-size: 12px;
+        color: #7ee8c8;
+        white-space: pre-line;
+    }
+
+    .axes {
+        margin-top: 12px;
+        padding-top: 10px;
+        border-top: 1px solid #333;
+    }
+
+    .axes label {
+        display: block;
+        margin: 5px 0;
+        cursor: pointer;
+        color: #bbb;
+    }
+
+    .hint {
+        margin-top: 8px;
+        font-size: 11px;
+        color: #777;
+    }
+
+    #reference {
+        position: fixed;
+        right: 16px;
+        bottom: 16px;
+        width: 220px;
+        z-index: 10;
+        border-radius: 8px;
+        border: 1px solid #333;
+        background: #000;
+    }
+
+    #debug {
+        position: fixed;
+        top: 16px;
+        right: 16px;
+        z-index: 10;
+        background: rgba(0,0,0,0.72);
+        backdrop-filter: blur(6px);
+        padding: 12px 14px;
+        border-radius: 10px;
+        font-family: ui-monospace, monospace;
+        font-size: 11px;
+        line-height: 1.45;
+        color: #cfe8ff;
+        white-space: pre;
+        max-height: 70vh;
+        overflow: auto;
+    }
+</style>
+</head>
+<body>
+
+<div id="panel">
+    <div>
+        <button id="playButton">▶ Play sign</button>
+        <button id="resetButton" class="secondary">Reset</button>
+    </div>
+    <label style="color:#bbb;cursor:pointer">
+        <input type="checkbox" id="loopToggle" checked> loop
+    </label>
+    <div id="status">Loading…</div>
+
+    <div class="axes">
+        <label><input type="checkbox" id="mirrorX"> mirror left/right (X)</label>
+        <label><input type="checkbox" id="flipZ"> flip depth (Z)</label>
+        <label><input type="checkbox" id="faceAway"> turn Jake around</label>
+        <label><input type="checkbox" id="debugToggle"> debug (key: d)</label>
+        <div class="hint">
+            If the motion is recognisable but pointing the wrong way, it is a
+            coordinate-frame mismatch, not a retargeting failure. Toggle these.
+        </div>
+    </div>
+</div>
+
+<video id="reference" src="./jump.mp4" muted playsinline></video>
+<div id="debug" hidden></div>
+
+<script type="importmap">
+{
+    "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"
+    }
+}
+</script>
+
+<script type="module">
+import * as THREE from "three";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+// ======================================================
+// CALIBRATION
+//
+// Per hand, so a sign can be tuned without touching the
+// retargeting maths. Offsets are in RADIANS and are applied in the
+// hand bone's own frame, after the palm orientation is solved:
+//   X = pitch (flex / extend the wrist)
+//   Y = yaw   (deviate towards thumb / little finger)
+//   Z = roll  (rotate the palm about the forearm)
+// Scales are multipliers on the measured MediaPipe angles: 1 = copy
+// what the signer did, >1 = exaggerate, <1 = damp.
+// ======================================================
+const CALIBRATION = {
+    left: {
+        WRIST_X_OFFSET: 0.0,
+        WRIST_Y_OFFSET: 0.0,
+        WRIST_Z_OFFSET: 0.0,
+        FINGER_CURL_SCALE: 1.0,
+        THUMB_CURL_SCALE: 1.0,
+        THUMB_SPREAD_SCALE: 1.0,
+        FINGER_SPREAD_SCALE: 1.0,
+        FINGER_SPREAD_BIAS: 0.0
+    },
+    right: {
+        WRIST_X_OFFSET: 0.0,
+        WRIST_Y_OFFSET: 0.0,
+        WRIST_Z_OFFSET: 0.0,
+        FINGER_CURL_SCALE: 1.0,
+        THUMB_CURL_SCALE: 1.0,
+        THUMB_SPREAD_SCALE: 1.0,
+        FINGER_SPREAD_SCALE: 1.0,
+        FINGER_SPREAD_BIAS: 0.0
+    }
+};
+
+// FINGER_SPREAD_BIAS is a constant offset in radians, subtracted before
+// scaling. It exists because a fan and an offset are different faults
+// and a multiplier only fixes the first. Averaged over this clip's
+// well-conditioned open-hand frames, the LEFT hand fans correctly
+// (index +4, mid -0, ring -3, pinky -9 degrees: radial to ulnar, as a
+// real hand does), while the RIGHT sits about +15 degrees thumb-ward on
+// mid/ring/pinky. Left at 0.0 by default so nothing is silently tuned to
+// one clip; set right to roughly 0.22 if that splay bothers you, or
+// re-measure per sign.
+
+// Per-finger trim on top of FINGER_CURL_SCALE, if one finger reads hot.
+const FINGER_TRIM = { index: 1.0, mid: 1.0, ring: 1.0, pinky: 1.0 };
+
+// Anatomical stops, in radians. MediaPipe occasionally reports a joint
+// folded backwards through the hand when a finger is occluded; without
+// a clamp that shows up as a snapped knuckle.
+const LIMITS = {
+    mcpFlex:   [-0.35, 1.75],
+    pipFlex:   [-0.10, 1.95],
+    dipFlex:   [-0.10, 1.45],
+    mcpSpread: [-0.30, 0.30],
+    thumbFlex: [-0.35, 1.40],
+    thumbSpread: [-0.70, 0.70]
+};
+
+// The PIP joint is a one-way hinge -- fingers do not bend backwards
+// there. A detection whose fingers ALL read as hyperextended is not a
+// pose, it is a bad fit, and MediaPipe produces those when a hand is
+// occluded or low contrast. In this clip that is the signer's resting
+// left hand: 17 of its 46 tracked frames come back chirally inconsistent
+// (medians down to -98 degrees), while the active right hand is clean in
+// 46 of 46. Holding the last good handshape through those frames beats
+// posing a broken one, so they are rejected rather than retargeted.
+const REJECT_PIP_BEND = -25 * Math.PI / 180;
+
+// MediaPipe re-estimates every joint independently each frame, so raw
+// directions jitter. Slerp towards the target instead of snapping to it.
+// 1 = no smoothing, 0.1 = heavy smoothing. Fingers are noisier than
+// arms (they are small in frame), so they are smoothed harder.
+const SMOOTHING = 0.45;
+const HAND_SMOOTHING = 0.35;
+const FINGER_SMOOTHING = 0.30;
+
+// ======================================================
+// SCENE
+// ======================================================
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x202020);
+
+const camera = new THREE.PerspectiveCamera(
+    38, window.innerWidth / window.innerHeight, 0.01, 1000
+);
+camera.position.set(0, 1.42, 2.05);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+document.body.appendChild(renderer.domElement);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(0, 1.30, 0);
+controls.enableDamping = true;
+
+scene.add(new THREE.HemisphereLight(0xffffff, 0x444444, 2.2));
+
+const keyLight = new THREE.DirectionalLight(0xffffff, 2.5);
+keyLight.position.set(3, 5, 4);
+scene.add(keyLight);
+
+const fillLight = new THREE.DirectionalLight(0xffffff, 0.8);
+fillLight.position.set(-3, 2, -2);
+scene.add(fillLight);
+
+const floor = new THREE.Mesh(
+    new THREE.PlaneGeometry(20, 20),
+    new THREE.MeshStandardMaterial({ color: 0x2c2c2c })
+);
+floor.rotation.x = -Math.PI / 2;
+scene.add(floor);
+
+// ======================================================
+// STATE
+// ======================================================
+let model = null;
+let motion = null;
+let fps = 30;
+let aspect = 1;          // video width / height, for image-space landmarks
+let usingWorld = false;  // pose_world (metres) rather than image space
+
+let playing = false;
+let startTime = 0;
+let currentFrame = -1;
+
+const statusElement = document.getElementById("status");
+const referenceVideo = document.getElementById("reference");
+const debugElement = document.getElementById("debug");
+
+// ======================================================
+// JAKE'S BONES
+//
+// Character Creator rig. Each aimed bone also needs the child that
+// defines which way it points -- and it is NOT always the first child
+// bone in the list. CC_Base_L_Forearm's children are, in order,
+// ElbowShareBone, ForearmTwist01, Hand: taking the first would aim the
+// forearm at a helper bone. So the child is named explicitly.
+// ======================================================
+const BONES = {
+    leftUpperArm:  { name: "CC_Base_L_Upperarm", child: "CC_Base_L_Forearm" },
+    leftForearm:   { name: "CC_Base_L_Forearm",  child: "CC_Base_L_Hand"    },
+    rightUpperArm: { name: "CC_Base_R_Upperarm", child: "CC_Base_R_Forearm" },
+    rightForearm:  { name: "CC_Base_R_Forearm",  child: "CC_Base_R_Hand"    }
+};
+
+const bones = {};
+const restPose = {};
+
+// The four fingers, in rig order. Thumb is handled separately -- its
+// carpometacarpal joint moves on axes the others do not have.
+const FINGERS = ["index", "mid", "ring", "pinky"];
+
+const FINGER_BONE = {
+    index: "Index",
+    mid:   "Mid",
+    ring:  "Ring",
+    pinky: "Pinky"
+};
+
+// ======================================================
+// MEDIAPIPE LANDMARKS
+// ======================================================
+const MP = {
+    LEFT_SHOULDER: 11, RIGHT_SHOULDER: 12,
+    LEFT_ELBOW: 13,    RIGHT_ELBOW: 14,
+    LEFT_WRIST: 15,    RIGHT_WRIST: 16,
+    LEFT_HIP: 23,      RIGHT_HIP: 24
+};
+
+// Hand landmark indices. Each finger is [MCP, PIP, DIP, TIP]; the thumb
+// is [CMC, MCP, IP, TIP] and so maps onto Thumb1/2/3 one joint shifted.
+const HAND = {
+    WRIST: 0,
+    THUMB: [1, 2, 3, 4],
+    index: [5, 6, 7, 8],
+    mid:   [9, 10, 11, 12],
+    ring:  [13, 14, 15, 16],
+    pinky: [17, 18, 19, 20],
+    INDEX_MCP: 5,
+    MIDDLE_MCP: 9,
+    PINKY_MCP: 17
+};
+
+// ======================================================
+// MEDIAPIPE SPACE -> THREE.JS SPACE
+//
+// MediaPipe: +x right across the image, +y DOWN the image, +z away from
+// the camera. Three.js: +x right, +y UP, +z towards the viewer.
+// So y and z both flip; x is already correct.
+//
+// Image-space landmarks are normalised separately by width and height,
+// which stretches x by the frame's aspect ratio. pose_world is already
+// in metres and needs no correction.
+// ======================================================
+const mirrorXInput = document.getElementById("mirrorX");
+const flipZInput = document.getElementById("flipZ");
+
+function mpVector(p, imageSpace, target) {
+    const stretch = imageSpace ? aspect : 1;
+    const v = target || new THREE.Vector3();
+
+    v.set(p.x * stretch, -p.y, -p.z * stretch);
+
+    if (mirrorXInput.checked) v.x = -v.x;
+    if (flipZInput.checked) v.z = -v.z;
+
+    return v;
+}
+
+// Negating a single axis turns a right-handed basis into a left-handed
+// one, which flips the sign of every cross product -- including the palm
+// normal. Two negations cancel. Track that parity so the palm frame
+// stays correct whichever way the toggles are set.
+function handednessParity() {
+    let parity = 1;
+    if (mirrorXInput.checked) parity = -parity;
+    if (flipZInput.checked) parity = -parity;
+    return parity;
+}
+
+// ======================================================
+// REST POSE (ARMS)
+//
+// A bone's rest direction is the offset to its child, expressed in the
+// PARENT's frame: the child's local offset rotated by the bone's own
+// rest rotation. Targets get converted into that same frame, so the two
+// are directly comparable.
+// ======================================================
+function saveRestPose(key) {
+    const bone = bones[key];
+    if (!bone) return;
+
+    const childName = BONES[key].child;
+    const child = bone.children.find(c => c.isBone && c.name === childName);
+
+    if (!child) {
+        console.warn(`No child "${childName}" under ${bone.name}`);
+        return;
+    }
+
+    const quaternion = bone.quaternion.clone();
+
+    const direction = child.position
+        .clone()
+        .normalize()
+        .applyQuaternion(quaternion)
+        .normalize();
+
+    restPose[key] = { quaternion, direction };
+}
+
+// ======================================================
+// AIM A BONE ALONG A DIRECTION  (arms)
+// ======================================================
+const _parentQuaternion = new THREE.Quaternion();
+const _desired = new THREE.Quaternion();
+
+function pointBone(key, targetDirection, snap) {
+    const bone = bones[key];
+    const rest = restPose[key];
+
+    if (!bone || !rest) return;
+    if (targetDirection.lengthSq() < 1e-8) return;
+
+    targetDirection.normalize();
+
+    // The target is in scene space; the rest direction is in the bone's
+    // parent frame. Bring the target into that frame before comparing.
+    if (bone.parent) {
+        bone.parent.getWorldQuaternion(_parentQuaternion).invert();
+    } else {
+        _parentQuaternion.identity();
+    }
+
+    const targetLocal = targetDirection
+        .clone()
+        .applyQuaternion(_parentQuaternion)
+        .normalize();
+
+    // Shortest-arc rotation from where the bone rests to where it should
+    // point, then re-apply the rest orientation so Jake's own roll and
+    // joint offsets survive.
+    _desired
+        .setFromUnitVectors(rest.direction, targetLocal)
+        .multiply(rest.quaternion);
+
+    if (snap) {
+        bone.quaternion.copy(_desired);
+    } else {
+        bone.quaternion.slerp(_desired, SMOOTHING);
+    }
+}
+
+// ======================================================
+// HAND RIG
+//
+// Captured once, from the GLB's own rest pose, so nothing about the
+// finger axes is hardcoded.
+//
+// The curl axis is derived rather than assumed. Character Creator ships
+// its hands with a few degrees of natural bend already in them, and the
+// axis of that bend IS the flexion axis. Measuring it on all four
+// fingers and taking the dominant sign against Index1->Pinky1 gives the
+// direction "curl" means for this rig: it comes out at +0.82..+0.99 on
+// the left hand and -0.82..-0.99 on the right, i.e. the mirror image,
+// exactly as anatomy requires. That also fixes the palm normal, via
+//     palmNormal = curlAxis x forward
+// which points out of the palm on both hands -- confirmed by the thumb
+// sitting on that side of the plane in the rest pose.
+// ======================================================
+const handRigs = {};
+
+function captureHandRig(side) {
+    const prefix = `CC_Base_${side === "left" ? "L" : "R"}_`;
+    const hand = model.getObjectByName(`${prefix}Hand`);
+
+    if (!hand) {
+        console.warn("MISSING BONE:", `${prefix}Hand`);
+        return;
+    }
+
+    const boneOf = n => model.getObjectByName(prefix + n);
+    const worldOf = b => b.getWorldPosition(new THREE.Vector3());
+
+    // ---- Jake's palm frame, in the hand bone's own local space ------
+    const mid1 = boneOf("Mid1");
+    const index1 = boneOf("Index1");
+    const pinky1 = boneOf("Pinky1");
+
+    if (!mid1 || !index1 || !pinky1) {
+        console.warn("MISSING finger roots under", hand.name);
+        return;
+    }
+
+    const forwardLocal = mid1.position.clone().normalize();
+    const sideLocal = pinky1.position.clone()
+        .sub(index1.position).normalize();
+
+    // ---- which way does this hand curl? ----------------------------
+    // Read it off the residual bend baked into the rest pose.
+    const handWorldQ = hand.getWorldQuaternion(new THREE.Quaternion());
+    const sideWorld = sideLocal.clone().applyQuaternion(handWorldQ).normalize();
+
+    let vote = 0;
+    for (const finger of FINGERS) {
+        const n = FINGER_BONE[finger];
+        const a = boneOf(`${n}1`), b = boneOf(`${n}2`), c = boneOf(`${n}3`);
+        if (!a || !b || !c) continue;
+
+        const d1 = worldOf(b).sub(worldOf(a)).normalize();
+        const d2 = worldOf(c).sub(worldOf(b)).normalize();
+        vote += new THREE.Vector3().crossVectors(d1, d2).dot(sideWorld);
+    }
+
+    const curlSign = vote >= 0 ? 1 : -1;
+
+    // ---- orthonormal palm basis, in hand-local space ---------------
+    const curlLocal = sideLocal.clone().multiplyScalar(curlSign).normalize();
+    const normalLocal = new THREE.Vector3()
+        .crossVectors(curlLocal, forwardLocal).normalize();
+    curlLocal.crossVectors(forwardLocal, normalLocal).normalize();
+
+    const rig = {
+        side,
+        hand,
+        restQuaternion: hand.quaternion.clone(),
+        forwardLocal,
+        curlLocal,
+        normalLocal,
+        curlSign,
+        // rest basis as a rotation matrix, hand-local -> palm frame
+        restBasis: new THREE.Matrix4().makeBasis(
+            curlLocal, forwardLocal, normalLocal
+        ),
+        fingers: {},
+        thumb: null
+    };
+
+    // ---- per-bone flexion axes -------------------------------------
+    // Flexion leaves its own axis invariant, so the curl axis expressed
+    // in each successive bone's PARENT frame is just the previous one
+    // pushed through that bone's rest rotation. Walk the chain once.
+    function chainAxes(boneNames) {
+        const out = [];
+        let curl = curlLocal.clone();      // in the parent's frame
+        let normal = normalLocal.clone();
+
+        for (const name of boneNames) {
+            const bone = boneOf(name);
+            if (!bone) { out.push(null); continue; }
+
+            out.push({
+                bone,
+                rest: bone.quaternion.clone(),
+                curlAxis: curl.clone(),
+                spreadAxis: normal.clone()
+            });
+
+            const inv = bone.quaternion.clone().invert();
+            curl = curl.clone().applyQuaternion(inv).normalize();
+            normal = normal.clone().applyQuaternion(inv).normalize();
+        }
+        return out;
+    }
+
+    // ---- fingers ----------------------------------------------------
+    const forwardWorld = forwardLocal.clone()
+        .applyQuaternion(handWorldQ).normalize();
+    const curlWorld = curlLocal.clone()
+        .applyQuaternion(handWorldQ).normalize();
+    const normalWorld = normalLocal.clone()
+        .applyQuaternion(handWorldQ).normalize();
+
+    for (const finger of FINGERS) {
+        const n = FINGER_BONE[finger];
+        const joints = chainAxes([`${n}1`, `${n}2`, `${n}3`]);
+        if (joints.some(j => !j)) continue;
+
+        const a = worldOf(joints[0].bone);
+        const b = worldOf(joints[1].bone);
+        const c = worldOf(joints[2].bone);
+
+        const d1 = b.clone().sub(a);
+        const d2 = c.clone().sub(b);
+
+        // Jake is not perfectly flat at rest. Measure the bend he
+        // already has so a MediaPipe reading of "straight" lands on
+        // Jake's own straight rather than adding to it.
+        const rest1 = swingAngles(d1, curlWorld, forwardWorld, normalWorld);
+
+        rig.fingers[finger] = {
+            joints,
+            restMcpFlex: rest1.flex,
+            restMcpSpread: rest1.spread,
+            restPipFlex: hingeAngle(d1, d2, curlWorld),
+            // Index3/Mid3/... are leaf bones with no child, so the rig
+            // states no distal bend to subtract.
+            restDipFlex: 0
+        };
+    }
+
+    // ---- thumb ------------------------------------------------------
+    const thumbJoints = chainAxes(["Thumb1", "Thumb2", "Thumb3"]);
+    if (!thumbJoints.some(j => !j)) {
+        const a = worldOf(thumbJoints[0].bone);
+        const b = worldOf(thumbJoints[1].bone);
+        const c = worldOf(thumbJoints[2].bone);
+
+        const d0 = b.clone().sub(a).normalize();
+
+        rig.thumb = {
+            joints: thumbJoints,
+            // Thumb1 is aimed rather than hinged: the CMC joint swings
+            // in two axes at once and a single flexion angle cannot
+            // describe it. Its rest direction is stored in the hand's
+            // own frame so the aim can be rebuilt from the palm basis.
+            restDirLocal: new THREE.Vector3(
+                d0.dot(curlWorld), d0.dot(forwardWorld), d0.dot(normalWorld)
+            ),
+            restMcpFlex: hingeAngle(
+                b.clone().sub(a), c.clone().sub(b), curlWorld),
+            restIpFlex: 0
+        };
+    }
+
+    handRigs[side] = rig;
+}
+
+// ======================================================
+// JOINT ANGLE MEASUREMENT
+//
+// Two different measurements, because MCP and PIP/DIP are different
+// joints. Angles rather than positions throughout: MediaPipe's
+// per-landmark depth is its weakest signal, and copying XYZ straight
+// onto a phalanx turns that noise into a visibly broken hand.
+//
+// swingAngles -- the MCP is a ball joint, so its direction decomposes
+// into flexion (elevation out of the palm plane) and spread (fan within
+// it). Measuring flexion as elevation, rather than as an angle inside a
+// projected plane, is what keeps it stable: a finger folded into the
+// palm has almost no projection left to measure, and the naive version
+// reports spreads of -100 degrees for a fist. `planar` reports how much
+// signal the spread reading actually had, so the caller can fade it.
+//
+// hingeAngle -- PIP and DIP are one-way hinges. The angle between the
+// two segments is well conditioned at every pose, so take it whole and
+// only borrow the sign from the curl axis.
+// ======================================================
+const _sw = { flex: 0, spread: 0, planar: 0 };
+const _d = new THREE.Vector3();
+const _h1 = new THREE.Vector3();
+const _h2 = new THREE.Vector3();
+const _cross = new THREE.Vector3();
+
+function swingAngles(direction, curl, forward, normal) {
+    _d.copy(direction);
+    if (_d.lengthSq() < 1e-12) {
+        _sw.flex = 0; _sw.spread = 0; _sw.planar = 1;
+        return _sw;
+    }
+    _d.normalize();
+
+    const alongCurl = _d.dot(curl);
+    const alongForward = _d.dot(forward);
+    const alongNormal = _d.dot(normal);
+
+    _sw.planar = Math.hypot(alongCurl, alongForward);
+    _sw.flex = Math.atan2(alongNormal, _sw.planar);
+    _sw.spread = Math.atan2(-alongCurl, alongForward);
+
+    return _sw;
+}
+
+// Spread is only meaningful on a reasonably open hand. As a finger folds
+// into the palm the in-plane component it is measured from shrinks
+// towards nothing, and what is left is mostly noise -- a closing fist
+// was reading as all four fingers fanned 23 degrees sideways. Trust it
+// fully below about 37 degrees of flexion, not at all past about 63, and
+// ramp between. Nobody can see finger spread inside a fist anyway.
+function spreadConfidence(planar) {
+    const t = Math.min(1, Math.max(0, (planar - 0.45) / 0.35));
+    return t * t * (3 - 2 * t);
+}
+
+function hingeAngle(v1, v2, axis) {
+    _h1.copy(v1);
+    _h2.copy(v2);
+    if (_h1.lengthSq() < 1e-12 || _h2.lengthSq() < 1e-12) return 0;
+
+    _h1.normalize();
+    _h2.normalize();
+    _cross.crossVectors(_h1, _h2);
+
+    const angle = Math.acos(Math.min(1, Math.max(-1, _h1.dot(_h2))));
+    return _cross.dot(axis) >= 0 ? angle : -angle;
+}
+
+function clamp(value, range) {
+    return Math.min(range[1], Math.max(range[0], value));
+}
+
+// ======================================================
+// PALM FRAME FROM MEDIAPIPE
+//
+// Requirement: the wrist is NOT solved from elbow->wrist. The palm is a
+// plane, and three points on it define an orientation that a single
+// direction cannot -- elbow->wrist says nothing about whether the palm
+// faces up or down.
+// ======================================================
+const _lm = [];
+for (let i = 0; i < 21; i++) _lm.push(new THREE.Vector3());
+
+function palmFrame(landmarks, curlSign) {
+    for (let i = 0; i < 21; i++) mpVector(landmarks[i], true, _lm[i]);
+
+    const wrist = _lm[HAND.WRIST];
+    const indexMcp = _lm[HAND.INDEX_MCP];
+    const middleMcp = _lm[HAND.MIDDLE_MCP];
+    const pinkyMcp = _lm[HAND.PINKY_MCP];
+
+    // Towards the knuckles. Averaging index/middle/pinky MCP is steadier
+    // than any single landmark.
+    const forward = new THREE.Vector3()
+        .addVectors(indexMcp, pinkyMcp)
+        .addScaledVector(middleMcp, 2)
+        .multiplyScalar(0.25)
+        .sub(wrist);
+
+    if (forward.lengthSq() < 1e-10) return null;
+    forward.normalize();
+
+    // Across the knuckles, index -> pinky: the same semantic as Jake's
+    // Index1 -> Pinky1, so the same curl sign applies to both.
+    const across = new THREE.Vector3().subVectors(pinkyMcp, indexMcp);
+    if (across.lengthSq() < 1e-10) return null;
+
+    const curl = across.normalize().multiplyScalar(curlSign * handednessParity());
+
+    const normal = new THREE.Vector3().crossVectors(curl, forward);
+    if (normal.lengthSq() < 1e-10) return null;
+    normal.normalize();
+
+    curl.crossVectors(forward, normal).normalize();
+
+    return { wrist: wrist.clone(), forward, curl, normal };
+}
+
+// ======================================================
+// WRIST / PALM ORIENTATION
+// ======================================================
+const _targetBasis = new THREE.Matrix4();
+const _targetQuat = new THREE.Quaternion();
+const _restBasisQuat = new THREE.Quaternion();
+const _offsetEuler = new THREE.Euler();
+const _offsetQuat = new THREE.Quaternion();
+const _handParentQuat = new THREE.Quaternion();
+
+function applyPalm(rig, frame, snap) {
+    const cal = CALIBRATION[rig.side];
+
+    // Rotation that carries Jake's rest palm basis onto MediaPipe's.
+    _targetBasis.makeBasis(frame.curl, frame.forward, frame.normal);
+    _targetQuat.setFromRotationMatrix(_targetBasis);
+
+    _restBasisQuat.setFromRotationMatrix(rig.restBasis).invert();
+
+    // desired world orientation of the hand bone
+    _targetQuat.multiply(_restBasisQuat);
+
+    // world -> the hand bone's parent frame (the forearm, already posed)
+    rig.hand.parent.getWorldQuaternion(_handParentQuat).invert();
+    _targetQuat.premultiply(_handParentQuat);
+
+    // calibration trim, in the hand's own frame
+    _offsetEuler.set(
+        cal.WRIST_X_OFFSET, cal.WRIST_Y_OFFSET, cal.WRIST_Z_OFFSET, "XYZ"
+    );
+    _offsetQuat.setFromEuler(_offsetEuler);
+    _targetQuat.multiply(_offsetQuat);
+
+    if (snap) {
+        rig.hand.quaternion.copy(_targetQuat);
+    } else {
+        rig.hand.quaternion.slerp(_targetQuat, HAND_SMOOTHING);
+    }
+}
+
+// ======================================================
+// FINGER FLEXION
+//
+// Angles, not positions. MediaPipe's per-landmark depth is its weakest
+// signal, and copying XYZ straight onto a phalanx turns that noise into
+// a visibly broken hand. A joint ANGLE is dominated by the in-plane
+// component, so it survives bad z -- and a hinge rotation about the
+// rig's own flexion axis can only produce poses a real hand can hold.
+// ======================================================
+const _jointQuat = new THREE.Quaternion();
+const _spreadQuat = new THREE.Quaternion();
+const _v1 = new THREE.Vector3();
+const _v2 = new THREE.Vector3();
+const _v3 = new THREE.Vector3();
+
+function setJoint(joint, flex, spread, snap) {
+    _jointQuat.setFromAxisAngle(joint.curlAxis, flex);
+
+    if (spread) {
+        _spreadQuat.setFromAxisAngle(joint.spreadAxis, spread);
+        _jointQuat.premultiply(_spreadQuat);
+    }
+
+    _jointQuat.multiply(joint.rest);
+
+    if (snap) {
+        joint.bone.quaternion.copy(_jointQuat);
+    } else {
+        joint.bone.quaternion.slerp(_jointQuat, FINGER_SMOOTHING);
+    }
+}
+
+function applyFingers(rig, frame, snap, readout) {
+    const cal = CALIBRATION[rig.side];
+    const { forward, curl, normal } = frame;
+
+    for (const finger of FINGERS) {
+        const data = rig.fingers[finger];
+        if (!data) continue;
+
+        const [mcp, pip, dip, tip] = HAND[finger].map(i => _lm[i]);
+        const scale = cal.FINGER_CURL_SCALE * (FINGER_TRIM[finger] || 1);
+
+        _v1.subVectors(pip, mcp);
+        _v2.subVectors(dip, pip);
+        _v3.subVectors(tip, dip);
+
+        // MCP: flexion out of the palm plane, plus spread within it.
+        const swing = swingAngles(_v1, curl, forward, normal);
+
+        const mcpFlex = clamp(
+            (swing.flex - data.restMcpFlex) * scale,
+            LIMITS.mcpFlex
+        );
+        const mcpSpread = clamp(
+            (swing.spread - data.restMcpSpread - cal.FINGER_SPREAD_BIAS)
+                * spreadConfidence(swing.planar) * cal.FINGER_SPREAD_SCALE,
+            LIMITS.mcpSpread
+        );
+
+        // PIP and DIP are pure hinges, measured between segments.
+        const pipFlex = clamp(
+            (hingeAngle(_v1, _v2, curl) - data.restPipFlex) * scale,
+            LIMITS.pipFlex
+        );
+        const dipFlex = clamp(
+            (hingeAngle(_v2, _v3, curl) - data.restDipFlex) * scale,
+            LIMITS.dipFlex
+        );
+
+        setJoint(data.joints[0], mcpFlex, mcpSpread, snap);
+        setJoint(data.joints[1], pipFlex, 0, snap);
+        setJoint(data.joints[2], dipFlex, 0, snap);
+
+        if (readout) {
+            readout[finger] = [mcpFlex, pipFlex, dipFlex, mcpSpread];
+        }
+    }
+
+    // ---- thumb ------------------------------------------------------
+    // Separate on purpose. The carpometacarpal joint rotates on axes the
+    // other four do not have, so Thumb1 is AIMED using the palm basis
+    // instead of hinged, and only Thumb2/Thumb3 are treated as hinges.
+    const thumb = rig.thumb;
+    if (!thumb) return;
+
+    const [cmc, mcpT, ip, tipT] = HAND.THUMB.map(i => _lm[i]);
+
+    _v1.subVectors(mcpT, cmc);
+    if (_v1.lengthSq() > 1e-10) {
+        _v1.normalize();
+
+        // Decompose the aim in the palm basis so spread (across the
+        // palm) and curl (into the palm) get their own scale knobs.
+        const rest = thumb.restDirLocal;
+        const aCurl = rest.x + (_v1.dot(curl) - rest.x) * cal.THUMB_SPREAD_SCALE;
+        const aFwd = _v1.dot(forward);
+        const aNorm = rest.z + (_v1.dot(normal) - rest.z) * cal.THUMB_CURL_SCALE;
+
+        _v2.copy(curl).multiplyScalar(aCurl)
+            .addScaledVector(forward, aFwd)
+            .addScaledVector(normal, aNorm);
+
+        if (_v2.lengthSq() > 1e-10) {
+            aimJoint(thumb.joints[0], _v2.normalize(), rig, snap);
+        }
+    }
+
+    _v1.subVectors(mcpT, cmc);
+    _v2.subVectors(ip, mcpT);
+    _v3.subVectors(tipT, ip);
+
+    const thumbMcp = clamp(
+        (hingeAngle(_v1, _v2, curl) - thumb.restMcpFlex)
+            * cal.THUMB_CURL_SCALE,
+        LIMITS.thumbFlex
+    );
+    const thumbIp = clamp(
+        (hingeAngle(_v2, _v3, curl) - thumb.restIpFlex)
+            * cal.THUMB_CURL_SCALE,
+        LIMITS.thumbFlex
+    );
+
+    setJoint(thumb.joints[1], thumbMcp, 0, snap);
+    setJoint(thumb.joints[2], thumbIp, 0, snap);
+
+    if (readout) readout.thumb = [thumbMcp, thumbIp];
+}
+
+// ======================================================
+// IS THIS DETECTION PHYSICALLY POSSIBLE?
+//
+// Take the median PIP bend across the four fingers. One finger reading
+// backwards is noise; all four reading backwards means the detection has
+// the hand inside out.
+// ======================================================
+const _pipBends = [];
+
+function medianPipBend(rig, frame) {
+    _pipBends.length = 0;
+
+    for (const finger of FINGERS) {
+        if (!rig.fingers[finger]) continue;
+
+        const [mcp, pip, dip] = HAND[finger].map(i => _lm[i]);
+        _v1.subVectors(pip, mcp);
+        _v2.subVectors(dip, pip);
+        _pipBends.push(hingeAngle(_v1, _v2, frame.curl));
+    }
+
+    if (!_pipBends.length) return 0;
+
+    _pipBends.sort((a, b) => a - b);
+    const middle = _pipBends.length >> 1;
+
+    return _pipBends.length % 2
+        ? _pipBends[middle]
+        : (_pipBends[middle - 1] + _pipBends[middle]) / 2;
+}
+
+// ======================================================
+// AIM ONE FINGER JOINT (used for the thumb's CMC)
+// ======================================================
+const _aimParent = new THREE.Quaternion();
+const _aimQuat = new THREE.Quaternion();
+const _aimTarget = new THREE.Vector3();
+const _aimRestDir = new THREE.Vector3();
+
+function aimJoint(joint, targetWorld, rig, snap) {
+    const bone = joint.bone;
+    const child = bone.children.find(c => c.isBone);
+    if (!child) return;
+
+    bone.parent.getWorldQuaternion(_aimParent).invert();
+    _aimTarget.copy(targetWorld).applyQuaternion(_aimParent).normalize();
+
+    _aimRestDir.copy(child.position).normalize()
+        .applyQuaternion(joint.rest).normalize();
+
+    _aimQuat.setFromUnitVectors(_aimRestDir, _aimTarget).multiply(joint.rest);
+
+    if (snap) {
+        bone.quaternion.copy(_aimQuat);
+    } else {
+        bone.quaternion.slerp(_aimQuat, FINGER_SMOOTHING);
+    }
+}
+
+// ======================================================
+// RELAX A HAND BACK TO REST
+//
+// MediaPipe loses the hands on 5 of the 51 frames in this clip. Holding
+// the last pose looks like a freeze; snapping to rest looks like a
+// twitch. Easing back is the least distracting of the three.
+// ======================================================
+function relaxHand(rig, snap) {
+    const ease = snap ? 1 : FINGER_SMOOTHING;
+
+    rig.hand.quaternion.slerp(rig.restQuaternion, snap ? 1 : HAND_SMOOTHING);
+
+    for (const finger of FINGERS) {
+        const data = rig.fingers[finger];
+        if (!data) continue;
+        for (const joint of data.joints) {
+            joint.bone.quaternion.slerp(joint.rest, ease);
+        }
+    }
+
+    if (rig.thumb) {
+        for (const joint of rig.thumb.joints) {
+            joint.bone.quaternion.slerp(joint.rest, ease);
+        }
+    }
+}
+
+// ======================================================
+// APPLY ONE FRAME
+// ======================================================
+const debugState = { frame: 0, hands: {} };
+
+function applyFrame(frame, snap) {
+    if (!frame) return;
+
+    const pose = usingWorld ? frame.pose_world : frame.pose;
+    if (!pose || pose.length < 25) return;
+
+    const imageSpace = !usingWorld;
+    const at = i => mpVector(pose[i], imageSpace);
+
+    // ---- arms -----------------------------------------------------
+    // Each chain is upper arm first, then forearm: the forearm's target
+    // is resolved through the upper arm's freshly updated world matrix,
+    // so the parent has to be committed before the child is aimed.
+    const chains = [
+        { upper: "leftUpperArm",  fore: "leftForearm",
+          shoulder: MP.LEFT_SHOULDER,  elbow: MP.LEFT_ELBOW,  wrist: MP.LEFT_WRIST  },
+        { upper: "rightUpperArm", fore: "rightForearm",
+          shoulder: MP.RIGHT_SHOULDER, elbow: MP.RIGHT_ELBOW, wrist: MP.RIGHT_WRIST }
+    ];
+
+    for (const chain of chains) {
+        const shoulder = at(chain.shoulder);
+        const elbow = at(chain.elbow);
+        const wrist = at(chain.wrist);
+
+        pointBone(chain.upper, elbow.clone().sub(shoulder), snap);
+        model.updateMatrixWorld(true);
+
+        pointBone(chain.fore, wrist.clone().sub(elbow), snap);
+        model.updateMatrixWorld(true);
+    }
+
+    // ---- hands ----------------------------------------------------
+    const hands = [
+        { side: "left",  data: frame.left_hand  },
+        { side: "right", data: frame.right_hand }
+    ];
+
+    for (const entry of hands) {
+        const rig = handRigs[entry.side];
+        if (!rig) continue;
+
+        if (!entry.data || entry.data.length !== 21) {
+            relaxHand(rig, snap);
+            debugState.hands[entry.side] = null;
+            continue;
+        }
+
+        const frameBasis = palmFrame(entry.data, rig.curlSign);
+        if (!frameBasis) {
+            relaxHand(rig, snap);
+            debugState.hands[entry.side] = null;
+            continue;
+        }
+
+        // Reject an impossible fit before it reaches the rig. Holding
+        // whatever the hand last did is far less distracting than a
+        // handshape bent inside out for two frames.
+        const bend = medianPipBend(rig, frameBasis);
+        if (bend < REJECT_PIP_BEND) {
+            const previous = debugState.hands[entry.side];
+            debugState.hands[entry.side] = previous
+                ? { ...previous, rejected: true }
+                : { rejected: true, basis: frameBasis, fingers: {},
+                    quaternion: rig.hand.quaternion.clone() };
+            continue;
+        }
+
+        // Palm first: the fingers hang off the hand bone, so it has to
+        // be committed before their world axes mean anything.
+        applyPalm(rig, frameBasis, snap);
+        model.updateMatrixWorld(true);
+
+        const readout = {};
+        applyFingers(rig, frameBasis, snap, readout);
+
+        debugState.hands[entry.side] = {
+            basis: frameBasis,
+            quaternion: rig.hand.quaternion.clone(),
+            fingers: readout,
+            rejected: false
+        };
+    }
+
+    model.updateMatrixWorld(true);
+
+    if (debugOn) updateDebug();
+}
+
+// ======================================================
+// RESET
+// ======================================================
+function resetModel() {
+    playing = false;
+    currentFrame = -1;
+
+    for (const key in restPose) {
+        bones[key].quaternion.copy(restPose[key].quaternion);
+    }
+
+    for (const side in handRigs) relaxHand(handRigs[side], true);
+
+    if (model) model.updateMatrixWorld(true);
+
+    if (motion && motion.frames.length) {
+        applyFrame(motion.frames[0], true);
+        currentFrame = 0;
+    }
+
+    referenceVideo.pause();
+    referenceVideo.currentTime = 0;
+
+    setStatus("Reset — press Play sign");
+}
+
+// ======================================================
+// LOADING
+// ======================================================
+async function loadMotion() {
+    const response = await fetch("./motion.json");
+    if (!response.ok) throw new Error(`motion.json: HTTP ${response.status}`);
+
+    motion = await response.json();
+
+    fps = motion.fps || 30;
+    aspect = (motion.width && motion.height) ? motion.width / motion.height : 1;
+    usingWorld = motion.frames.some(f => f.pose_world);
+
+    console.log(
+        `motion.json: ${motion.frames.length} frames @ ${fps}fps, ` +
+        `${usingWorld ? "pose_world (metres)" : "pose (image space)"}, ` +
+        `aspect ${aspect.toFixed(2)}`
+    );
+}
+
+function loadModel() {
+    return new Promise((resolve, reject) => {
+        new GLTFLoader().load("./jakke.glb", gltf => {
+            model = gltf.scene;
+            scene.add(model);
+            applyFacing();
+            model.updateMatrixWorld(true);
+
+            for (const key in BONES) {
+                bones[key] = model.getObjectByName(BONES[key].name);
+                if (!bones[key]) console.warn("MISSING BONE:", BONES[key].name);
+            }
+
+            for (const key in BONES) saveRestPose(key);
+
+            captureHandRig("left");
+            captureHandRig("right");
+
+            for (const side in handRigs) {
+                const rig = handRigs[side];
+                console.log(
+                    `${side} hand: curlSign ${rig.curlSign > 0 ? "+" : "-"}1, ` +
+                    `${Object.keys(rig.fingers).length} fingers` +
+                    `${rig.thumb ? " + thumb" : ", NO THUMB"}`
+                );
+            }
+
+            buildDebugHelpers();
+            resolve();
+        }, undefined, reject);
+    });
+}
+
+// ======================================================
+// FACING
+// ======================================================
+const faceAwayInput = document.getElementById("faceAway");
+
+function applyFacing() {
+    if (model) model.rotation.y = faceAwayInput.checked ? Math.PI : 0;
+}
+
+// Re-pose immediately on toggle, so the effect is visible while paused
+// rather than only after the next Play.
+function refreshCurrentFrame() {
+    if (!model || !motion) return;
+    const index = currentFrame >= 0 ? currentFrame : 0;
+    applyFrame(motion.frames[index], true);
+}
+
+faceAwayInput.addEventListener("change", () => {
+    applyFacing();
+    if (model) model.updateMatrixWorld(true);
+    refreshCurrentFrame();
+});
+
+mirrorXInput.addEventListener("change", refreshCurrentFrame);
+flipZInput.addEventListener("change", refreshCurrentFrame);
+
+// ======================================================
+// DEBUG
+// ======================================================
+const debugToggle = document.getElementById("debugToggle");
+let debugOn = false;
+const debugArrows = {};
+
+function buildDebugHelpers() {
+    for (const side of ["left", "right"]) {
+        if (!handRigs[side]) continue;
+        debugArrows[side] = {
+            // red = across the knuckles (curl axis)
+            curl: arrow(0xff5566),
+            // green = towards the fingertips
+            forward: arrow(0x66ff88),
+            // blue = out of the palm
+            normal: arrow(0x6699ff)
+        };
+    }
+}
+
+function arrow(color) {
+    const a = new THREE.ArrowHelper(
+        new THREE.Vector3(0, 1, 0), new THREE.Vector3(), 0.09, color, 0.03, 0.02
+    );
+    a.visible = false;
+    scene.add(a);
+    return a;
+}
+
+function degrees(radians) {
+    return (radians * 180 / Math.PI).toFixed(0).padStart(4);
+}
+
+function updateDebug() {
+    const lines = [`frame  ${debugState.frame + 1} / ${motion ? motion.frames.length : "?"}`];
+
+    for (const side of ["left", "right"]) {
+        const rig = handRigs[side];
+        const state = debugState.hands[side];
+        const arrows = debugArrows[side];
+
+        lines.push("");
+        lines.push(
+            `${side.toUpperCase()} HAND` +
+            (!state ? "   (no landmarks)" : state.rejected ? "   (bad fit - held)" : "")
+        );
+
+        if (!state) {
+            if (arrows) for (const k in arrows) arrows[k].visible = false;
+            continue;
+        }
+
+        const q = state.quaternion;
+        lines.push(
+            `  wrist quat  ${q.x.toFixed(3)} ${q.y.toFixed(3)} ` +
+            `${q.z.toFixed(3)} ${q.w.toFixed(3)}`
+        );
+        lines.push("           MCP  PIP  DIP  spr");
+
+        for (const finger of FINGERS) {
+            const v = state.fingers[finger];
+            if (!v) continue;
+            lines.push(
+                `  ${finger.padEnd(6)} ${degrees(v[0])} ${degrees(v[1])} ` +
+                `${degrees(v[2])} ${degrees(v[3])}`
+            );
+        }
+        if (state.fingers.thumb) {
+            lines.push(
+                `  thumb  ${degrees(state.fingers.thumb[0])} ` +
+                `${degrees(state.fingers.thumb[1])}`
+            );
+        }
+
+        // palm axes, drawn at the wrist bone so they sit on the model
+        if (arrows && rig) {
+            const origin = rig.hand.getWorldPosition(new THREE.Vector3());
+            for (const [key, axis] of [
+                ["curl", state.basis.curl],
+                ["forward", state.basis.forward],
+                ["normal", state.basis.normal]
+            ]) {
+                arrows[key].position.copy(origin);
+                arrows[key].setDirection(axis);
+                arrows[key].visible = true;
+            }
+        }
+    }
+
+    debugElement.textContent = lines.join("\n");
+}
+
+function setDebug(on) {
+    debugOn = on;
+    debugToggle.checked = on;
+    debugElement.hidden = !on;
+
+    if (!on) {
+        for (const side in debugArrows) {
+            for (const k in debugArrows[side]) debugArrows[side][k].visible = false;
+        }
+    } else {
+        updateDebug();
+    }
+}
+
+debugToggle.addEventListener("change", () => setDebug(debugToggle.checked));
+
+window.addEventListener("keydown", e => {
+    if (e.key === "d" || e.key === "D") setDebug(!debugOn);
+});
+
+// ======================================================
+// STATUS
+// ======================================================
+function setStatus(text) {
+    statusElement.textContent = text;
+}
+
+// ======================================================
+// CONTROLS
+// ======================================================
+const loopInput = document.getElementById("loopToggle");
+
+document.getElementById("playButton").addEventListener("click", () => {
+    if (!motion || !model) return;
+
+    playing = true;
+    currentFrame = -1;
+    startTime = performance.now();
+
+    referenceVideo.currentTime = 0;
+    referenceVideo.play().catch(() => {});
+});
+
+document.getElementById("resetButton").addEventListener("click", resetModel);
+
+// ======================================================
+// ANIMATION LOOP
+// ======================================================
+function animate() {
+    requestAnimationFrame(animate);
+    controls.update();
+
+    if (playing && motion) {
+        const elapsed = (performance.now() - startTime) / 1000;
+        let index = Math.floor(elapsed * fps);
+
+        if (index >= motion.frames.length) {
+            if (loopInput.checked) {
+                startTime = performance.now();
+                index = 0;
+                referenceVideo.currentTime = 0;
+                referenceVideo.play().catch(() => {});
+            } else {
+                playing = false;
+                index = motion.frames.length - 1;
+                setStatus("Finished");
+            }
+        }
+
+        if (playing || index !== currentFrame) {
+            const frame = motion.frames[index];
+            debugState.frame = index;
+            applyFrame(frame, false);
+            currentFrame = index;
+
+            if (playing) {
+                const hands =
+                    (frame.left_hand ? "L" : "·") + (frame.right_hand ? "R" : "·");
+                setStatus(
+                    `${usingWorld ? "pose_world" : "pose"}  hands ${hands}\n` +
+                    `frame ${index + 1} / ${motion.frames.length}`
+                );
+            }
+        }
+    }
+
+    renderer.render(scene, camera);
+}
+
+// ======================================================
+// START
+// ======================================================
+async function start() {
+    // Render from the first tick: jakke.glb is tens of megabytes, and a
+    // black window for the length of that download reads as a broken page.
+    animate();
+
+    try {
+        setStatus("Loading Jake…");
+        await loadModel();
+
+        setStatus("Loading motion…");
+        await loadMotion();
+
+        applyFrame(motion.frames[0], true);
+        currentFrame = 0;
+        setStatus("Ready — press Play sign");
+    } catch (error) {
+        console.error(error);
+        setStatus("ERROR — see browser console");
+    }
+}
+
+// ======================================================
+// CONSOLE HOOK
+//
+// The calibration table above is only useful if it can be tried without
+// an edit-and-reload cycle. Everything here is live:
+//
+//   jake.calibration.right.FINGER_CURL_SCALE = 1.3
+//   jake.seek(29)                 // pose one frame, smoothing bypassed
+//   jake.focus("right")           // put the camera on that hand
+//   jake.focus(null)              // back to the whole figure
+//   jake.limits.pipFlex[1] = 2.2
+// ======================================================
+window.jake = {
+    calibration: CALIBRATION,
+    limits: LIMITS,
+    trim: FINGER_TRIM,
+
+    get rigs() { return handRigs; },
+    get bones() { return bones; },
+    get frame() { return currentFrame; },
+    get frameCount() { return motion ? motion.frames.length : 0; },
+
+    seek(index) {
+        if (!motion || !model) return null;
+        const i = Math.max(0, Math.min(motion.frames.length - 1, index | 0));
+
+        playing = false;
+        debugState.frame = i;
+
+        // Snap several times: the palm is solved before the fingers, so
+        // one pass leaves the finger axes reading a stale hand.
+        for (let pass = 0; pass < 4; pass++) {
+            applyFrame(motion.frames[i], true);
+        }
+
+        currentFrame = i;
+        referenceVideo.currentTime = i / fps;
+        setStatus(`frame ${i + 1} / ${motion.frames.length}`);
+        updateDebug();
+        return i;
+    },
+
+    focus(side, distance = 0.42) {
+        if (!side) {
+            camera.position.set(0, 1.42, 2.05);
+            controls.target.set(0, 1.30, 0);
+            controls.update();
+            return;
+        }
+        const rig = handRigs[side];
+        if (!rig) return;
+
+        // Stand off along +Z and a little to the outside, so the body
+        // never ends up between the camera and the hand.
+        const at = rig.hand.getWorldPosition(new THREE.Vector3());
+        const outward = side === "left" ? 1 : -1;
+
+        controls.target.copy(at);
+        camera.position.set(
+            at.x + outward * distance * 0.45,
+            at.y + distance * 0.30,
+            at.z + distance
+        );
+        controls.update();
+    },
+
+    debug(on) { setDebug(on !== false); }
+};
+
+start();
+
+window.addEventListener("resize", () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+});
+</script>
+</body>
+</html>

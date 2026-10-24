@@ -1,0 +1,106 @@
+{
+  "A": {
+    "motion": "assets/fingerspelling/motion/letter_A.json",
+    "video": "assets/fingerspelling/videos/letter_A.mp4"
+  },
+  "B": {
+    "motion": "assets/fingerspelling/motion/letter_B.json",
+    "video": "assets/fingerspelling/videos/letter_B.mp4"
+  },
+  "C": {
+    "motion": "assets/fingerspelling/motion/letter_C.json",
+    "video": "assets/fingerspelling/videos/letter_C.mp4"
+  },
+  "D": {
+    "motion": "assets/fingerspelling/motion/letter_D.json",
+    "video": "assets/fingerspelling/videos/letter_D.mp4"
+  },
+  "E": {
+    "motion": "assets/fingerspelling/motion/letter_E.json",
+    "video": "assets/fingerspelling/videos/letter_E.mp4"
+  },
+  "F": {
+    "motion": "assets/fingerspelling/motion/letter_F.json",
+    "video": "assets/fingerspelling/videos/letter_F.mp4"
+  },
+  "G": {
+    "motion": "assets/fingerspelling/motion/letter_G.json",
+    "video": "assets/fingerspelling/videos/letter_G.mp4"
+  },
+  "H": {
+    "motion": "assets/fingerspelling/motion/letter_H.json",
+    "video": "assets/fingerspelling/videos/letter_H.mp4"
+  },
+  "I": {
+    "motion": "assets/fingerspelling/motion/letter_I.json",
+    "video": "assets/fingerspelling/videos/letter_I.mp4"
+  },
+  "J": {
+    "motion": "assets/fingerspelling/motion/letter_J.json",
+    "video": "assets/fingerspelling/videos/letter_J.mp4"
+  },
+  "K": {
+    "motion": "assets/fingerspelling/motion/letter_K.json",
+    "video": "assets/fingerspelling/videos/letter_K.mp4"
+  },
+  "L": {
+    "motion": "assets/fingerspelling/motion/letter_L.json",
+    "video": "assets/fingerspelling/videos/letter_L.mp4"
+  },
+  "M": {
+    "motion": "assets/fingerspelling/motion/letter_M.json",
+    "video": "assets/fingerspelling/videos/letter_M.mp4"
+  },
+  "N": {
+    "motion": "assets/fingerspelling/motion/letter_N.json",
+    "video": "assets/fingerspelling/videos/letter_N.mp4"
+  },
+  "O": {
+    "motion": "assets/fingerspelling/motion/letter_O.json",
+    "video": "assets/fingerspelling/videos/letter_O.mp4"
+  },
+  "P": {
+    "motion": "assets/fingerspelling/motion/letter_P.json",
+    "video": "assets/fingerspelling/videos/letter_P.mp4"
+  },
+  "Q": {
+    "motion": "assets/fingerspelling/motion/letter_Q.json",
+    "video": "assets/fingerspelling/videos/letter_Q.mp4"
+  },
+  "R": {
+    "motion": "assets/fingerspelling/motion/letter_R.json",
+    "video": "assets/fingerspelling/videos/letter_R.mp4"
+  },
+  "S": {
+    "motion": "assets/fingerspelling/motion/letter_S.json",
+    "video": "assets/fingerspelling/videos/letter_S.mp4"
+  },
+  "T": {
+    "motion": "assets/fingerspelling/motion/letter_T.json",
+    "video": "assets/fingerspelling/videos/letter_T.mp4"
+  },
+  "U": {
+    "motion": "assets/fingerspelling/motion/letter_U.json",
+    "video": "assets/fingerspelling/videos/letter_U.mp4"
+  },
+  "V": {
+    "motion": "assets/fingerspelling/motion/letter_V.json",
+    "video": "assets/fingerspelling/videos/letter_V.mp4"
+  },
+  "W": {
+    "motion": "assets/fingerspelling/motion/letter_W.json",
+    "video": "assets/fingerspelling/videos/letter_W.mp4"
+  },
+  "X": {
+    "motion": "assets/fingerspelling/motion/letter_X.json",
+    "video": "assets/fingerspelling/videos/letter_X.mp4"
+  },
+  "Y": {
+    "motion": "assets/fingerspelling/motion/letter_Y.json",
+    "video": "assets/fingerspelling/videos/letter_Y.mp4"
+  },
+  "Z": {
+    "motion": "assets/fingerspelling/motion/letter_Z.json",
+    "video": "assets/fingerspelling/videos/letter_Z.mp4"
+  }
+}

@@ -91,7 +91,10 @@ check("resume from a transition: time moves on from the pause point",
 unreliable = J("Object.entries(auslan.lib.manifest.signs).find(([id,s])=>s.status==='unreliable' && s.keys[0].split(' ').length===1)")
 uid, ukey = unreliable[0], unreliable[1]["keys"][0].lower()
 J(f"auslan.say({ukey!r})"); wait_playing(); time.sleep(0.3)
-check(f"unreliable ({uid}) typed: fingerspelled", J("auslan.plan.steps[0].kind") == "spell", shape())
+# typed: never the unreliable sign -- fingerspelled, or a dictionary stand-in marked for review
+first = J("auslan.plan.steps[0]")
+check(f"unreliable ({uid}) typed: not played",
+      first.get("id") != uid and (first["kind"] == "spell" or first.get("uncertain")), shape())
 J(f"auslan.gloss({uid!r})"); wait_playing(); time.sleep(0.3)
 check("unreliable in a gloss line: fingerspelled", J("auslan.plan.steps[0].kind") == "spell", shape())
 check("unreliable not playing: no warning shown", J("document.getElementById('warn').hidden"))

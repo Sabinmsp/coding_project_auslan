@@ -34,7 +34,7 @@ experiments/   2d/ and 3d/ prior work, archived as-is -- not used by the app
 docs/          structure, pipeline, datasets, deploy, cleanup report
 ```
 
-Full map: [docs/PROJECT_STRUCTURE.md](docs/PROJECT_STRUCTURE.md).
+Full map: [docs/PROJECT_STRUCTURE.md](docs/PROJECT_STRUCTURE.md). Every file in the whole workspace, and what is safe to remove: [docs/WORKSPACE_MAP.md](docs/WORKSPACE_MAP.md).
 
 ## Common tasks
 

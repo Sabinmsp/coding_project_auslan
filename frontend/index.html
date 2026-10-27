@@ -32,7 +32,7 @@
              grid-template-areas: "input stage" "doc stage" "plan stage"; }
     .hero { grid-area: input; } #docpanel { grid-area: doc; } #planpanel { grid-area: plan; }
     #stagecol { grid-area: stage; position: sticky; top: 14px; }
-    .actions, #advanced, .notice { grid-column: 1 / -1; }
+    /* the Advanced button, its panel and the notice sit below the grid, so the sticky avatar never covers them */
 
     /* ---- header ---- */
     header { border-bottom: 1px solid var(--line); background: var(--surface); }
@@ -244,7 +244,8 @@
 
 <div id="announce" class="sr-only" aria-live="polite" role="status"
      style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden"></div>
-<main class="wrap shell">
+<main>
+<div class="wrap shell">
     <section class="hero">
         <h2>Turn text into sign animation</h2>
         <p>Type English, or upload a PDF. Recorded Auslan signs play on the figure.</p>
@@ -317,7 +318,9 @@
             <span id="count" aria-live="off">—</span>
         </div>
     </section>
+</div>
 
+<div class="wrap">
     <div class="actions">
         <span class="legend" aria-label="what the tiles mean"><span>✓ signed</span><span>⚠ check: best guess</span><span>ABC fingerspelled</span></span>
         <button class="btn" id="adv-toggle" aria-expanded="false" aria-controls="advanced">⚙ Advanced settings</button>
@@ -375,6 +378,7 @@
 
     <p class="notice">Prototype: signs are chosen automatically, some words are fingerspelled, and sign order and
         meaning may be imperfect. Not checked by a fluent Auslan signer. <button id="about-link">Learn more</button></p>
+</div>
 </main>
 
 <dialog id="about" aria-labelledby="about-title">
@@ -1226,6 +1230,7 @@ $("adv-toggle").addEventListener("click", () => {
     $("advanced").hidden = !open;
     $("adv-toggle").setAttribute("aria-expanded", String(open));
     $("adv-toggle").textContent = open ? "⚙ Hide advanced settings" : "⚙ Advanced settings";
+    if (open) $("advanced").scrollIntoView({ behavior: "smooth", block: "nearest" });
 });
 $("glossline").addEventListener("keydown", e => {
     if (e.key === "Enter") { e.preventDefault(); playGlossLine(); }

@@ -83,6 +83,12 @@ J("document.getElementById('adv-toggle').click()"); time.sleep(0.2)
 check("Advanced settings opens the gloss line, video, alternatives",
       all(visible(s) for s in ("#glossline", "#reference", "#alts")) and
       J("document.getElementById('adv-toggle').getAttribute('aria-expanded')") == "true")
+overlap = max(J(f"""(() => {{ scrollTo(0, {y}); const s = document.getElementById('stagecol').getBoundingClientRect(),
+    a = document.getElementById('advanced').getBoundingClientRect(); return s.bottom - a.top; }})()""") for y in range(0, 3000, 150))
+check("  the pinned avatar never covers the Advanced panel while scrolling", overlap <= 0, f"{overlap:.0f}px")
+check("  the panel opens directly under its button",
+      0 <= J("document.getElementById('advanced').getBoundingClientRect().top - document.getElementById('adv-toggle').getBoundingClientRect().bottom") < 40)
+J("scrollTo(0, 0)")
 J("document.getElementById('adv-toggle').click()"); time.sleep(0.2)
 check("and closes again", not visible("#glossline"))
 

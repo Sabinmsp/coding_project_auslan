@@ -28,6 +28,7 @@ if curl -s -o /dev/null "http://localhost:$PORT/"; then
     run "browser: controls + end-to-end" python3 tests/browser/test_controls.py "$PORT"
     run "browser: PDF -> key points -> signing" python3 tests/browser/test_document.py "$PORT"
     run "browser: motion-only playback (all MP4s blocked)" python3 tests/browser/test_motion_only.py "$PORT"
+    run "browser: main screen, advanced drawer, keyboard" python3 tests/browser/test_ui.py "$PORT"
 else
     echo "== browser tests SKIPPED: nothing on port $PORT (start: python3 backend/serve.py $PORT)"
 fi

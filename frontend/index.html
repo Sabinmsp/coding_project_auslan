@@ -7,217 +7,190 @@
      https://signs.example.com (set by build_dist.py --asset-base). The CDN
      must send Access-Control-Allow-Origin for the JSON files. -->
 <meta name="asset-base" content="">
-<title>SignBridge Auslan</title>
+<title>SignBridge</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='26' font-size='26'%3E%F0%9F%A4%9F%3C/text%3E%3C/svg%3E">
 <style>
     * { box-sizing: border-box; }
     :root {
-        --bg: #0e1015; --panel: #161920; --raised: #1d212a; --line: #2a303c; --line2: #3a4252;
-        --ink: #eef1f6; --dim: #9aa3b5; --faint: #6b7385;
-        --body: #7ee8c8; --left: #ff9b78; --right: #74b9ff; --accent: #3b7be0; --accent-ink: #fff;
-        --ok: #3fb68b; --warn: #e0a83a; --spell: #6d9be0; --bad: #e0675f;
-        --focus: #ffd75e;
-        --radius: 8px;
+        --bg: #0d0f14; --surface: #151922; --raised: #1c212c; --line: #2a3140; --line2: #3a4356;
+        --ink: #f1f4f9; --dim: #a2abbd; --faint: #707a8e;
+        --body: #7ee8c8; --left: #ff9b78; --right: #74b9ff; --accent: #4c8dff; --accent-ink: #fff;
+        --ok: #3fc191; --warn: #f0b440; --spell: #8fb3ff; --bad: #f07067; --focus: #ffd75e;
+        --radius: 14px;
     }
-    html, body { height: 100%; }
-    body {
-        margin: 0; background: var(--bg); color: var(--ink);
-        font: 14px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
-        display: grid; height: 100vh; height: 100dvh; overflow: hidden;
-        grid-template-columns: minmax(300px, 340px) minmax(0, 1fr) minmax(260px, 300px);
-        grid-template-rows: auto minmax(0, 1fr) auto;
-        grid-template-areas: "head head head" "left stage right" "left controls controls";
-    }
-    :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
-    button, select, input { font: inherit; color: inherit; }
+    html { background: var(--bg); }
+    body { margin: 0; background: var(--bg); color: var(--ink);
+           font: 16px/1.55 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Arial, sans-serif; }
+    :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+    button, select, input, textarea { font: inherit; color: inherit; }
     button { cursor: pointer; }
-    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    [hidden] { display: none !important; }
+    .wrap { max-width: 980px; margin: 0 auto; padding: 0 20px; }
 
-    /* ---- header --------------------------------------------------- */
-    header { grid-area: head; display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap;
-             padding: 10px 18px; border-bottom: 1px solid var(--line); background: var(--panel); }
-    header h1 { font-size: 16px; margin: 0; letter-spacing: .01em; }
-    header h1 span { color: var(--dim); font-weight: 500; }
-    #disclaimer { margin: 0; font-size: 12px; color: var(--dim); flex: 1; min-width: 240px; }
-    #libstat { margin: 0; font-size: 11.5px; color: var(--faint); }
+    /* ---- header ---- */
+    header { border-bottom: 1px solid var(--line); background: var(--surface); }
+    header .wrap { display: flex; align-items: center; gap: 12px; height: 60px; }
+    .brand { font-size: 20px; font-weight: 800; letter-spacing: -.01em; margin: 0; display: flex; align-items: center; gap: 8px; }
+    .brand .logo { width: 30px; height: 30px; border-radius: 8px; background: var(--accent); display: grid; place-items: center; font-size: 17px; }
+    .brand small { font-size: 12px; font-weight: 600; color: var(--warn); border: 1px solid var(--warn); border-radius: 999px; padding: 0 8px; }
+    header nav { margin-left: auto; display: flex; gap: 4px; }
+    .link { background: none; border: 0; color: var(--dim); padding: 8px 12px; border-radius: 8px; font-size: 15px; }
+    .link:hover { color: var(--ink); background: var(--raised); }
 
-    /* ---- side panels ---------------------------------------------- */
-    .panel { background: var(--panel); overflow-y: auto; padding: 14px 16px 18px; min-height: 0; }
-    #left { grid-area: left; border-right: 1px solid var(--line); }
-    #right { grid-area: right; border-left: 1px solid var(--line); }
-    .panel h2 { font-size: 11.5px; color: var(--dim); margin: 16px 0 7px; font-weight: 650;
-                letter-spacing: .07em; text-transform: uppercase; }
-    .panel h2:first-child { margin-top: 0; }
-    .panel h2 .tag { text-transform: none; letter-spacing: 0; font-weight: 500; font-size: 11px; color: var(--warn); margin-left: 4px; }
-    .hint { font-size: 11.5px; color: var(--dim); margin: 4px 0 0; }
+    /* ---- hero / input ---- */
+    .hero { text-align: center; padding: 22px 0 4px; }
+    .hero h2 { font-size: clamp(26px, 4vw, 36px); line-height: 1.2; margin: 0 0 6px; letter-spacing: -.02em; }
+    .hero p { color: var(--dim); margin: 0 0 14px; }
+    .inputcard { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; }
+    #sentence-input { width: 100%; min-height: 54px; resize: vertical; background: var(--raised); color: var(--ink);
+                      border: 1px solid var(--line2); border-radius: 10px; padding: 12px 14px; font-size: 18px; line-height: 1.45; }
+    #sentence-input::placeholder { color: var(--faint); }
+    .inputrow { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+    .btn { border: 1px solid transparent; border-radius: 10px; padding: 10px 18px; font-weight: 700; font-size: 15px;
+           background: var(--raised); color: var(--ink); border-color: var(--line2); }
+    .btn:hover { filter: brightness(1.15); }
+    .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+    .btn.big { padding: 13px 26px; font-size: 17px; }
+    #sentence-go { margin-left: auto; }
+    .examples { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; justify-content: center; margin-top: 14px; }
+    .examples::before { content: "Try:"; color: var(--faint); font-size: 14px; margin-right: 2px; }
+    .examples button { font-size: 14px; padding: 5px 12px; border-radius: 999px; border: 1px solid var(--line2);
+                       background: transparent; color: var(--dim); }
+    .examples button:hover { color: var(--ink); border-color: var(--accent); }
 
-    .sentbox { display: flex; gap: 6px; }
-    .field { flex: 1; min-width: 0; padding: 9px 11px; font-size: 14px; border: 1px solid var(--line2);
-             border-radius: var(--radius); background: var(--raised); color: var(--ink); }
-    .field::placeholder { color: var(--faint); }
-    .btn { padding: 8px 14px; font-size: 13.5px; font-weight: 650; border: 1px solid transparent;
-           border-radius: var(--radius); background: var(--accent); color: var(--accent-ink); white-space: nowrap; }
-    .btn:hover { filter: brightness(1.12); }
-    .btn.ghost { background: var(--raised); border-color: var(--line2); color: var(--ink); }
-    .btn[disabled] { opacity: .5; cursor: default; filter: none; }
-    .opts { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--dim); margin: 8px 0 0; }
-    .opts label { cursor: pointer; user-select: none; }
-    .examples { display: flex; flex-wrap: wrap; gap: 5px; }
-    .examples button { font-size: 12px; padding: 4px 9px; border-radius: 999px; border: 1px solid var(--line2);
-                       background: transparent; color: var(--ink); }
-    .examples button:hover { background: var(--raised); }
-
-    /* document */
-    .drop { display: block; border: 2px dashed var(--line2); border-radius: 10px; padding: 14px; text-align: center;
-            color: var(--dim); font-size: 13px; cursor: pointer; background: var(--raised); }
+    /* ---- document panel ---- */
+    #docpanel { margin-top: 14px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; }
+    #docpanel h3 { margin: 0 0 10px; font-size: 17px; }
+    .drop { display: block; position: relative; border: 2px dashed var(--line2); border-radius: 12px; padding: 18px; text-align: center;
+            color: var(--dim); cursor: pointer; background: var(--raised); }
     .drop:hover, .drop.over { border-color: var(--accent); color: var(--ink); }
     .drop strong { color: var(--ink); }
     .drop input { position: absolute; width: 1px; height: 1px; opacity: 0; }
-    .drop:focus-within { outline: 2px solid var(--focus); outline-offset: 2px; }
-    .docrow { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 8px; font-size: 12px; color: var(--dim); }
-    .docrow .btn { padding: 5px 10px; font-size: 12px; }
-    #docprog { width: 100%; height: 6px; margin-top: 8px; accent-color: var(--accent); }
-    #docprog[hidden] { display: none; }
-    #docmsg { font-size: 12.5px; margin-top: 6px; color: var(--dim); }
+    .drop:focus-within { outline: 3px solid var(--focus); outline-offset: 2px; }
+    .docrow { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 10px; font-size: 14px; color: var(--dim); }
+    #docprog { width: 100%; height: 8px; margin-top: 10px; accent-color: var(--accent); }
+    #docmsg { font-size: 14px; margin-top: 8px; color: var(--dim); }
     #docmsg.error { color: #ffb4ab; }
-    #docstats { font-size: 12.5px; margin: 8px 0 4px; }
+    #docstats { font-size: 15px; margin: 12px 0 8px; }
     #docstats b { color: var(--ink); }
-    #points { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
-    #points li { border: 1px solid var(--line); border-radius: 8px; background: var(--raised); padding: 7px 9px; }
+    #docstats .hint { font-size: 13px; color: var(--faint); }
+    #points { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+    #points li { border: 1px solid var(--line); border-radius: 10px; background: var(--raised); padding: 10px 12px; }
     #points li.active { border-color: var(--accent); }
-    #points .pt { display: block; width: 100%; text-align: left; background: none; border: 0; padding: 0;
-                  font-size: 13.5px; line-height: 1.4; color: var(--ink); }
-    #points .pt::before { content: "▶ "; color: var(--accent); font-size: 11px; }
-    #points .meta { font-size: 11px; color: var(--faint); margin-top: 3px; display: flex; gap: 8px; flex-wrap: wrap; }
+    #points .pt { display: block; width: 100%; text-align: left; background: none; border: 0; padding: 0; font-size: 16px; line-height: 1.45; }
+    #points .pt::before { content: "▶ "; color: var(--accent); font-size: 12px; }
+    #points .meta { font-size: 12.5px; color: var(--faint); margin-top: 4px; display: flex; gap: 10px; flex-wrap: wrap; }
     #points .flag { color: var(--warn); }
-    #points details { font-size: 11.5px; color: var(--dim); margin: 3px 0 0; border: 0; padding: 0; }
-    #points summary { font-size: 11px; text-transform: none; letter-spacing: 0; font-weight: 500; color: var(--faint); }
+    #points details { font-size: 13px; color: var(--dim); margin: 4px 0 0; }
 
-    /* plan chips */
+    /* ---- the stage (centre of the page) ---- */
+    #stagecol { margin-top: 14px; scroll-margin-top: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+    #captionbar { padding: 16px 20px 4px; text-align: center; min-height: 82px; }
+    #word { font-size: clamp(28px, 5vw, 44px); font-weight: 800; letter-spacing: .04em; text-transform: uppercase; line-height: 1.15;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    #sub { color: var(--dim); font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    #warn { margin: 6px 20px; padding: 8px 12px; border: 1px solid var(--bad); border-radius: 8px; background: #3a1d1d; color: #ffdcd6; font-size: 14px; }
+    #stage { position: relative; height: clamp(300px, 52vh, 600px); }
+    canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+    #status { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; color: var(--dim);
+              font-size: 16px; text-align: center; padding: 24px; }
+    .handkey { position: absolute; right: 14px; top: 8px; display: flex; flex-direction: column; align-items: flex-end; gap: 1px;
+               font-size: 12px; color: var(--faint); pointer-events: none; }
+    .handkey i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; vertical-align: -1px; }
+    #sentence { padding: 4px 20px 8px; font-size: 18px; text-align: center; min-height: 38px; }
+    #sentence .w { color: #5d6780; margin: 0 4px; }
+    #sentence .w.active { color: var(--ink); font-weight: 700; }
+
+    /* word strip: one tile per sign, ✓ signed / ABC fingerspelled / ⚠ check */
+    #steps { display: flex; gap: 6px; padding: 0 20px 14px; flex-wrap: wrap; justify-content: center; }
+    #steps button { min-width: 64px; max-width: 200px; border: 1px solid var(--line); border-radius: 10px; padding: 6px 12px 5px;
+                    background: var(--raised); color: var(--ink); display: flex; flex-direction: column; align-items: center; gap: 1px; }
+    #steps .lbl { font-weight: 700; font-size: 15px; letter-spacing: .03em; max-width: 176px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    #steps .ico { font-size: 12px; font-weight: 700; }
+    #steps .sign .ico { color: var(--ok); } #steps .check .ico { color: var(--warn); } #steps .spell .ico { color: var(--spell); }
+    #steps button.active { border-color: var(--accent); background: #22314d; }
+
+    /* ---- controls ---- */
+    #controls { border-top: 1px solid var(--line); padding: 12px 18px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: center; }
+    #controls .btn { min-width: 48px; min-height: 44px; }
+    #play { min-width: 110px; }
+    #scrub { flex: 1 1 200px; min-width: 140px; accent-color: var(--accent); height: 28px; }
+    #controls select { background: var(--raised); border: 1px solid var(--line2); border-radius: 8px; padding: 8px; }
+    #count { color: var(--dim); font-family: ui-monospace, monospace; font-size: 13px; min-width: 90px; text-align: right; }
+    label.toggle { color: var(--dim); font-size: 14px; cursor: pointer; user-select: none; }
+
+    .actions { display: flex; gap: 10px; justify-content: space-between; flex-wrap: wrap; margin: 16px 0; }
+    .notice { font-size: 13.5px; color: var(--faint); text-align: center; margin: 4px 0 28px; }
+    .notice button { background: none; border: 0; color: var(--dim); text-decoration: underline; padding: 0; font-size: inherit; }
+
+    /* ---- advanced ---- */
+    #advanced { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-bottom: 28px; }
+    .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; min-width: 0; }
+    .card h3 { font-size: 13px; color: var(--dim); text-transform: uppercase; letter-spacing: .07em; margin: 0 0 10px; }
+    .card h3 + * { margin-top: 0; }
+    .card.wide { grid-column: 1 / -1; }
+    .opts { display: grid; gap: 6px; font-size: 14.5px; color: var(--dim); }
+    .opts label { cursor: pointer; }
+    .hint { font-size: 13px; color: var(--faint); margin: 6px 0 0; }
+    #libstat { font-size: 13px; color: var(--faint); margin: 8px 0 0; }
     .plan { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 8px; }
-    .plan .empty { font-size: 12px; color: var(--faint); }
-    .chip { border: 1px solid var(--line); border-left-width: 4px; border-radius: 6px;
-            padding: 3px 7px 4px; background: var(--raised); max-width: 100%; }
-    .chip .en { display: block; font-size: 11px; color: var(--dim); line-height: 1.3;
-                white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 250px; }
-    .chip .st { font-weight: 650; color: var(--ink); }
-    .chip select { background: transparent; color: var(--ink); border: 0; padding: 0; max-width: 250px;
-                   font: 650 12.5px/1.35 ui-sans-serif, system-ui, sans-serif; cursor: pointer; }
+    .plan .empty { font-size: 14px; color: var(--faint); }
+    .chip { border: 1px solid var(--line); border-left-width: 4px; border-radius: 8px; padding: 4px 8px 5px; background: var(--raised); max-width: 100%; }
+    .chip .en { display: block; font-size: 12px; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 260px; }
+    .chip .st { font-weight: 700; color: var(--ink); }
+    .chip select { background: transparent; border: 0; padding: 0; max-width: 260px; font-weight: 700; font-size: 14px; }
     .chip select option { background: var(--raised); color: var(--ink); }
-    .chip.sign { border-left-color: var(--ok); }
-    .chip.spell { border-left-color: var(--spell); }
-    .chip.check { border-left-color: var(--warn); background: #2a2419; }
-    .chip.omit { opacity: .55; }
+    .chip.sign { border-left-color: var(--ok); } .chip.spell { border-left-color: var(--spell); }
+    .chip.check { border-left-color: var(--warn); } .chip.omit { opacity: .55; }
     .chip.omit select { text-decoration: line-through; }
     .chip.reviewed .en::after { content: " · chosen by you"; color: var(--ok); }
     .chip.active { outline: 2px solid var(--ink); outline-offset: 1px; }
-    .legend { display: flex; flex-wrap: wrap; gap: 2px 10px; font-size: 11px; color: var(--dim); }
-    .legend i { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
+    .legend { display: flex; flex-wrap: wrap; gap: 2px 12px; font-size: 12.5px; color: var(--dim); }
+    .legend i { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 4px; }
     .legend .sign { background: var(--ok); } .legend .check { background: var(--warn); }
     .legend .spell { background: var(--spell); } .legend .omit { background: #4a505c; }
-    .glabel { display: block; font-size: 11.5px; color: var(--dim); margin: 10px 0 4px; }
-    .glossline { width: 100%; font: 12.5px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace; padding: 7px 9px; }
-    #plan-notes { font-size: 12px; color: #e6c27a; margin-top: 8px; }
-    #plan-notes div { margin-bottom: 3px; }
+    .glabel { display: block; font-size: 13px; color: var(--dim); margin: 12px 0 4px; }
+    .glossline { width: 100%; font: 13px/1.4 ui-monospace, Menlo, monospace; padding: 8px 10px; background: var(--raised);
+                 color: var(--ink); border: 1px solid var(--line2); border-radius: 8px; }
+    #plan-notes { font-size: 13px; color: #e6c27a; margin-top: 8px; }
     #plan-notes .summary { color: var(--dim); }
-    details { margin-top: 16px; border-top: 1px solid var(--line); padding-top: 10px; }
-    summary { cursor: pointer; font-size: 11.5px; color: var(--dim); font-weight: 650; letter-spacing: .07em; text-transform: uppercase; }
-    .words { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 6px; margin-top: 8px; }
-    .words button { padding: 7px 6px; font-size: 12px; font-weight: 650; letter-spacing: .03em; border: 1px solid var(--line);
-                    border-radius: 7px; background: var(--raised); color: var(--ink); text-transform: uppercase; }
-    .words button:hover { border-color: var(--line2); }
+    #reference { width: 100%; aspect-ratio: 4 / 3; border-radius: 10px; border: 1px solid var(--line); background: #000; display: block; object-fit: contain; }
+    .refnote { font-size: 12.5px; color: var(--faint); margin: 6px 0 0; }
+    #info dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 3px 12px; font-size: 14px; }
+    #info dt { color: var(--dim); } #info dd { margin: 0; overflow-wrap: anywhere; }
+    #info .why { font-size: 13px; color: var(--dim); margin: 8px 0 0; }
+    #alts { display: flex; flex-direction: column; gap: 5px; }
+    #alts button { text-align: left; font-size: 14px; padding: 7px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--raised); }
+    #alts button[aria-current="true"] { border-color: var(--accent); }
+    #alts button[disabled] { opacity: .5; cursor: default; }
+    #alts .none, #tracking .none { font-size: 13px; color: var(--faint); }
+    #tracking ul { margin: 0; padding-left: 18px; font-size: 14px; }
+    .words { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 6px; }
+    .words button { padding: 7px 6px; font-size: 13px; font-weight: 700; border: 1px solid var(--line); border-radius: 8px;
+                    background: var(--raised); text-transform: uppercase; }
     .words button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); }
     .words button.pending { color: var(--faint); border-style: dashed; }
     .words button.flagged::after { content: " ⚠"; color: var(--warn); }
+    .keys { font-size: 13px; color: var(--faint); margin: 0; }
 
-    /* ---- stage ----------------------------------------------------- */
-    #stagecol { grid-area: stage; display: flex; flex-direction: column; min-width: 0; min-height: 0; }
-    #captionbar { padding: 12px 20px 6px; min-height: 76px; }
-    #word { font-size: 30px; font-weight: 750; letter-spacing: .05em; text-transform: uppercase; line-height: 1.2;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    #sub { color: var(--dim); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    #warn { margin: 0 20px 6px; padding: 7px 10px; border: 1px solid var(--bad); border-radius: 6px;
-            background: #3a1d1d; color: #ffdcd6; font-size: 13px; }
-    #warn[hidden] { display: none; }
-    #stage { flex: 1; position: relative; min-height: 180px; }
-    canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
-    #status { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none;
-              color: var(--dim); font-size: 14px; text-align: center; padding: 20px; }
-    #status[hidden] { display: none; }
-    .handkey { position: absolute; right: 14px; top: 6px; display: flex; flex-direction: column; align-items: flex-end; gap: 1px; font-size: 11.5px; color: var(--dim); pointer-events: none; }
-    .handkey i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; vertical-align: -1px; }
-    #sentence { padding: 4px 20px 6px; font-size: 16px; line-height: 1.5; min-height: 34px; }
-    #sentence .w { color: #5a6378; margin-right: 7px; }
-    #sentence .w.active { color: var(--ink); font-weight: 700; }
-    #steps { display: flex; gap: 2px; padding: 0 20px 10px; min-height: 30px; }
-    #steps button { flex: 1 1 0; min-width: 6px; height: 26px; border: 0; border-radius: 4px; padding: 0 4px;
-                    background: var(--raised); color: var(--dim); font-size: 11px; font-weight: 650;
-                    overflow: hidden; white-space: nowrap; text-overflow: ellipsis; border-bottom: 3px solid var(--line2); }
-    #steps button.sign { border-bottom-color: var(--ok); }
-    #steps button.check { border-bottom-color: var(--warn); }
-    #steps button.spell { border-bottom-color: var(--spell); }
-    #steps button.active { background: var(--line2); color: var(--ink); }
+    /* ---- dialogs ---- */
+    dialog { background: var(--surface); color: var(--ink); border: 1px solid var(--line2); border-radius: var(--radius);
+             max-width: 560px; width: calc(100% - 32px); padding: 22px 24px; }
+    dialog::backdrop { background: rgba(0, 0, 0, .6); }
+    dialog h2 { margin: 0 0 10px; font-size: 21px; }
+    dialog ul { padding-left: 20px; } dialog li { margin-bottom: 4px; }
+    dialog form { text-align: right; margin-top: 12px; }
 
-    /* ---- right panel ---------------------------------------------- */
-    #reference { width: 100%; aspect-ratio: 4 / 3; border-radius: 8px; border: 1px solid var(--line); background: #000; display: block; object-fit: contain; }
-    .refnote { font-size: 11px; color: var(--faint); margin: 4px 0 0; }
-    #info dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 3px 10px; font-size: 12.5px; }
-    #info dt { color: var(--dim); }
-    #info dd { margin: 0; overflow-wrap: anywhere; }
-    #info .why { font-size: 12px; color: var(--dim); margin: 8px 0 0; }
-    #alts { display: flex; flex-direction: column; gap: 4px; }
-    #alts button { text-align: left; font-size: 12.5px; padding: 6px 9px; border-radius: 6px; border: 1px solid var(--line);
-                   background: var(--raised); color: var(--ink); }
-    #alts button[aria-current="true"] { border-color: var(--accent); }
-    #alts button[disabled] { opacity: .45; cursor: default; }
-    #alts .none, #tracking .none { font-size: 12px; color: var(--faint); }
-    #right section + section { margin-top: 16px; }
-    #tracking ul { margin: 0; padding-left: 18px; font-size: 12.5px; }
-    #tracking li { margin-bottom: 3px; }
-
-    /* ---- controls --------------------------------------------------- */
-    #controls { grid-area: controls; border-top: 1px solid var(--line); background: var(--panel);
-                padding: 10px 18px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-    #controls .btn { padding: 8px 14px; }
-    #play { min-width: 96px; }
-    #scrub { flex: 1; min-width: 120px; accent-color: var(--accent); height: 24px; }
-    #controls select { background: var(--raised); color: var(--ink); border: 1px solid var(--line2); border-radius: 6px; padding: 6px; font-size: 13px; }
-    #count { color: var(--dim); font-family: ui-monospace, monospace; font-size: 12px; min-width: 88px; text-align: right; }
-    label.toggle { color: var(--dim); font-size: 13px; cursor: pointer; user-select: none; }
-    .keys { font-size: 11px; color: var(--faint); width: 100%; margin: 0; }
-
-    /* ---- narrower screens ------------------------------------------ */
-    @media (max-width: 1180px) {
-        body { grid-template-columns: minmax(280px, 320px) minmax(0, 1fr);
-               grid-template-rows: auto minmax(0, 1fr) auto auto;
-               grid-template-areas: "head head" "left stage" "left right" "left controls"; }
-        #right { border-left: 0; border-top: 1px solid var(--line); display: grid; gap: 0 16px;
-                 grid-template-columns: 170px 1fr 1fr; max-height: 172px; padding-top: 10px; }
-        #right section { min-width: 0; }
-        #right section + section { margin-top: 0; }
-        #right h2 { margin-top: 0; }
-        #right h2 ~ h2 { margin-top: 10px; }
-        .refnote, .keys { display: none; }
-        #captionbar { min-height: 0; padding-top: 8px; }
-        #word { font-size: 24px; }
-    }
-    @media (max-width: 760px) {
-        body { display: flex; flex-direction: column; height: auto; overflow: auto; }
-        header { padding: 8px 12px; }
-        #stagecol { order: 1; height: 62dvh; min-height: 380px; }
-        #controls { order: 2; position: sticky; bottom: 0; z-index: 2; padding: 8px 12px; gap: 8px; }
-        #left { order: 3; border-right: 0; }
-        #right { order: 4; display: block; max-height: none; border-top: 1px solid var(--line); }
-        #captionbar { padding: 8px 12px 4px; min-height: 60px; }
-        #word { font-size: 22px; }
-        #sentence { padding: 2px 12px; font-size: 14px; }
-        #steps { padding: 0 12px 8px; }
-        #warn { margin: 0 12px 6px; }
-        #reference { max-width: 320px; }
-        .keys { display: none; }
-        .handkey { font-size: 10.5px; }
-        header h1 span { display: none; }
-        #disclaimer { font-size: 11.5px; }
+    @media (max-width: 720px) {
+        .wrap { padding: 0 14px; }
+        .brand small { display: none; }
+        .hero { padding-top: 18px; }
+        #sentence-go { margin-left: 0; width: 100%; }
+        #advanced { grid-template-columns: 1fr; }
+        #stage { height: 56vh; min-height: 300px; }
+        #controls { gap: 8px; padding: 10px; }
+        #count { display: none; }
+        .handkey { font-size: 11px; }
     }
     @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
 </style>
@@ -225,121 +198,169 @@
 <body>
 
 <header>
-    <h1>SignBridge <span>· English → Auslan sign animation (prototype)</span></h1>
-    <p id="disclaimer">Shows recorded Auslan dictionary signs in a simplified, rule-based order.
-        <strong>It is not a full Auslan translation</strong>, and no output here has been checked by a Deaf signer.</p>
-    <p id="libstat" aria-live="polite">loading…</p>
+    <div class="wrap">
+        <h1 class="brand"><span class="logo" aria-hidden="true">🤟</span>SignBridge <small>prototype</small></h1>
+        <nav>
+            <button class="link" id="about-open">About</button>
+            <button class="link" id="help-open">Help</button>
+        </nav>
+    </div>
 </header>
 
-<aside id="left" class="panel" aria-label="Input and sign plan">
-    <h2>1 · Document</h2>
-    <label class="drop" id="drop">
-        <input type="file" id="pdf-input" accept="application/pdf,.pdf">
-        <strong>Drop a PDF here</strong> or click to choose<br>
-        <span style="font-size:11.5px">Read in your browser; the file is not uploaded. With the AI switch on,
-        short excerpts are sent to the AI service.</span>
-    </label>
-    <div class="docrow">
-        <button class="btn ghost" id="sample-pdf">Try a sample handbook</button>
-        <label title="Rewrite the key points in plain English with Claude, if this server has it set up. Every number and date is checked against the PDF. Without it, the offline summary is used."><input type="checkbox" id="use-ai" checked> AI plain-English summary</label>
-    </div>
-    <progress id="docprog" max="1" value="0" hidden></progress>
-    <div id="docmsg" aria-live="polite"></div>
-    <div id="docstats"></div>
-    <ol id="points" aria-label="Key points: select one to sign it"></ol>
+<main class="wrap">
+    <section class="hero">
+        <h2>Turn text into sign animation</h2>
+        <p>Type English, or upload a PDF. Recorded Auslan signs play on the figure below.</p>
+        <div class="inputcard">
+            <label for="sentence-input" class="sr-only" style="position:absolute;left:-9999px">English text</label>
+            <textarea id="sentence-input" rows="1" placeholder="Type something here… e.g. Please pay your bill tomorrow"
+                      autocomplete="off" enterkeyhint="go"></textarea>
+            <div class="inputrow">
+                <button class="btn" id="upload-pdf">📄 Upload PDF</button>
+                <button id="sentence-go" class="btn primary big">▶ Translate &amp; Play</button>
+            </div>
+        </div>
+        <div class="examples" id="examples"></div>
+    </section>
 
-    <h2><label for="sentence-input">2 · Sentence</label></h2>
-    <div class="sentbox">
-        <input type="text" id="sentence-input" class="field" placeholder="e.g. Please pay your bill tomorrow"
-               autocomplete="off" enterkeyhint="go">
-        <button id="sentence-go" class="btn">Translate ▶</button>
-    </div>
-    <div class="opts">
-        <label title="Time words first; wh-word last in a question. Common Auslan patterns, applied mechanically -- not a grammar.">
-            <input type="checkbox" id="order" checked> simplified Auslan order</label>
-        <label title="Cut each clip's leading/trailing rest pose so signs flow into each other.">
-            <input type="checkbox" id="trim" checked> trim rest between signs</label>
-        <label title="Inside a fingerspelled word, play only each letter's held handshape (max 0.9 s) instead of the whole recording with its rise and fall. H and J keep their full recording: they involve movement.">
-            <input type="checkbox" id="compact" checked> compact fingerspelling</label>
-        <label title="Draw the face (eyebrows, eyes, lips) from the recording. Off: a plain head outline.">
-            <input type="checkbox" id="face"> show face</label>
-        <label title="Remove single-frame tracking spikes (3-frame median). Off = the raw MediaPipe data.">
-            <input type="checkbox" id="despike" checked> remove tracking spikes</label>
+    <section id="docpanel" hidden aria-label="Document">
+        <h3>Document</h3>
+        <label class="drop" id="drop">
+            <input type="file" id="pdf-input" accept="application/pdf,.pdf">
+            <strong>Drop a PDF here</strong> or click to choose<br>
+            <span style="font-size:13px">Read in your browser; the file is not uploaded. With the AI switch on,
+                short excerpts are sent to the AI service.</span>
+        </label>
+        <div class="docrow">
+            <button class="btn" id="sample-pdf">Try a sample handbook</button>
+            <label title="Rewrite the key points in plain English with Claude, if this server has it set up. Every number and date is checked against the PDF. Without it, the offline summary is used."><input type="checkbox" id="use-ai" checked> AI plain-English summary</label>
+        </div>
+        <progress id="docprog" max="1" value="0" hidden></progress>
+        <div id="docmsg" aria-live="polite"></div>
+        <div id="docstats"></div>
+        <ol id="points" aria-label="Key points: select one to sign it"></ol>
+    </section>
+
+    <section id="stagecol" aria-label="Signing avatar">
+        <div id="captionbar">
+            <div id="word">—</div>
+            <div id="sub">select a sign</div>
+        </div>
+        <div id="warn" role="alert" hidden></div>
+        <div id="stage">
+            <canvas id="canvas" role="img" aria-label="Figure signing the current sign"></canvas>
+            <div id="status" role="status">loading the sign library…</div>
+            <div class="handkey" aria-hidden="true"><span><i style="background:var(--right)"></i>signer's right hand</span>
+                <span><i style="background:var(--left)"></i>signer's left hand</span></div>
+        </div>
+        <div id="sentence"></div>
+        <div id="steps" role="group" aria-label="Signs in this sentence: select one to jump to it"></div>
+        <div id="controls" aria-label="Playback">
+            <button id="prev" class="btn" aria-label="previous sign" title="previous sign (←)">⏮</button>
+            <button id="play" class="btn primary" title="play / pause (Space)">▶ Play</button>
+            <button id="next" class="btn" aria-label="next sign" title="next sign (→)">⏭</button>
+            <button id="replay" class="btn" title="replay from the start (Home)">↻ Replay</button>
+            <input type="range" id="scrub" min="0" max="0" value="0" step="1" aria-label="position in the sentence">
+            <select id="speed" aria-label="playback speed">
+                <option value="0.5">0.5×</option><option value="0.75">0.75×</option>
+                <option value="1" selected>1×</option><option value="1.25">1.25×</option><option value="1.5">1.5×</option>
+            </select>
+            <label class="toggle"><input type="checkbox" id="loop" checked> loop</label>
+            <span id="count" aria-live="off">—</span>
+        </div>
+    </section>
+
+    <div class="actions">
+        <span class="legend" aria-label="what the tiles mean"><span>✓ signed</span><span>⚠ check: best guess</span><span>ABC fingerspelled</span></span>
+        <button class="btn" id="adv-toggle" aria-expanded="false" aria-controls="advanced">⚙ Advanced settings</button>
     </div>
 
-    <h2>Examples</h2>
-    <div class="examples" id="examples"></div>
+    <section id="advanced" hidden aria-label="Advanced settings">
+        <div class="card">
+            <h3>Options</h3>
+            <div class="opts">
+                <label title="Time words first; wh-word last in a question. Common Auslan patterns, applied mechanically -- not a grammar.">
+                    <input type="checkbox" id="order" checked> simplified Auslan word order</label>
+                <label title="Cut each clip's leading/trailing rest pose so signs flow into each other.">
+                    <input type="checkbox" id="trim" checked> trim rest between signs</label>
+                <label title="Inside a fingerspelled word, play only each letter's held handshape (max 0.9 s) instead of the whole recording with its rise and fall. H and J keep their full recording: they involve movement.">
+                    <input type="checkbox" id="compact" checked> compact fingerspelling</label>
+                <label title="Remove single-frame tracking spikes (3-frame median). Off = the raw MediaPipe data.">
+                    <input type="checkbox" id="despike" checked> remove tracking spikes</label>
+                <label title="Draw the face (eyebrows, eyes, lips) from the recording. Off: a plain head outline.">
+                    <input type="checkbox" id="face"> show face</label>
+            </div>
+            <p id="libstat" aria-live="polite">loading…</p>
+            <p class="keys">Keys: Space play/pause · ← → previous/next sign · Home replay</p>
+        </div>
+        <div class="card">
+            <h3>Source recording</h3>
+            <section>
+                <video id="reference" muted playsinline preload="auto" aria-label="Original corpus video of the current sign"></video>
+                <p class="refnote" id="refnote">The corpus video the motion was extracted from, kept in step with the avatar.</p>
+            </section>
+        </div>
+        <div class="card wide">
+            <h3>Sign plan <span style="text-transform:none;letter-spacing:0;color:var(--warn)">rule-based · editable</span></h3>
+            <div id="plan" class="plan" aria-live="polite"><span class="empty">Type something above, or pick an example.</span></div>
+            <div class="legend"><span><i class="sign"></i>✓ Sign</span><span><i class="check"></i>⚠ Check</span>
+                <span><i class="spell"></i>✋ Fingerspelled</span><span><i class="omit"></i>— Omitted</span></div>
+            <p class="hint">✓ means the motion data passed automated checks, not that a signer verified it. Use a step's menu to change it.</p>
+            <label class="glabel" for="glossline">Gloss line: edit, then press Enter to play exactly this</label>
+            <input id="glossline" class="glossline" spellcheck="false" autocomplete="off" placeholder="hello my fs:NAME fs:SABIN">
+            <div id="plan-notes" aria-live="polite"></div>
+        </div>
+        <div class="card" id="info">
+            <h3>Current sign</h3>
+            <div id="info-body"><p class="none hint">Nothing playing.</p></div>
+        </div>
+        <div class="card">
+            <h3>Alternatives</h3>
+            <div id="alts"><span class="none">—</span></div>
+            <h3 style="margin-top:14px">Tracking</h3>
+            <div id="tracking"><span class="none">—</span></div>
+        </div>
+        <div class="card">
+            <h3>Single signs</h3>
+            <div class="words" id="words"></div>
+        </div>
+        <div class="card">
+            <h3>Fingerspelled phrases</h3>
+            <div class="words" id="fingerspell-words"></div>
+        </div>
+    </section>
 
-    <h2>Sign plan <span class="tag">rule-based · editable</span></h2>
-    <div id="plan" class="plan" aria-live="polite"><span class="empty">Type something above, or pick an example.</span></div>
-    <div class="legend" aria-label="legend"><span><i class="sign"></i>✓ Sign</span><span><i class="check"></i>⚠ Check</span>
-        <span><i class="spell"></i>✋ Fingerspelled</span><span><i class="omit"></i>— Omitted</span></div>
-    <p class="hint">✓ means the motion data passed automated checks, not that a signer verified it.
-        Use a step's menu to change it.</p>
-    <label class="glabel" for="glossline">Gloss line: edit, then press Enter to play exactly this</label>
-    <input id="glossline" class="field glossline" spellcheck="false" autocomplete="off"
-           placeholder="hello my fs:NAME fs:SABIN">
-    <div id="plan-notes" aria-live="polite"></div>
-
-    <details>
-        <summary>Single signs</summary>
-        <div class="words" id="words"></div>
-    </details>
-    <details>
-        <summary>Fingerspelled phrases</summary>
-        <div class="words" id="fingerspell-words"></div>
-    </details>
-</aside>
-
-<main id="stagecol" aria-label="Signing avatar">
-    <div id="captionbar" aria-live="off">
-        <div id="word">—</div>
-        <div id="sub">select a sign</div>
-    </div>
-    <div id="warn" role="alert" hidden></div>
-    <div id="stage">
-        <canvas id="canvas" role="img" aria-label="Stick-figure avatar signing the current sign"></canvas>
-        <div id="status" role="status">loading the sign library…</div>
-        <div class="handkey" aria-hidden="true"><span><i style="background:var(--right)"></i>signer's right hand</span>
-            <span><i style="background:var(--left)"></i>signer's left hand</span>
-            <span><i style="background:var(--left);opacity:.35"></i>faded = tracking lost</span></div>
-    </div>
-    <div id="sentence"></div>
-    <div id="steps" role="group" aria-label="Signs in this sentence: select one to jump to it"></div>
+    <p class="notice">Prototype: signs are chosen automatically, some words are fingerspelled, and sign order and
+        meaning may be imperfect. Not checked by a fluent Auslan signer. <button id="about-link">Learn more</button></p>
 </main>
 
-<aside id="right" class="panel" aria-label="Sign details">
-    <section>
-        <h2>Source recording</h2>
-        <video id="reference" muted playsinline preload="auto" aria-label="Original corpus video of the current sign"></video>
-        <p class="refnote" id="refnote">The corpus video the motion was extracted from, kept in step with the avatar.</p>
-    </section>
-    <section id="info">
-        <h2>Current sign</h2>
-        <div id="info-body"><p class="none hint">Nothing playing.</p></div>
-    </section>
-    <section>
-        <h2>Alternatives</h2>
-        <div id="alts"><span class="none">—</span></div>
-        <h2>Tracking</h2>
-        <div id="tracking"><span class="none">—</span></div>
-    </section>
-</aside>
-
-<footer id="controls" aria-label="Playback">
-    <button id="prev" class="btn ghost" aria-label="previous sign" title="previous sign (←)">⏮</button>
-    <button id="play" class="btn" title="play / pause (Space)">▶ Play</button>
-    <button id="next" class="btn ghost" aria-label="next sign" title="next sign (→)">⏭</button>
-    <button id="replay" class="btn ghost" title="replay from the start">↻ Replay</button>
-    <input type="range" id="scrub" min="0" max="0" value="0" step="1" aria-label="position in the sentence">
-    <select id="speed" aria-label="playback speed">
-        <option value="0.5">0.5×</option><option value="0.75">0.75×</option>
-        <option value="1" selected>1×</option><option value="1.25">1.25×</option><option value="1.5">1.5×</option>
-    </select>
-    <label class="toggle"><input type="checkbox" id="loop" checked> loop</label>
-    <span id="count" aria-live="off">—</span>
-    <p class="keys">Keys: Space play/pause · ← → previous/next sign · Home replay</p>
-</footer>
+<dialog id="about" aria-labelledby="about-title">
+    <h2 id="about-title">About SignBridge</h2>
+    <p>SignBridge turns English text, typed or from a PDF, into a sequence of recorded Auslan signs played on a 2D figure.
+        The motion comes from 3,215 recorded dictionary signs, tracked with MediaPipe.</p>
+    <p><strong>It is not an Auslan translator.</strong></p>
+    <ul>
+        <li>Signs are chosen automatically, word by word, with a few simple ordering rules. Auslan grammar
+            (use of space, facial grammar, classifiers) is not modelled.</li>
+        <li>Words without a usable sign are fingerspelled. ⚠ marks a best guess among several meanings.</li>
+        <li>Sign order and meaning may be imperfect.</li>
+        <li>Nothing here has been verified by a fluent Auslan signer or Deaf community members.</li>
+    </ul>
+    <form method="dialog"><button class="btn primary">Close</button></form>
+</dialog>
+<dialog id="help" aria-labelledby="help-title">
+    <h2 id="help-title">How to use it</h2>
+    <ul>
+        <li>Type a sentence and press <strong>Translate &amp; Play</strong> (or Enter).</li>
+        <li>The tiles under the figure show each sign: <strong>✓</strong> signed, <strong>⚠</strong> best guess,
+            <strong>ABC</strong> fingerspelled. Select a tile to jump to it.</li>
+        <li><strong>Upload PDF</strong> to get the document's key points; select a point to sign it.</li>
+        <li>Keys: <strong>Space</strong> play/pause, <strong>← →</strong> previous/next sign, <strong>Home</strong> replay.</li>
+        <li><strong>Advanced settings</strong> shows the sign plan (and lets you change any sign), the source
+            recording, and tracking details.</li>
+    </ul>
+    <form method="dialog"><button class="btn primary">Close</button></form>
+</dialog>
 
 <script type="module">
 // ======================================================
@@ -407,9 +428,8 @@ function setStatus(text) {
     el.hidden = !text;
     if (text) el.textContent = text;
 }
-const EXAMPLES = ["Welcome to the university.", "Students must attend classes.", "The examination starts tomorrow.",
-                  "Hello, how are you?", "My name is Sabin.", "I need help.", "Where is the hospital?",
-                  "I want to learn Auslan.", "Thank you for helping me.", "Please pay your bill tomorrow."];
+const EXAMPLES = ["I love Australia.", "My name is Sabin.", "Welcome to the university.",
+                  "The examination starts tomorrow.", "Thank you for helping me.", "Please pay your bill tomorrow."];
 let libOpts = null;        // what the Library was built from (rebuilt by the spike switch)
 let stepTimes = [];        // [{n, t0, t1}] per plan step on the current timeline
 let buildSeq = 0, videoClip = -1, activeStep = -1;
@@ -915,16 +935,14 @@ function caption(s) {
     }
     if (step.kind === "sign") {
         setText(wordEl, step.gloss);
-        const notes = [`${stateText(step)} — ${STATES[stateOf(step)].note}`];
-        if (step.uncertain) notes.push("⚠ check: " + step.why);
-        else if (step.match === "stem" || step.match === "keyword" || step.reviewed) notes.push(step.why);
-        if (step.flags && step.flags.length) notes.push("⚠ tracking: " + step.flags.join(", "));
-        else if (step.low) notes.push("low tracking quality in the source clip");
-        if (s.local === null) notes.unshift("transition");
-        setText(subEl, notes.join(" · "));
+        // plain words here; the full reasoning is in Advanced -> Current sign
+        const notes = [step.uncertain ? "⚠ Best guess: one of several possible signs"
+                       : step.status ? "⚠ Sign · motion tracking flagged for review" : "✓ Sign"];
+        if (step.en && step.en.toLowerCase() !== step.gloss.toLowerCase()) notes.push(`for “${step.en}”`);
+        setText(subEl, notes.join(" "));
     } else if (step.kind === "spell") {
         setText(wordEl, step.letters.join(""));
-        setText(subEl, `${stateText(step)} (${detailOf(step)}): ` + step.letters
+        setText(subEl, `${stateText(step)} (${SPELL_SHORT[step.reason] || "no sign available"}): ` + step.letters
             .map((l, i) => i === c.li ? l : l.toLowerCase()).join(" – "));
     }
 }
@@ -992,6 +1010,8 @@ const SPELL_REASON = {
     loose: "the only dictionary match was too loose to use", unreliable: "the sign's tracking is unreliable",
     pending: "the sign exists but is not available here",
 };
+const SPELL_SHORT = { name: "a name", requested: "as requested", nosign: "no sign for this word",
+    sense: "no matching sign", loose: "no matching sign", unreliable: "sign not reliable yet", pending: "sign not available" };
 function detailOf(step) {
     if (step.kind === "omit") return "omitted by the current planner";
     if (step.kind === "phrase") return "pre-recorded fingerspelled phrase";
@@ -1012,16 +1032,19 @@ function renderSteps() {
     const bar = $("steps");
     bar.innerHTML = "";
     if (!tl || !stepTimes.length) return;
-    for (const st of stepTimes) {
-        const step = tl.plan.steps[st.n];
+    for (const seg of stepTimes) {
+        const step = tl.plan.steps[seg.n];
         const b = document.createElement("button");
-        b.dataset.n = st.n;
+        b.dataset.n = seg.n;
         b.className = stateOf(step);
-        b.style.flexGrow = Math.max(0.2, st.t1 - st.t0).toFixed(3);
-        b.textContent = step.kind === "sign" ? step.gloss : step.kind === "spell" ? step.letters.join("") : (step.en || "");
-        b.title = `${stateText(step)} · ${b.textContent} — ${detailOf(step)}`;
-        b.setAttribute("aria-label", `jump to ${b.textContent}, ${STATES[stateOf(step)].label}`);
-        b.addEventListener("click", () => jumpTo(st.t0));
+        const label = step.kind === "sign" ? step.gloss : step.kind === "spell" ? step.letters.join("") : (step.en || "");
+        const st = stateOf(step);
+        b.append(Object.assign(document.createElement("span"), { className: "lbl", textContent: label }),
+                 Object.assign(document.createElement("span"), { className: "ico", "ariaHidden": "true",
+                     textContent: st === "sign" ? "✓" : st === "check" ? "⚠" : "ABC" }));
+        b.title = `${stateText(step)} · ${label} — ${detailOf(step)}`;
+        b.setAttribute("aria-label", `jump to ${label}, ${STATES[st].label}`);
+        b.addEventListener("click", () => jumpTo(seg.t0));
         bar.appendChild(b);
     }
 }
@@ -1197,6 +1220,7 @@ function docMessage(text, error = false) {
 }
 
 async function openPdf(file) {
+    $("docpanel").hidden = false;
     const seq = ++docSeq;
     const prog = $("docprog");
     $("points").innerHTML = ""; $("docstats").textContent = ""; docPoints = []; activePoint = -1;
@@ -1316,6 +1340,10 @@ function playTyped() {
     if (!text || !lib) return;
     clearPressed();
     playPlan(makePlan(text, lib, { auslanOrder: $("order").checked }));
+    // bring the figure into view if it is below the fold (phones, short screens)
+    const r = $("stagecol").getBoundingClientRect();
+    if (r.top > innerHeight * 0.45 || r.bottom < 80)
+        $("stagecol").scrollIntoView({ block: "start", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
 }
 
 function playGlossLine() {
@@ -1361,7 +1389,17 @@ function playQuick(name) {
 
 $("sentence-go").addEventListener("click", playTyped);
 $("sentence-input").addEventListener("keydown", e => {
-    if (e.key === "Enter") { e.preventDefault(); playTyped(); }
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); playTyped(); }   // Shift+Enter: new line
+});
+// header dialogs, the document panel and the advanced drawer
+for (const [btn, dlg] of [["about-open", "about"], ["about-link", "about"], ["help-open", "help"]])
+    $(btn).addEventListener("click", () => $(dlg).showModal());
+$("upload-pdf").addEventListener("click", () => { $("docpanel").hidden = false; $("pdf-input").click(); });
+$("adv-toggle").addEventListener("click", () => {
+    const open = $("advanced").hidden;
+    $("advanced").hidden = !open;
+    $("adv-toggle").setAttribute("aria-expanded", String(open));
+    $("adv-toggle").textContent = open ? "⚙ Hide advanced settings" : "⚙ Advanced settings";
 });
 $("glossline").addEventListener("keydown", e => {
     if (e.key === "Enter") { e.preventDefault(); playGlossLine(); }

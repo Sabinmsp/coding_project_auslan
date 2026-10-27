@@ -88,12 +88,12 @@ sh tests/run_all.sh 8003             # everything below, in one go
 
 | suite | what |
 |---|---|
-| `node --test tests/*.mjs` (66) | planner, keywords, library, timeline, reliability, playback, document summary |
+| `node --test tests/*.mjs` (88) | planner, matching, sentences, library, timeline, player, reliability, playback, document summary |
 | `scripts/check_library.py` | every motion file, video, letter and quick pick present and well-formed |
 | `tests/test_pipeline.py` (16) | catalog, keywords, ownership, validator, lossless format |
 | `tests/test_llm_plan.py` (9) | LLM plan validation, offline |
 | `tests/test_summarize_llm.py` (9) | AI summary endpoint, offline (stubbed model) |
-| `tests/browser/` (5 suites, headless Chrome) | behaviour, failure paths, controls + end-to-end, PDF → key points → signing, motion-only playback |
+| `tests/browser/` (8 suites, headless Chrome) | behaviour, failure paths, controls + end-to-end, PDF → key points → signing, motion-only playback, main screen + keyboard, stress + slow device |
 
 These test the engineering. None of them says whether the signing is
 correct Auslan.

@@ -45,8 +45,10 @@ visible = lambda sel: J(f"(()=>{{const e=document.querySelector({sel!r});return 
 
 check("first screen: input, Translate & Play, avatar, controls visible",
       all(visible(s) for s in ("#sentence-input", "#sentence-go", "#canvas", "#play")))
-check("first screen: developer panels hidden",
-      not any(visible(s) for s in ("#plan", "#glossline", "#reference", "#alts", "#tracking", "#docpanel")))
+check("first screen: developer panels hidden (gloss editor, source video, alternatives, tracking, document)",
+      not any(visible(s) for s in ("#glossline", "#reference", "#alts", "#tracking", "#docpanel")))
+check("two columns on a wide screen: input on the left, avatar on the right",
+      J("(()=>{const a=document.getElementById('sentence-input').getBoundingClientRect(), b=document.getElementById('canvas').getBoundingClientRect(); return a.right <= b.left + 1})()"))
 check("limitations notice visible on the first screen", visible(".notice") and "not checked by a fluent auslan signer"
       in J("document.querySelector('.notice').textContent").lower())
 
@@ -78,11 +80,22 @@ check("Tab from the text box reaches Translate & Play", "sentence-go" in order, 
 
 # Advanced drawer
 J("document.getElementById('adv-toggle').click()"); time.sleep(0.2)
-check("Advanced settings opens the plan, gloss line, video, alternatives",
-      all(visible(s) for s in ("#plan", "#glossline", "#reference", "#alts")) and
+check("Advanced settings opens the gloss line, video, alternatives",
+      all(visible(s) for s in ("#glossline", "#reference", "#alts")) and
       J("document.getElementById('adv-toggle').getAttribute('aria-expanded')") == "true")
 J("document.getElementById('adv-toggle').click()"); time.sleep(0.2)
-check("and closes again", not visible("#plan"))
+check("and closes again", not visible("#glossline"))
+
+# left panel: plan + vocabulary lists
+J("auslan.say('Where is the hospital? My name is Sabin. I love Australia')"); time.sleep(1.2)
+check("translation plan shows a chip per step, on the left", J("document.querySelectorAll('#plan .chip').length") >= 8 and visible("#plan"))
+vocab = J("document.getElementById('vocab').innerText")
+check("vocabulary lists: signs, no-sign words, names, left-out words",
+      all(k in vocab for k in ("Signs available", "No sign available", "Names, fingerspelled", "Left out by the current planner"))
+      and "Sabin" in vocab and "hospital" in vocab.lower(), vocab[:90].replace("\n", " | "))
+check("screen reader is told which sign is on", "of" in J("document.getElementById('announce').textContent"),
+      J("document.getElementById('announce').textContent"))
+check("full screen button present with a label", visible("#fullscreen") and J("document.getElementById('fullscreen').getAttribute('aria-label')") == "full screen")
 
 # Upload PDF reveals the document panel (the file chooser itself is the OS's)
 J("document.getElementById('pdf-input').click = () => {}; document.getElementById('upload-pdf').click()")

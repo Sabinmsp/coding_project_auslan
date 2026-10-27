@@ -27,6 +27,8 @@ auslan-ai-clean/
 │   │   ├── planner.js         English -> sign plan (rules, every step explained)
 │   │   ├── library.js         manifest lookup, lazy loading, cache, normalising, spike removal
 │   │   ├── timeline.js        many clips -> one timeline, transitions, held hands
+│   │   ├── player.js          the one playback clock (play, pause, seek, next/previous, loop)
+│   │   ├── renderer.js        canvas drawing of one motion frame (no page, no state)
 │   │   ├── document.js        PDF -> pages of text (pdf.js, in the browser)
 │   │   └── summarize.js       offline key-point summary + fact check
 │   ├── vendor/pdfjs/          pdf.js 3.11.174 (Mozilla, Apache-2.0)

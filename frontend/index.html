@@ -25,7 +25,14 @@
     button, select, input, textarea { font: inherit; color: inherit; }
     button { cursor: pointer; }
     [hidden] { display: none !important; }
-    .wrap { max-width: 980px; margin: 0 auto; padding: 0 20px; }
+    .wrap { max-width: 1320px; margin: 0 auto; padding: 0 22px; }
+    /* two columns: input + plan on the left, avatar on the right (sticky while the left scrolls) */
+    .shell { display: grid; gap: 16px 24px; align-items: start; padding-top: 20px;
+             grid-template-columns: minmax(330px, 430px) minmax(0, 1fr);
+             grid-template-areas: "input stage" "doc stage" "plan stage"; }
+    .hero { grid-area: input; } #docpanel { grid-area: doc; } #planpanel { grid-area: plan; }
+    #stagecol { grid-area: stage; position: sticky; top: 14px; }
+    .actions, #advanced, .notice { grid-column: 1 / -1; }
 
     /* ---- header ---- */
     header { border-bottom: 1px solid var(--line); background: var(--surface); }
@@ -38,9 +45,9 @@
     .link:hover { color: var(--ink); background: var(--raised); }
 
     /* ---- hero / input ---- */
-    .hero { text-align: center; padding: 22px 0 4px; }
-    .hero h2 { font-size: clamp(26px, 4vw, 36px); line-height: 1.2; margin: 0 0 6px; letter-spacing: -.02em; }
-    .hero p { color: var(--dim); margin: 0 0 14px; }
+    .hero { text-align: left; padding: 0; }
+    .hero h2 { font-size: clamp(24px, 3vw, 30px); line-height: 1.2; margin: 0 0 6px; letter-spacing: -.02em; }
+    .hero p { color: var(--dim); margin: 0 0 14px; font-size: 15px; }
     .inputcard { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; }
     #sentence-input { width: 100%; min-height: 54px; resize: vertical; background: var(--raised); color: var(--ink);
                       border: 1px solid var(--line2); border-radius: 10px; padding: 12px 14px; font-size: 18px; line-height: 1.45; }
@@ -52,14 +59,14 @@
     .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
     .btn.big { padding: 13px 26px; font-size: 17px; }
     #sentence-go { margin-left: auto; }
-    .examples { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; justify-content: center; margin-top: 14px; }
+    .examples { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; justify-content: flex-start; margin-top: 12px; }
     .examples::before { content: "Try:"; color: var(--faint); font-size: 14px; margin-right: 2px; }
     .examples button { font-size: 14px; padding: 5px 12px; border-radius: 999px; border: 1px solid var(--line2);
                        background: transparent; color: var(--dim); }
     .examples button:hover { color: var(--ink); border-color: var(--accent); }
 
     /* ---- document panel ---- */
-    #docpanel { margin-top: 14px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; }
+    #docpanel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; }
     #docpanel h3 { margin: 0 0 10px; font-size: 17px; }
     .drop { display: block; position: relative; border: 2px dashed var(--line2); border-radius: 12px; padding: 18px; text-align: center;
             color: var(--dim); cursor: pointer; background: var(--raised); }
@@ -84,7 +91,7 @@
     #points details { font-size: 13px; color: var(--dim); margin: 4px 0 0; }
 
     /* ---- the stage (centre of the page) ---- */
-    #stagecol { margin-top: 14px; scroll-margin-top: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+    #stagecol { scroll-margin-top: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
     #captionbar { padding: 16px 20px 4px; text-align: center; min-height: 82px; }
     #word { font-size: clamp(28px, 5vw, 44px); font-weight: 800; letter-spacing: .04em; text-transform: uppercase; line-height: 1.15;
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -97,8 +104,9 @@
     .handkey { position: absolute; right: 14px; top: 8px; display: flex; flex-direction: column; align-items: flex-end; gap: 1px;
                font-size: 12px; color: var(--faint); pointer-events: none; }
     .handkey i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; vertical-align: -1px; }
-    #sentence { padding: 4px 20px 8px; font-size: 18px; text-align: center; min-height: 38px; }
-    #sentence .w { color: #5d6780; margin: 0 4px; }
+    #sentence { padding: 4px 20px 8px; font-size: 18px; min-height: 38px;
+                display: flex; flex-wrap: wrap; justify-content: center; gap: 0 4px; }
+    #sentence .w { color: #5d6780; }
     #sentence .w.active { color: var(--ink); font-weight: 700; }
 
     /* word strip: one tile per sign, ✓ signed / ABC fingerspelled / ⚠ check */
@@ -122,6 +130,25 @@
     .actions { display: flex; gap: 10px; justify-content: space-between; flex-wrap: wrap; margin: 16px 0; }
     .notice { font-size: 13.5px; color: var(--faint); text-align: center; margin: 4px 0 28px; }
     .notice button { background: none; border: 0; color: var(--dim); text-decoration: underline; padding: 0; font-size: inherit; }
+
+    /* ---- translation plan + vocabulary (left column) ---- */
+    #planpanel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; }
+    #planpanel h3 { margin: 0 0 10px; font-size: 13px; color: var(--dim); text-transform: uppercase; letter-spacing: .07em; }
+    #planpanel h3 .tag { text-transform: none; letter-spacing: 0; color: var(--warn); font-weight: 500; margin-left: 6px; }
+    #vocab { margin-top: 14px; display: grid; gap: 12px; }
+    #vocab h4 { margin: 0 0 5px; font-size: 12.5px; color: var(--dim); font-weight: 700; }
+    #vocab ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 5px; }
+    #vocab li { font-size: 13.5px; border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; background: var(--raised); }
+    #vocab .v-sign li { border-color: var(--ok); } #vocab .v-check li { border-color: var(--warn); }
+    #vocab .v-spell li { border-color: var(--spell); } #vocab .v-name li { border-color: var(--spell); border-style: dashed; }
+    #vocab .v-omit li { border-style: dashed; color: var(--faint); }
+    #vocab .why { font-size: 12px; color: var(--faint); }
+    #vocab .none { font-size: 13px; color: var(--faint); }
+
+    /* ---- fullscreen avatar ---- */
+    #stagecol:fullscreen, #stagecol:-webkit-full-screen { display: flex; flex-direction: column; background: var(--bg);
+        border: 0; border-radius: 0; overflow: auto; }
+    #stagecol:fullscreen #stage, #stagecol:-webkit-full-screen #stage { flex: 1; height: auto; min-height: 0; }
 
     /* ---- advanced ---- */
     #advanced { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-bottom: 28px; }
@@ -181,10 +208,18 @@
     dialog ul { padding-left: 20px; } dialog li { margin-bottom: 4px; }
     dialog form { text-align: right; margin-top: 12px; }
 
+    @media (max-width: 1000px) {
+        .shell { grid-template-columns: minmax(280px, 340px) minmax(0, 1fr); gap: 14px 16px; }
+    }
+    @media (max-width: 820px) {
+        /* one column: input, avatar, then the document and plan */
+        .shell { grid-template-columns: minmax(0, 1fr); padding-top: 14px;
+                 grid-template-areas: "input" "stage" "doc" "plan"; }
+        #stagecol { position: static; }
+    }
     @media (max-width: 720px) {
         .wrap { padding: 0 14px; }
         .brand small { display: none; }
-        .hero { padding-top: 18px; }
         #sentence-go { margin-left: 0; width: 100%; }
         #advanced { grid-template-columns: 1fr; }
         #stage { height: 56vh; min-height: 300px; }
@@ -207,10 +242,12 @@
     </div>
 </header>
 
-<main class="wrap">
+<div id="announce" class="sr-only" aria-live="polite" role="status"
+     style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden"></div>
+<main class="wrap shell">
     <section class="hero">
         <h2>Turn text into sign animation</h2>
-        <p>Type English, or upload a PDF. Recorded Auslan signs play on the figure below.</p>
+        <p>Type English, or upload a PDF. Recorded Auslan signs play on the figure.</p>
         <div class="inputcard">
             <label for="sentence-input" class="sr-only" style="position:absolute;left:-9999px">English text</label>
             <textarea id="sentence-input" rows="1" placeholder="Type something here… e.g. Please pay your bill tomorrow"
@@ -241,6 +278,16 @@
         <ol id="points" aria-label="Key points: select one to sign it"></ol>
     </section>
 
+    <section id="planpanel" aria-label="Translation plan">
+        <h3>Translation plan <span class="tag">rule-based · editable</span></h3>
+        <div id="plan" class="plan" aria-live="polite"><span class="empty">Type something above, or pick an example.</span></div>
+        <div class="legend"><span><i class="sign"></i>✓ Sign</span><span><i class="check"></i>⚠ Check</span>
+            <span><i class="spell"></i>✋ Fingerspelled</span><span><i class="omit"></i>— Omitted</span></div>
+        <p class="hint">✓ means the motion data passed automated checks, not that a signer verified it. Use a step's menu to change it.</p>
+        <div id="plan-notes" aria-live="polite"></div>
+        <div id="vocab" aria-label="Vocabulary in this sentence"></div>
+    </section>
+
     <section id="stagecol" aria-label="Signing avatar">
         <div id="captionbar">
             <div id="word">—</div>
@@ -266,6 +313,7 @@
                 <option value="1" selected>1×</option><option value="1.25">1.25×</option><option value="1.5">1.5×</option>
             </select>
             <label class="toggle"><input type="checkbox" id="loop" checked> loop</label>
+            <button id="fullscreen" class="btn" aria-label="full screen" title="full screen (F)">⛶</button>
             <span id="count" aria-live="off">—</span>
         </div>
     </section>
@@ -291,7 +339,7 @@
                     <input type="checkbox" id="face"> show face</label>
             </div>
             <p id="libstat" aria-live="polite">loading…</p>
-            <p class="keys">Keys: Space play/pause · ← → previous/next sign · Home replay</p>
+            <p class="keys">Keys: Space play/pause · ← → previous/next sign · Home replay · F full screen</p>
         </div>
         <div class="card">
             <h3>Source recording</h3>
@@ -301,14 +349,9 @@
             </section>
         </div>
         <div class="card wide">
-            <h3>Sign plan <span style="text-transform:none;letter-spacing:0;color:var(--warn)">rule-based · editable</span></h3>
-            <div id="plan" class="plan" aria-live="polite"><span class="empty">Type something above, or pick an example.</span></div>
-            <div class="legend"><span><i class="sign"></i>✓ Sign</span><span><i class="check"></i>⚠ Check</span>
-                <span><i class="spell"></i>✋ Fingerspelled</span><span><i class="omit"></i>— Omitted</span></div>
-            <p class="hint">✓ means the motion data passed automated checks, not that a signer verified it. Use a step's menu to change it.</p>
-            <label class="glabel" for="glossline">Gloss line: edit, then press Enter to play exactly this</label>
+            <h3>Gloss line</h3>
+            <label class="glabel" for="glossline">Edit the sign sequence directly, then press Enter to play exactly this</label>
             <input id="glossline" class="glossline" spellcheck="false" autocomplete="off" placeholder="hello my fs:NAME fs:SABIN">
-            <div id="plan-notes" aria-live="polite"></div>
         </div>
         <div class="card" id="info">
             <h3>Current sign</h3>
@@ -701,6 +744,12 @@ function setActiveStep(n) {
     }
     const step = currentPlan.steps[n];
     showStepInfo(step);
+    // screen readers: say which sign is on (polite, once per sign)
+    const pos = stepTimes.findIndex(x => x.n === n) + 1;
+    const said = `${step.kind === "spell" ? "Fingerspelling" : "Signing"} ${step.kind === "sign" ? step.gloss : step.letters ? step.letters.join("") : step.en}` +
+                 (stepTimes.length ? `, ${pos} of ${stepTimes.length}` : "") + (step.uncertain ? ", best guess" : "");
+    $("announce").textContent = said;
+    scrub.setAttribute("aria-valuetext", said);
     const el = $("sentence");
     if (currentPlan.tokens && currentPlan.tokens.length) {
         el.innerHTML = "";
@@ -897,6 +946,8 @@ function renderPlan() {
         el.appendChild(chip);
     }
 
+    renderVocab(p);
+
     const gl = $("glossline");
     const hasPhrase = p.steps.some(s => s.kind === "phrase");
     gl.disabled = hasPhrase;
@@ -916,6 +967,38 @@ function renderPlan() {
     else if (pending.length) addNote(`exists in the corpus but not extracted yet: ` +
         pending.map(s => s.pending).join(", ") + ` — python3 scripts/build_library.py --only ` +
         pending.map(s => s.pending).join(" "));
+}
+
+// What the sentence became, in four plain lists: signs available, words with
+// no sign (fingerspelled), names (fingerspelled on purpose), words the planner left out.
+function renderVocab(p) {
+    const box = $("vocab");
+    box.innerHTML = "";
+    if (!p || !p.steps.length) return;
+    const group = (cls, title, items, why) => {
+        if (!items.length) return;
+        const d = document.createElement("div");
+        d.className = cls;
+        const h = document.createElement("h4"); h.textContent = title;
+        const ul = document.createElement("ul");
+        for (const t of items) { const li = document.createElement("li"); li.textContent = t; ul.appendChild(li); }
+        d.append(h, ul);
+        if (why) d.appendChild(Object.assign(document.createElement("div"), { className: "why", textContent: why }));
+        box.appendChild(d);
+    };
+    const uniq = a => [...new Set(a)];
+    const signs = p.steps.filter(s => s.kind === "sign");
+    group("v-sign", "Signs available", uniq(signs.filter(s => !s.uncertain && !s.status).map(s => s.gloss)));
+    group("v-check", "Signs to check (best guess or tracking flagged)",
+          uniq(signs.filter(s => s.uncertain || s.status).map(s => `⚠ ${s.gloss}` + (s.en && s.en.toLowerCase() !== s.gloss.toLowerCase() ? ` ← ${s.en}` : ""))));
+    const spelled = p.steps.filter(s => s.kind === "spell");
+    group("v-spell", "No sign available, so fingerspelled",
+          uniq(spelled.filter(s => s.reason !== "name" && s.reason !== "requested")
+              .map(s => `${(s.en || s.letters.join("")).toLowerCase()} (${SPELL_SHORT[s.reason] || "no sign"})`)));
+    group("v-name", "Names, fingerspelled", uniq(spelled.filter(s => s.reason === "name").map(s => s.en || s.letters.join(""))));
+    group("v-omit", "Left out by the current planner", uniq(p.steps.filter(s => s.kind === "omit").map(s => s.en)),
+          "Omitted by these rules; not a claim that Auslan has no sign.");
+    if (!box.children.length) box.appendChild(Object.assign(document.createElement("p"), { className: "none", textContent: "Nothing to show yet." }));
 }
 
 function addNote(text, cls) {
@@ -1160,6 +1243,20 @@ playBtn.addEventListener("click", () => {
 });
 $("replay").addEventListener("click", () => player.replay());
 $("prev").addEventListener("click", () => stepBy(-1));
+// full screen for the avatar (the Fullscreen API is missing on some phones: hide the button there)
+const fsRoot = $("stagecol");
+const fsEnabled = document.fullscreenEnabled || document.webkitFullscreenEnabled;
+if (!fsEnabled) $("fullscreen").hidden = true;
+function toggleFullscreen() {
+    if (!fsEnabled) return;
+    const on = document.fullscreenElement || document.webkitFullscreenElement;
+    // the browser may refuse (no user gesture, policy): that is fine, nothing to report
+    const r = on ? (document.exitFullscreen || document.webkitExitFullscreen).call(document)
+                 : (fsRoot.requestFullscreen || fsRoot.webkitRequestFullscreen).call(fsRoot);
+    if (r && r.catch) r.catch(() => {});
+}
+$("fullscreen").addEventListener("click", toggleFullscreen);
+document.addEventListener("fullscreenchange", () => { resize(); $("fullscreen").setAttribute("aria-pressed", String(!!document.fullscreenElement)); });
 $("next").addEventListener("click", () => stepBy(1));
 $("despike").addEventListener("change", () => {
     if (!libOpts) return;
@@ -1186,7 +1283,7 @@ window.addEventListener("keydown", e => {
     // never steal keys a focused control already handles
     if (e.target.closest("input, select, textarea, button, summary") || e.metaKey || e.ctrlKey || e.altKey) return;
     const act = { " ": () => playBtn.click(), ArrowLeft: () => stepBy(-1), ArrowRight: () => stepBy(1),
-                  Home: () => $("replay").click() }[e.key];
+                  Home: () => $("replay").click(), f: toggleFullscreen, F: toggleFullscreen }[e.key];
     if (!act) return;
     e.preventDefault();
     act();

@@ -154,6 +154,14 @@ export function tokenize(text) {
 // Expanded word list: contractions split, numbers spelled out. Each entry
 // remembers which ORIGINAL token it came from, so captions can highlight
 // the English the viewer typed.
+// Clipped words -> the full word the corpus labels use. Same meaning, so
+// the full word's sign applies; only words whose full form has a sign.
+export const CLIPPED = {
+    exam: "examination", exams: "examination", uni: "university", maths: "mathematics", math: "mathematics",
+    tv: "television", telly: "television", fridge: "refrigerator", bike: "bicycle", bikes: "bicycle",
+    gov: "government", govt: "government",
+};
+
 function expand(tokens) {
     const words = [];
     for (const t of tokens) {
@@ -166,6 +174,10 @@ function expand(tokens) {
         }
         // possessive 's: Sabin's -> Sabin (the possession itself is not signed)
         const w = t.word.endsWith("'s") ? t.word.slice(0, -2) : t.word;
+        if (CLIPPED[w]) {
+            words.push({ w: CLIPPED[w], src: t.index, from: t.raw, cap: false, why: `"${w}" = "${CLIPPED[w]}"` });
+            continue;
+        }
         words.push({ w, src: t.index, from: t.raw, cap: t.cap && !t.sentenceStart });
     }
     return words;
@@ -194,6 +206,19 @@ const keyOf = words => words.join(" ").toUpperCase();
 // "time") is not evidence: evidence has to come from the REST of the sentence.
 const formOf = (a, b) => a === b || stems(a.toLowerCase()).includes(b.toLowerCase()) ||
                          stems(b.toLowerCase()).includes(a.toLowerCase());
+// A gloss that is the word plus a DERIVATIONAL ending names the same concept
+// in another word class (HAPPINESS for "happy", WHEREABOUTS for "where");
+// Auslan signs often serve both. Accepted from the dictionary, but always
+// marked for review. Deliberately short list: -ER is excluded (TEACHER is
+// not "teach"), and so is any ending that changes the meaning.
+const DERIVATIONAL = ["NESS", "MENT", "ATION", "ITY", "ABOUTS"];
+// English words whose everyday meaning the derived sign does not share
+// ("mean" = intend, not MEANNESS; "hard" = difficult, not HARDNESS)
+const POLYSEMOUS = new Set(["MEAN", "HARD", "MAJOR", "FAIR", "PRETTY", "PLAIN", "TIGHT"]);
+export const derivedFrom = (gloss, key) => {
+    const k = key.toUpperCase(), roots = [k, k.replace(/E$/, ""), k.replace(/Y$/, "I")];
+    return k.length >= 4 && !POLYSEMOUS.has(k) && roots.some(r => DERIVATIONAL.some(suf => gloss === r + suf));
+};
 const senseWordsOf = (sense, matchedKey) => (sense || "").split(" ")
     .filter(w => w && !SENSE_STOP.has(w) && !matchedKey.split(" ").some(k => formOf(w, k)));
 const playable = s => !!(s && s.available && s.status !== "unreliable");
@@ -261,7 +286,8 @@ function chooseKeyword(entries, matchedKey, contextWords) {
     // that lists this word earliest.
     const glossWords = e => e.sign.gloss.toUpperCase().split(/[^A-Z]+/).filter(Boolean);
     const overlap = e => glossWords(e).filter(x => !keyWords.includes(x) && contextWords.has(x)).length;
-    const strong = e => e.pos <= 1 || glossWords(e).some(g => keyWords.some(k => formOf(g, k)));
+    const related = e => glossWords(e).some(g => keyWords.some(k => derivedFrom(g, k)));
+    const strong = e => e.pos <= 1 || glossWords(e).some(g => keyWords.some(k => formOf(g, k))) || related(e);
     const ranked = [...pool].sort((a, b) =>
         (overlap(b) - overlap(a)) || (strong(b) - strong(a)) ||
         (a.pos - b.pos) || (a.pos / a.n - b.pos / b.n) ||
@@ -274,8 +300,9 @@ function chooseKeyword(entries, matchedKey, contextWords) {
                       `(its keyword ${best.pos + 1} of ${best.n}) -- choose it from the menu to see it` };
     }
     const others = pool.filter(e => e !== best).map(e => e.sign.gloss);
-    return { sign: best.sign, uncertain: others.length > 0 || pool === supported,
-             why: "dictionary keyword" + (others.length
+    const onlyRelated = related(best) && best.pos > 1 && !glossWords(best).some(g => keyWords.some(k => formOf(g, k)));
+    return { sign: best.sign, uncertain: others.length > 0 || pool === supported || onlyRelated,
+             why: "dictionary keyword" + (onlyRelated ? `; ${best.sign.gloss} is a related form of "${matchedKey.toLowerCase()}" -- check` : "") + (others.length
                  ? `; also listed for: ${others.slice(0, 4).join(", ")}${others.length > 4 ? ", ..." : ""} -- check`
                  : pool === supported ? ` (sense "${best.sense}" fits the sentence) -- check` : "") };
 }
@@ -358,8 +385,15 @@ export function plan(text, lex, opts = {}) {
         let hit = null, deferred = null;
         for (let n = Math.min(maxN, words.length - i); n >= 1; n--) {
             const span = words.slice(i, i + n);
-            const key = keyOf(span.map(x => x.w));
-            const cands = lex.candidates(key);
+            // the words as rewritten ("nineteen", "that is", "one") AND as typed
+            // ("19", "that's", "one's"): labels such as COVID 19, THAT'S RIGHT and
+            // USHER'S SYNDROME are written the second way
+            const asTyped = keyOf(span.filter((x, k) => k === 0 || x.src !== span[k - 1].src)
+                .map(x => x.from.toLowerCase().replace(/[^a-z0-9']/g, "")));
+            const whole = (span[0] === words[i]) && (i === 0 || words[i - 1].src !== span[0].src) &&
+                          (i + n >= words.length || words[i + n].src !== span[n - 1].src);
+            let key = keyOf(span.map(x => x.w)), cands = lex.candidates(key);
+            if (!cands.length && whole && asTyped !== key) { key = asTyped; cands = lex.candidates(key); }
             if (!cands.length) continue;
             if (n > 1) {
                 const c = chooseSign(cands, key, contextWords);

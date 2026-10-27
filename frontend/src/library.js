@@ -203,6 +203,11 @@ export class LRU {
     get size() { return this.map.size; }
 }
 
+// Labels shown on screen. The corpus labels its everyday DEAF sign
+// "DEAF MUTE", a dated term many Deaf people find offensive; the screen says
+// DEAF and the sign panel still shows the corpus label. Nothing else is renamed.
+export const DISPLAY_GLOSS = { "DEAF MUTE": "DEAF" };
+
 // ---------- the library -------------------------------------------------
 // manifest: assets/signs/manifest.json (3,215 signs, search keys)
 // letters:  assets/fingerspelling/letters.json (A-Z, v1 motion files)
@@ -238,7 +243,7 @@ export class Library {
     byId(id) {
         const s = this.manifest.signs[id];
         if (!s) return null;
-        return { id, gloss: s.gloss, kind: s.kind, sense: s.sense || null, keys: s.keys,
+        return { id, gloss: DISPLAY_GLOSS[s.gloss] || s.gloss, corpusGloss: s.gloss, kind: s.kind, sense: s.sense || null, keys: s.keys,
                  available: !!s.clip, low: !!s.low, q: s.q ?? null, failed: !!s.failed,
                  // from scripts/validate_signs.py: "review" | "unreliable" | null (ok)
                  status: s.status || null, flags: s.flags || [] };
@@ -269,7 +274,7 @@ export class Library {
         if (!s || !s.clip) return Promise.reject(new Error(`sign ${id} not available`));
         return this._load(`sign:${id}`, `${this.base}/assets/signs/motion/${s.clip}.json`, m => {
             const motion = this.prepareMotion(m);
-            return { kind: "sign", id, label: s.gloss, motion, span: activeSpan(motion),
+            return { kind: "sign", id, label: DISPLAY_GLOSS[s.gloss] || s.gloss, motion, span: activeSpan(motion),
                      video: this.videos ? `${this.base}/assets/signs/videos/${s.clip}.mp4` : null, low: !!s.low };
         });
     }

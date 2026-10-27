@@ -1043,6 +1043,7 @@ function showStepInfo(step) {
     if (step.kind === "sign") {
         const m = lib.manifest.signs[step.id];
         if (m && m.clip) row("Recording", m.clip);
+        if (m && m.gloss !== step.gloss) row("Corpus label", m.gloss);
     }
     body.appendChild(dl);
     if (step.why) { const p = document.createElement("p"); p.className = "why"; p.textContent = `Planner note: ${step.why}`; body.appendChild(p); }

@@ -212,6 +212,10 @@ export class Library {
                   despike: useDespike = true }) {
         this.prepareMotion = m => normalizeMotion(useDespike ? despike(m) : m);
         this.manifest = manifest || { signs: {}, keys: {}, counts: {} };
+        // why an existing sign can't play: a partial web build (build_dist.py
+        // --signs-from) ships only some signs and says so in its manifest
+        this.unavailableText = this.manifest.unavailable_text || "not extracted yet";
+        this.partial = !!this.manifest.unavailable_text;
         // English keyword -> signs, from the dataset's dictionary (scripts/build_keywords.py)
         this.keywords = (keywords && keywords.keys) || {};
         this.maxKeywordWords = Math.max(1, ...Object.keys(this.keywords).map(k => k.split(" ").length));

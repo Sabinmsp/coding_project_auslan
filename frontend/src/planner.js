@@ -311,6 +311,8 @@ function mergeOptions(a, b) {
     return a.concat(b.filter(o => !seen.has(o.id) && seen.add(o.id)));
 }
 
+const NA = lex => lex.unavailableText || "not extracted yet";
+
 function lettersOf(word) {
     return word.toUpperCase().replace(/[^A-Z]/g, "").split("");
 }
@@ -370,7 +372,7 @@ export function plan(text, lex, opts = {}) {
             break;
         }
         const deferNote = deferred
-            ? `; ${deferred.gloss} would fit better but is not extracted yet` : "";
+            ? `; ${deferred.gloss} would fit better but is ${NA(lex)}` : "";
 
         // grammatical words Auslan does not sign -- unless they start a
         // longer phrase that IS a sign ("to do" isn't, but check anyway)
@@ -407,7 +409,7 @@ export function plan(text, lex, opts = {}) {
                        why: `"${spanWord}" -> ${c.sign.gloss}` +
                             (kw.stem ? ` (via "${kw.stem}")` : "") + `: ${c.why}` +
                             (standIn ? `; standing in for ${standIn.gloss}, which ` +
-                                (standIn.available ? "has unreliable tracking" : "is not extracted yet") : "") +
+                                (standIn.available ? "has unreliable tracking" : `is ${NA(lex)}`) : "") +
                             (hit && !standIn ? `; not ${hit.cands.map(o => o.gloss).join(" / ")}: ` +
                                 `no evidence in the sentence for that sense` : "") + deferNote,
                        options: mergeOptions(kwOptions,
@@ -437,7 +439,7 @@ export function plan(text, lex, opts = {}) {
                 push({ kind: "spell", letters: lettersOf(spanWord), key: hit.key,
                        reason: pending ? "pending" : unreliable ? "unreliable" : "sense",
                        uncertain: c.uncertain || unreliable,
-                       why: (pending ? `sign ${c.sign.gloss} exists but is not extracted yet -- fingerspelled`
+                       why: (pending ? `sign ${c.sign.gloss} exists but is ${NA(lex)} -- fingerspelled`
                              : unreliable ? `sign ${c.sign.gloss} has unreliable tracking ` +
                                `(${c.sign.flags.join(", ")}) -- fingerspelled; choose it from the menu to see it`
                              : c.why) + deferNote,
@@ -454,7 +456,7 @@ export function plan(text, lex, opts = {}) {
                          : kw ? "loose" : w.cap ? "name" : "nosign",
                    why: (w.why ? w.why + "; " : "") +
                         (kwSign ? `dictionary sign ${kwSign.gloss} ` +
-                                  (kwSign.available ? "has unreliable tracking" : "is not extracted yet") +
+                                  (kwSign.available ? "has unreliable tracking" : `is ${NA(lex)}`) +
                                   " -- fingerspelled"
                          : kw ? kw.choice.why + " -- fingerspelled"
                          : w.cap ? "name -- fingerspelled" : "no sign in the corpus -- fingerspelled") +
@@ -548,7 +550,7 @@ export function fromGlossLine(line, lex) {
                          why: "from gloss line", options: [], src: [],
                          letters: lettersOf(info.keys[0]) });
         } else {
-            if (info) problems.push(`${tok}: not extracted yet`);
+            if (info) problems.push(`${tok}: ${NA(lex)}`);
             else if (!problems.some(p => p.startsWith(tok + ":"))) problems.push(`${tok}: no such sign`);
             const letters = lettersOf(tok);
             if (letters.length) steps.push({ kind: "spell", letters, en: tok.toLowerCase(),

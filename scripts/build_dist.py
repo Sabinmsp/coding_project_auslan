@@ -88,8 +88,32 @@ def slim_motion(data):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--small-videos", action="store_true")
+    ap.add_argument("--small-videos", action="store_true",
+                    help="re-encode reference videos at 240px (library, letters and phrases)")
+    ap.add_argument("--signs-from", metavar="FILE",
+                    help="partial build: only the signs the planner needs for the text in FILE "
+                         "(e.g. scripts/web_demo.txt); the rest are marked 'not included in this web demo'")
     args = ap.parse_args()
+    ffmpeg = paths.find_tool("ffmpeg") if args.small_videos else None
+
+    def copy_video(src, dst):
+        if ffmpeg:
+            subprocess.run([ffmpeg, "-y", "-v", "error", "-i", str(src), "-vf", "scale=-2:240",
+                            "-c:v", "libx264", "-preset", "veryfast", "-crf", "28",
+                            "-pix_fmt", "yuv420p", "-movflags", "+faststart", "-an", str(dst)],
+                           check=True)
+        else:
+            shutil.copy2(src, dst)
+
+    subset = None
+    if args.signs_from:
+        node = shutil.which("node") or next(iter(sorted(Path.home().glob(".nvm/versions/node/*/bin/node"))), None)
+        if not node:
+            raise SystemExit("--signs-from needs Node.js (it runs the app's planner)")
+        out = subprocess.run([str(node), str(paths.ROOT / "scripts" / "collect_sign_ids.mjs"), args.signs_from],
+                             check=True, capture_output=True, text=True).stdout
+        subset = set(json.loads(out))
+        print(f"partial build: {len(subset)} signs needed by {args.signs_from}")
 
     if DIST.exists():
         shutil.rmtree(DIST)
@@ -130,7 +154,7 @@ def main():
     for rel in wanted_video:
         dest = DIST / rel
         dest.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(paths.ROOT / rel, dest)
+        copy_video(paths.ROOT / rel, dest)
         video_bytes += dest.stat().st_size
 
     # ---- the sign library ----
@@ -140,21 +164,28 @@ def main():
     for src in (paths.MANIFEST, paths.FACE_TOPOLOGY, paths.KEYWORDS):
         shutil.copy2(src, dlib / src.name)
     manifest = json.loads(paths.MANIFEST.read_text())
+    if subset is not None:
+        # signs left out stay in the manifest (the planner still knows they
+        # exist and offers them, disabled) but have no clip, and the page
+        # says why in words: "not included in this web demo"
+        for sid, s in manifest["signs"].items():
+            if sid not in subset and s.get("clip"):
+                s["clip"] = None
+                s["web_excluded"] = True
+        manifest["unavailable_text"] = "not included in this web demo"
+        shipped = [s for s in manifest["signs"].values() if s.get("clip")]
+        manifest["counts"]["available"] = len(shipped)
+        for k in ("review", "unreliable"):
+            manifest["counts"][k] = sum(1 for s in shipped if s.get("status") == k)
+        (dlib / paths.MANIFEST.name).write_text(json.dumps(manifest, separators=(",", ":")))
     clips = sorted({s["clip"] for s in manifest["signs"].values() if s["clip"]})
-    ffmpeg = paths.find_tool("ffmpeg") if args.small_videos else None
     lib_motion = lib_video = 0
     for clip in clips:
         m_src, v_src = paths.SIGN_MOTION / f"{clip}.json", paths.SIGN_VIDEOS / f"{clip}.mp4"
         shutil.copy2(m_src, dlib / "motion" / m_src.name)
         lib_motion += m_src.stat().st_size
         v_dst = dlib / "videos" / v_src.name
-        if ffmpeg:
-            subprocess.run([ffmpeg, "-y", "-v", "error", "-i", str(v_src), "-vf", "scale=-2:240",
-                            "-c:v", "libx264", "-preset", "veryfast", "-crf", "28",
-                            "-pix_fmt", "yuv420p", "-movflags", "+faststart", "-an", str(v_dst)],
-                           check=True)
-        else:
-            shutil.copy2(v_src, v_dst)
+        copy_video(v_src, v_dst)
         lib_video += v_dst.stat().st_size
 
     # correct MIME types + caching, for hosts that need telling
@@ -173,6 +204,13 @@ def main():
         '[[headers]]\n  for = "/assets/*.mp4"\n'
         '  [headers.values]\n    Content-Type = "video/mp4"\n'
     )
+
+    # Vercel: same headers; cleanUrls off so /index.html and ?text= links work as-is
+    (DIST / "vercel.json").write_text(json.dumps({
+        "headers": [
+            {"source": "/assets/(.*).mp4", "headers": [{"key": "Content-Type", "value": "video/mp4"}]},
+            {"source": "/assets/signs/manifest.json", "headers": [{"key": "Cache-Control", "value": "no-cache"}]},
+        ]}, indent=1) + "\n")
 
     files = [p for p in DIST.rglob("*") if p.is_file()]
     total = sum(p.stat().st_size for p in files)

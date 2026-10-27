@@ -186,3 +186,18 @@ test("rapid input changes: planning is pure (same text -> same plan)", () => {
     const out = texts.map(t => shape(plan(t, lex)));
     assert.equal(out[0], out[2]);
 });
+
+test("partial web build: the collector keeps every sign a listed sentence plays, and its options", async () => {
+    const { execFileSync } = await import("node:child_process");
+    const { writeFileSync, mkdtempSync } = await import("node:fs");
+    const { tmpdir } = await import("node:os");
+    const dir = mkdtempSync(`${tmpdir()}/collect-`);
+    writeFileSync(`${dir}/t.txt`, "# comment\nPlease pay your bill tomorrow.\n");
+    const ids = JSON.parse(execFileSync(process.execPath, [(await import("node:url")).fileURLToPath(new URL("../scripts/collect_sign_ids.mjs", import.meta.url)), `${dir}/t.txt`]));
+    for (const s of plan("Please pay your bill tomorrow.", lex).steps) {
+        if (s.kind === "sign") assert.ok(ids.includes(s.id), s.id);
+        for (const o of s.options || []) assert.ok(ids.includes(o.id), `option ${o.id}`);
+    }
+    assert.ok(ids.includes("hello"), "quick picks always included");
+    assert.ok(ids.length < 200, `${ids.length} signs: a subset, not the library`);
+});

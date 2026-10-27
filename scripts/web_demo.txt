@@ -1,0 +1,32 @@
+# Text the partial web build (build_dist.py --signs-from) must sign.
+# One sentence or word list per line; '#' lines are comments.
+Hello, how are you?
+My name is Sabin.
+I need help.
+Where is the hospital?
+I want to learn Auslan.
+Thank you for helping me.
+Please pay your bill tomorrow.
+hello hi bye goodbye thank you thanks please sorry yes no ok fine welcome
+i me my mine you your we us our they them their he she it his her this that here there
+what who where when why how which
+name deaf hearing sign interpreter auslan english language understand
+one two three four five six seven eight nine ten eleven twelve thirteen fourteen
+fifteen sixteen seventeen eighteen nineteen twenty thirty forty fifty hundred thousand million
+first second third last next number
+day week month year today tomorrow yesterday morning afternoon evening night time hour minute
+now later soon before after early late always never sometimes again
+monday tuesday wednesday thursday friday saturday sunday weekend
+january february march april may june july august september october november december
+date due pay bill money cost price dollar cents cash card credit card bank account
+rent electricity gas water phone internet council government tax fine debt owe
+letter email form address post mail notice important urgent warning danger emergency
+doctor nurse hospital sick pain medicine appointment health help ambulance police fire
+home house family mother father child children baby brother sister friend person people
+work job school student teacher learn study class meeting office
+go come stop start finish wait open close give take buy sell send receive get have need want
+know think feel see look read write tell say ask answer call phone text
+eat drink food sleep live stay move leave arrive change cancel book check
+can cannot must should will not none all some more less many much enough
+good bad big small new old hot cold happy sad ready free safe same different true wrong right
+car bus train taxi street shop

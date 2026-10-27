@@ -922,7 +922,7 @@ const SPELL_REASON = {
     name: "a name: fingerspelled on purpose", requested: "fingerspelling requested in the gloss line",
     nosign: "no sign for this word in the library", sense: "the library's sign is for a different sense",
     loose: "the only dictionary match was too loose to use", unreliable: "the sign's tracking is unreliable",
-    pending: "the sign exists but is not extracted",
+    pending: "the sign exists but is not available here",
 };
 function detailOf(step) {
     if (step.kind === "omit") return "omitted by the current planner";
@@ -985,7 +985,7 @@ function showStepInfo(step) {
     if (step.kind === "sign") opts.push({ value: `sign:${step.id}`, text: `${step.gloss} (playing)`, current: true });
     for (const o of step.options || []) {
         if (seen.has(o.id)) continue; seen.add(o.id);
-        opts.push({ value: `sign:${o.id}`, disabled: !o.available, text: o.gloss + (!o.available ? " · not extracted"
+        opts.push({ value: `sign:${o.id}`, disabled: !o.available, text: o.gloss + (!o.available ? ` · ${lib.unavailableText}`
             : o.status === "unreliable" ? " · ⚠ unreliable tracking" : o.status === "review" ? " · tracking flagged" : "") });
     }
     const letters = lettersFor(step);
@@ -1046,7 +1046,7 @@ function renderPlan() {
         for (const o of step.options || []) {
             if (seen.has(o.id)) continue;
             seen.add(o.id);
-            add(`sign:${o.id}`, o.gloss + (!o.available ? " · not extracted yet"
+            add(`sign:${o.id}`, o.gloss + (!o.available ? ` · ${lib.unavailableText}`
                 : o.status === "unreliable" ? " · unreliable tracking"
                 : o.status === "review" ? " · tracking flagged"
                 : o.low ? " · low tracking" : ""), !o.available);
@@ -1076,7 +1076,9 @@ function renderPlan() {
     if (!hasPhrase) addNote(summary.join(" · "), "summary");
     for (const s of p.notes || []) addNote(s);
     const pending = p.steps.filter(s => s.pending);
-    if (pending.length) addNote(`exists in the corpus but not extracted yet: ` +
+    if (pending.length && lib.partial) addNote(`signs ${lib.unavailableText}: ` +
+        pending.map(s => s.pending).join(", "));
+    else if (pending.length) addNote(`exists in the corpus but not extracted yet: ` +
         pending.map(s => s.pending).join(", ") + ` — python3 scripts/build_library.py --only ` +
         pending.map(s => s.pending).join(" "));
 }
@@ -1144,7 +1146,7 @@ function quickPlan(name) {
         if (!info.available) {
             return { ...base, steps: [{ n: 0, kind: "spell", letters: lettersOf(info.keys[0]),
                 en: name.toLowerCase(), src: [], options, pending: info.id, reason: "pending",
-                why: `sign ${info.gloss} exists but is not extracted yet -- fingerspelled` }] };
+                why: `sign ${info.gloss} exists but is ${lib.unavailableText} -- fingerspelled` }] };
         }
         return { ...base, steps: [{ n: 0, kind: "sign", id: info.id, gloss: info.gloss,
             key: info.keys[0], match: "exact", uncertain: false,
@@ -1268,8 +1270,9 @@ window.auslan = {
     }
 
     const c = manifest.counts;
-    $("libstat").textContent = !c ? "" : `${c.available.toLocaleString()} of ${c.signs.toLocaleString()} corpus signs extracted` +
-          (c.available < c.signs ? " (extraction in progress — reload for more)" : "") +
+    $("libstat").textContent = !c ? "" : `${c.available.toLocaleString()} of ${c.signs.toLocaleString()} corpus signs ` +
+          (lib.partial ? "in this web demo" : "extracted") +
+          (c.available < c.signs && !lib.partial ? " (extraction in progress — reload for more)" : "") +
           ` · A–Z fingerspelling` +
           (c.review || c.unreliable ? ` · ${c.review || 0} to check, ${c.unreliable || 0} unreliable (fingerspelled)` : "");
 
@@ -1282,7 +1285,7 @@ window.auslan = {
         const info = signs[name].library ? lib.byId(signs[name].library) : null;
         if (info && !info.available) {
             button.classList.add("pending");
-            button.title = "not extracted yet — plays fingerspelled";
+            button.title = `${lib.unavailableText} — plays fingerspelled`;
         } else if (info && info.status) {
             button.classList.add("flagged");
             button.title = info.status === "unreliable"

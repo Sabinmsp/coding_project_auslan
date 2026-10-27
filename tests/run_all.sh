@@ -18,6 +18,7 @@ fail=0
 run() { echo "== $1"; shift; "$@" || fail=1; }
 
 run "node tests" "$NODE" --test tests/*.mjs
+run "library integrity" python3 scripts/check_library.py
 run "python tests" "$PY" -m unittest tests/test_pipeline.py
 run "LLM validation tests" python3 -m unittest tests/test_llm_plan.py
 if curl -s -o /dev/null "http://localhost:$PORT/"; then

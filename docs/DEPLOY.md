@@ -9,10 +9,11 @@ API. Any static host works.
 |---|---|---|---|
 | full library | `python3 scripts/build_dist.py` | 1,034 MB, 6,499 files, largest file 8.5 MB | Cloudflare Pages (20,000 files, 25 MiB/file); Netlify; **not** Vercel (CLI upload cap 100 MB Hobby, 1 GB Pro) |
 | full library, small videos | `python3 scripts/build_dist.py --small-videos` | ~0.55 GB (estimate) | Cloudflare Pages, Netlify, Vercel Pro |
-| **web demo** | `python3 scripts/build_dist.py --signs-from scripts/web_demo.txt --small-videos` | **74 MB, 700 files** | **everything, including Vercel Hobby** |
+| **web demo** | `python3 scripts/build_dist.py --signs-from scripts/web_demo.txt --small-videos` | **88 MB, 858 files** | **everything, including Vercel Hobby (100 MB, little headroom)** |
 
-The web demo ships the 315 signs that the app's own planner needs for
-`scripts/web_demo.txt` (the seven demo sentences and ~300 everyday words),
+The web demo ships the 390 signs that the app's own planner needs for
+`scripts/web_demo.txt` (the demo sentences, the sample handbook's text as
+written and as simplified, and ~300 everyday words),
 plus every alternative their menus offer and all quick picks. Every other
 sign stays in the manifest without a clip; the page fingerspells it and
 says *"not included in this web demo"*, never that it doesn't exist. Add
@@ -26,6 +27,25 @@ video panel is lower resolution.
 `assets/` only what the page can request. Catalog, extraction log and QA
 sheets live in `datasets/processed/` and never ship. Host limits change:
 check them before deploying.
+
+### The AI summary (optional)
+
+PDF reading and the offline summary run entirely in the browser and need no
+server. The plain-English rewrite by Claude is a small serverless function:
+
+| | |
+|---|---|
+| route | `POST /api/summarize` (`dist/api/summarize.py`, built from `backend/api_summarize.py` + `backend/summarize_llm.py`) |
+| Vercel | runs it as a Python function; `dist/requirements.txt` installs `anthropic` |
+| env var `ANTHROPIC_API_KEY` | required for AI summaries; set it in the Vercel project settings, never in the page |
+| env var `ANTHROPIC_MODEL` | optional; default `claude-opus-5-5` |
+| without them | the route answers 503 and the page says so and keeps its offline summary |
+| other static hosts | the route doesn't exist; same fallback |
+
+What is sent: only the ~60 excerpts the offline summariser picked (each
+≤ 600 characters, with its page), never the whole PDF. A user uploading a
+private document should know that excerpts go to the API when the AI switch
+is on.
 
 ## 2. Test the bundle locally
 

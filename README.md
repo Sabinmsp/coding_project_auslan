@@ -1,8 +1,19 @@
-# Auslan AI — 2D sign animation
+# SignBridge: an Auslan-supported document assistant (prototype)
 
-Type English; the app proposes an Auslan sign sequence, lets you review and
-correct it, and plays it on a 2D figure driven by recorded signers' motion,
-with the source video alongside.
+Drop in a long PDF (a university handbook, a notice, a bill). The app reads
+it in the browser, picks out the key points with their page numbers, puts
+them in plainer English, and lets you select any point to see it played with
+recorded Auslan signs on a 2D figure, with the source video alongside.
+Words without a sign are fingerspelled and labelled.
+
+It is an **accessibility prototype, not an Auslan translator**: signs follow
+a simplified rule-based order, and nothing has been checked by Deaf signers.
+
+```
+PDF ─► text per page (pdf.js, in the browser) ─► key points + pages (offline summariser)
+    ─► [optional] plain-English rewrite by Claude, every fact re-checked against the PDF
+    ─► select a point ─► sign plan (planner.js) ─► sign library / fingerspelling ─► 2D figure
+```
 
 This is the cleaned-up project. The original workspace (`../`) is unchanged;
 what moved where, and why, is in [docs/CLEANUP_REPORT.md](docs/CLEANUP_REPORT.md).
@@ -55,6 +66,8 @@ Run from this folder. `V=../.venv-1/bin/python` below.
 | add videos from a folder (`thank_you.mp4` -> THANK YOU) | `python3 scripts/ingest.py --folder DIR` then `$V scripts/build_library.py` |
 | extract one video to the original motion format | `$V backend/extract_motion.py clip.mp4 out.json` |
 | run the tests | see below |
+| summarise a PDF's key excerpts with Claude, from the command line | `python3 backend/summarize_llm.py excerpts.json` (needs `pip install anthropic` + `ANTHROPIC_API_KEY`) |
+| regenerate the test PDFs | `python3 tests/fixtures/make_pdfs.py` |
 | check every library file is present and well-formed (read-only) | `python3 scripts/check_library.py` |
 | build the deployable site (full library, ~1 GB) | `python3 scripts/build_dist.py` -> `dist/` ([docs/DEPLOY.md](docs/DEPLOY.md)) |
 | build the small web demo (~75 MB, fits Vercel Hobby) | `python3 scripts/build_dist.py --signs-from scripts/web_demo.txt --small-videos` |
@@ -72,11 +85,12 @@ sh tests/run_all.sh 8003             # everything below, in one go
 
 | suite | what |
 |---|---|
-| `node --test tests/*.mjs` (55) | planner, keywords, library, timeline, reliability, playback |
+| `node --test tests/*.mjs` (66) | planner, keywords, library, timeline, reliability, playback, document summary |
 | `scripts/check_library.py` | every motion file, video, letter and quick pick present and well-formed |
 | `tests/test_pipeline.py` (16) | catalog, keywords, ownership, validator, lossless format |
 | `tests/test_llm_plan.py` (9) | LLM plan validation, offline |
-| `tests/browser/` (3 suites, headless Chrome) | behaviour, failure paths, controls + end-to-end checklist |
+| `tests/test_summarize_llm.py` (9) | AI summary endpoint, offline (stubbed model) |
+| `tests/browser/` (4 suites, headless Chrome) | behaviour, failure paths, controls + end-to-end, PDF → key points → signing |
 
 These test the engineering. None of them says whether the signing is
 correct Auslan.

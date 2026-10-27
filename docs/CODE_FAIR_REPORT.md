@@ -1,5 +1,83 @@
 # CDU IT Code Fair 2026: audit, fixes and release check
 
+**Update, 27 Oct (second sprint): the product is now an Auslan-supported
+document assistant.** Section 0 covers the PDF workflow; sections 1–10 the
+earlier animation, UI and deployment work, all still in force.
+
+## 0. PDF → key points → Auslan-supported signing
+
+![PDF workflow](images/codefair_pdf.png)
+
+### Audit before the sprint
+
+| part | state found |
+|---|---|
+| 2D avatar, sign library, planner, fingerspelling | working (sections 1–6) |
+| PDF upload | **missing** |
+| PDF text extraction | **missing** |
+| summarisation | **missing** (only `llm_plan.py`, a Claude gloss planner, never used live) |
+| AI credentials | none on this machine; `anthropic` SDK not installed |
+| deployment config | static builds only (`build_dist.py`) |
+
+### Built
+
+| step | how | file |
+|---|---|---|
+| upload | drag-and-drop or file picker; "Try a sample handbook" | `index.html` |
+| text extraction | pdf.js 3.11.174 (Mozilla, Apache-2.0), vendored so it works offline; page by page with progress; header/footer lines and page numbers removed; hyphenated words rejoined. The PDF never leaves the browser | `src/document.js`, `vendor/pdfjs/` |
+| summary (always available) | hierarchical and extractive: sentences scored by tf-idf across pages plus dates, amounts, deadlines, "must", contacts; best per 10-page chunk, then best overall, near-duplicates skipped at both levels; shown in document order with **page numbers**. Real sentences only, so nothing is invented | `src/summarize.js` |
+| simplified English | plain-English substitutions ("commence" → "start", "prior to" → "before"), asides without facts dropped, semicolons split. Rule-based and labelled so; numbers, dates, amounts, emails never change (tested) | `src/summarize.js` |
+| AI summary (optional) | the ~60 selected excerpts (not the PDF) go to `POST /api/summarize`; Claude rewrites the 10 most important points in plain English, citing excerpt numbers; the server maps citations to pages and drops uncited points; the browser re-checks every number, date, time, amount, email and link against the cited pages and shows ⚠ on any mismatch. Any failure: the offline summary stays, with a message | `backend/summarize_llm.py`, `backend/api_summarize.py` |
+| signing a point | selecting a point sends its text to the existing planner and player; nothing about them changed | `index.html` |
+| errors | not a PDF; damaged; password-protected; over 60 MB; no text (likely scanned: OCR not supported); AI unavailable or timed out | `src/document.js`, `index.html` |
+
+### The three test sentences (real planner output)
+
+| sentence | signed | flagged ⚠ (a dictionary guess) | fingerspelled / omitted |
+|---|---|---|---|
+| Welcome to the university. | WELCOME | UNIVERSITY → MORTARBOARD | "to", "the" omitted |
+| Students must attend classes. | MUST | STUDENT (tracking review), "attend" → COMING, "classes" → STYLE | — |
+| The examination starts tomorrow. | TOMORROW, START, "examination" → EXAMINED | — | "the" omitted |
+
+All three play without freezing (browser test). The flagged choices are
+visible on screen, and each can be changed or fingerspelled from the menu.
+
+### Tested (2026-10-27, all executed)
+
+| test | result |
+|---|---|
+| short PDF (2 pages, sample handbook) | pass: 10 key points with pages, deadline kept exactly |
+| medium PDF (13 pages, running header + page numbers) | pass: 3,413 words → 10 points in 0.5 s; header removed |
+| 200-page document (synthetic text, Node) | pass: 10 points from several parts of the document, < 2 s |
+| invalid file | pass: "This file is not a PDF." |
+| PDF with no text | pass: "may be scanned images; OCR not supported" |
+| selecting a point plays it | pass |
+| AI endpoint without key / SDK | pass: 503 + message, offline summary kept |
+| AI endpoint logic with a stubbed model | pass (citations → pages, invented citations dropped) |
+| fact check catches a changed date / wrong page | pass |
+| **a live Claude call** | **not verified: no API key on this machine** |
+| **the Vercel function deployed** | **not verified: nothing deployed** |
+| full suite, `sh tests/run_all.sh 8003` | **pass, twice in a row** (66 Node, 16 + 9 + 9 Python, integrity check, 4 browser suites) |
+
+Two older browser checks were timing-sensitive under load: the reference
+video got 0.8 s to load, and pause/resume was measured with the test
+machine's clock. They now wait up to 3 s, and measure with the page's own
+clock. Neither change loosens what is checked.
+
+### Next three tasks
+
+1. **Get an Anthropic API key, run one live AI summary of the sample PDF,
+   and read every point against the PDF.** The AI path is built and tested
+   offline only.
+2. **Shorten what gets signed.** A summary point like the enrolment
+   deadline takes about 36 s because ENROLMENT, ONLINE, FEBRUARY and the year
+   are fingerspelled. Options: ask the AI rewrite to prefer words the sign
+   library has, and show dates and numbers as text rather than spelling them.
+3. **Deploy the 88 MB web demo to a preview URL (with approval) and test it
+   on a real phone and on the venue's network**, then rehearse the
+   90-second demo with the sample handbook.
+
+
 State on 2026-10-27. Commits `3a338cd`, `fb77139`, `7a4f6a3` and the docs commit
 after them. Nothing has been deployed.
 

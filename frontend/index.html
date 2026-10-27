@@ -261,6 +261,8 @@
             <input type="checkbox" id="trim" checked> trim rest between signs</label>
         <label title="Inside a fingerspelled word, play only each letter's held handshape (max 0.6 s) instead of the whole recording with its rise and fall. H and J keep their full recording: they involve movement.">
             <input type="checkbox" id="compact" checked> compact fingerspelling</label>
+        <label title="Draw the face (eyebrows, eyes, lips) from the recording. Off: a plain head outline.">
+            <input type="checkbox" id="face"> show face</label>
         <label title="Remove single-frame tracking spikes (3-frame median). Off = the raw MediaPipe data.">
             <input type="checkbox" id="despike" checked> remove tracking spikes</label>
     </div>
@@ -558,7 +560,7 @@ function drawFrame(frame, layout) {
     // size as one with them
     const headR = Math.max(unit * 0.02, Math.hypot(nose[0] - neck[0], nose[1] - neck[1]) * 0.49);
     limb(neck, nose, thick * 0.7, "#7ee8c8");
-    if (frame.face && faceTopo) {
+    if (frame.face && faceTopo && $("face").checked) {
         drawFace(frame.face, layout, W, H, thick);
     } else {
         ctx.fillStyle = "#0f1318";
@@ -1368,6 +1370,7 @@ $("order").addEventListener("change", () => {
 });
 $("trim").addEventListener("change", () => { if (currentPlan) playPlan(currentPlan); });
 $("compact").addEventListener("change", () => { if (currentPlan) playPlan(currentPlan); });
+$("face").addEventListener("change", () => { dirty = true; });
 
 playBtn.addEventListener("click", () => {
     if (!tl) return;

@@ -16,7 +16,8 @@ Automated tests check engineering, not Auslan. Nothing here claims linguistic ac
 - [x] Free-text input; contractions, numbers, phrases, negation, stems
 - [x] Dictionary keywords with safety rules (no meaning flips; loose matches spelled)
 - [x] Every word becomes sign / fingerspell / omit, with a reason
-- [ ] One clear on-screen statement: "This shows Auslan signs in a simplified order. It is not a full Auslan translation."
+- [x] One clear on-screen statement in the page header: "It is not a full Auslan translation" (2026-10-27)
+- [x] Every fingerspelled step says why (name / no sign / unreliable / loose match / requested)
 
 ## 3. Quality signalling (see NEXT_STEPS #2)
 - [x] Plan chips show icon + word for each state
@@ -28,10 +29,11 @@ Automated tests check engineering, not Auslan. Nothing here claims linguistic ac
 - [x] Sequential playback, transitions, loop wrap, interpolation between recorded frames
 - [x] Play / pause / replay / scrub / speed; source video in sync
 - [x] Wrists joined; no redrawing while paused
+- [x] Tracking drop-outs fade instead of blinking; single-frame spikes removed; compact fingerspelling (see CODE_FAIR_REPORT.md)
 - [x] A sign's file failing to load mid-sentence is reported; the rest plays (tested)
 
 ## 5. Testing (see NEXT_STEPS #3)
-- [x] 40 JS + 16 Python + 9 LLM-validation tests + 2 browser suites pass
+- [x] 55 JS + 16 Python + 9 LLM-validation tests, library integrity check, 3 browser suites pass (2026-10-27)
 - [x] Browser tests in `tests/browser/`; `sh tests/run_all.sh` runs everything
 - [x] Tests for failed extraction, a missing motion file, fast switching, pause in a transition
 - [x] A whole-library check: no typed word ever auto-plays an `unreliable` sign

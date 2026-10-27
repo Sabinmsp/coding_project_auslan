@@ -10,8 +10,11 @@ what moved where, and why, is in [docs/CLEANUP_REPORT.md](docs/CLEANUP_REPORT.md
 ## Start
 
 ```sh
-python3 backend/serve.py          # http://localhost:8001
+python3 backend/serve.py 8003     # http://localhost:8003
 ```
+
+Code Fair notes (what changed, test results, limits, deploying):
+[docs/CODE_FAIR_REPORT.md](docs/CODE_FAIR_REPORT.md).
 
 Needs nothing but Python 3 to view. `?text=I go home tomorrow` in the URL
 plans and plays a sentence; `?gloss=hello fs:SABIN` plays an exact sign
@@ -52,7 +55,9 @@ Run from this folder. `V=../.venv-1/bin/python` below.
 | add videos from a folder (`thank_you.mp4` -> THANK YOU) | `python3 scripts/ingest.py --folder DIR` then `$V scripts/build_library.py` |
 | extract one video to the original motion format | `$V backend/extract_motion.py clip.mp4 out.json` |
 | run the tests | see below |
-| build the deployable site | `python3 scripts/build_dist.py` -> `dist/` ([docs/DEPLOY.md](docs/DEPLOY.md)) |
+| check every library file is present and well-formed (read-only) | `python3 scripts/check_library.py` |
+| build the deployable site (full library, ~1 GB) | `python3 scripts/build_dist.py` -> `dist/` ([docs/DEPLOY.md](docs/DEPLOY.md)) |
+| build the small web demo (~75 MB, fits Vercel Hobby) | `python3 scripts/build_dist.py --signs-from scripts/web_demo.txt --small-videos` |
 
 How the parts connect, and how to add a sign or process a new video in
 detail: [docs/PIPELINE.md](docs/PIPELINE.md). Why some animations looked
@@ -61,21 +66,28 @@ wrong and what fixed them: [docs/ANIMATION_DEBUG_REPORT.md](docs/ANIMATION_DEBUG
 ## Tests
 
 ```sh
-node --test tests/*.mjs                              # planner, keywords, library, timeline (36)
-../.venv-1/bin/python -m unittest tests/test_pipeline.py   # catalog, keywords, ownership, validator, lossless (15)
-python3 -m unittest tests/test_llm_plan.py           # LLM plan validation, offline (9)
+python3 backend/serve.py 8003 &      # the browser suites need the app running
+sh tests/run_all.sh 8003             # everything below, in one go
 ```
 
-Browser behaviour (playback, pause, replay, scrub, speed, reference video,
-captions, typing) was verified by driving headless Chrome; see
-[docs/CLEANUP_REPORT.md](docs/CLEANUP_REPORT.md#verification).
+| suite | what |
+|---|---|
+| `node --test tests/*.mjs` (55) | planner, keywords, library, timeline, reliability, playback |
+| `scripts/check_library.py` | every motion file, video, letter and quick pick present and well-formed |
+| `tests/test_pipeline.py` (16) | catalog, keywords, ownership, validator, lossless format |
+| `tests/test_llm_plan.py` (9) | LLM plan validation, offline |
+| `tests/browser/` (3 suites, headless Chrome) | behaviour, failure paths, controls + end-to-end checklist |
+
+These test the engineering. None of them says whether the signing is
+correct Auslan.
 
 ## Data, in one paragraph
 
 3,215 Auslan signs, two recorded takes each: 6,430 clips in
 `datasets/videos/rgb`, labelled by `datasets/raw/labels/Test_ITW.json`.
-**375 were extracted and playable at the cleanup (2026-10-23)**; the rest
-are extracted on demand or by the batch above (the page shows the live count). Every other word is fingerspelled from 26 letter clips.
+**All 3,215 are extracted and playable (2026-10-26)**: 2,543 pass the
+automated checks, 602 are flagged for review and 70 are unreliable (typed
+text fingerspells those). Every other word is fingerspelled from 26 letter clips.
 Details, including two large unused data sources:
 [docs/DATASET_REPORT.md](docs/DATASET_REPORT.md).
 

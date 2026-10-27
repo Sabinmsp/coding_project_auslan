@@ -3,58 +3,54 @@
 Static files and client-side JavaScript only: no server logic, database or
 API. Any static host works.
 
-## 1. Build the bundle
+## 1. Choose a build
 
-```sh
-python3 scripts/build_dist.py                 # full-resolution reference videos
-python3 scripts/build_dist.py --small-videos  # reference videos re-encoded at 240px
-```
+| build | command | size (measured 2026-10-27) | fits |
+|---|---|---|---|
+| full library | `python3 scripts/build_dist.py` | 1,034 MB, 6,499 files, largest file 8.5 MB | Cloudflare Pages (20,000 files, 25 MiB/file); Netlify; **not** Vercel (CLI upload cap 100 MB Hobby, 1 GB Pro) |
+| full library, small videos | `python3 scripts/build_dist.py --small-videos` | ~0.55 GB (estimate) | Cloudflare Pages, Netlify, Vercel Pro |
+| **web demo** | `python3 scripts/build_dist.py --signs-from scripts/web_demo.txt --small-videos` | **74 MB, 700 files** | **everything, including Vercel Hobby** |
+
+The web demo ships the 315 signs that the app's own planner needs for
+`scripts/web_demo.txt` (the seven demo sentences and ~300 everyday words),
+plus every alternative their menus offer and all quick picks. Every other
+sign stays in the manifest without a clip; the page fingerspells it and
+says *"not included in this web demo"*, never that it doesn't exist. Add
+lines to `scripts/web_demo.txt` to include more.
+
+`--small-videos` re-encodes every reference video (library, letters,
+phrases) at 240 px with ffmpeg. The avatar is unaffected; only the source
+video panel is lower resolution.
 
 `dist/` mirrors the URLs the page uses: `frontend/` at the root, and under
-`assets/` only what the page can request -- `signs.json`, `letters.json`,
-the letter and phrase clips they reference, and from `assets/signs/` the
-manifest, face topology and the motion + video of every sign the manifest
-marks available. Catalog, extraction log and QA sheets live in
-`datasets/processed/` and never ship.
-
-Size grows with the library. Measured at 225 extracted signs:
-
-| | |
-|---|---|
-| letters + phrases | 20 MB motion, 25 MB video |
-| library, per sign | ~130 KB motion + ~150 KB video |
-| bundle at 225 signs | 114 MB, 518 files |
-| **all 3,215 signs** | **~1.0 GB** (~0.5 GB with `--small-videos`, which cuts video 84%) |
-
-Check your host's site-size and file-count limits before deploying the full
-library. Motion JSON compresses well and hosts gzip it in transit, so what a
-viewer downloads is much smaller than what is stored.
+`assets/` only what the page can request. Catalog, extraction log and QA
+sheets live in `datasets/processed/` and never ship. Host limits change:
+check them before deploying.
 
 ## 2. Test the bundle locally
 
 ```sh
-python3 backend/serve.py 8002 dist
-open http://localhost:8002
+python3 backend/serve.py 8005 dist
+open http://localhost:8005
+python3 tests/browser/test_controls.py 8005     # and test_behaviour.py
 ```
 
-Use `backend/serve.py`, not `python3 -m http.server`: the built-in server ignores
-HTTP Range requests, which breaks seeking in the reference video. Real
-hosts support ranges.
+Use `backend/serve.py`, not `python3 -m http.server`: the built-in server
+ignores HTTP Range requests, which breaks seeking in the reference video.
+Real hosts support ranges. (`test_robustness.py` assumes the full library;
+against the web demo its unreliable-sign checks don't apply.)
 
-## 3. Deploy
-
-**Netlify** (drag and drop): app.netlify.com/drop, drop the `dist` folder.
+## 3. Deploy (only with the project owner's approval)
 
 ```sh
-npx netlify-cli deploy --dir=dist --prod     # Netlify CLI
-npx vercel --prod dist                       # Vercel
-npx wrangler pages deploy dist               # Cloudflare Pages
+npx vercel deploy dist --prod                # Vercel (web demo build)
+npx wrangler pages deploy dist               # Cloudflare Pages (any build)
+npx netlify-cli deploy --dir=dist --prod     # Netlify
 ```
 
-**GitHub Pages:** push the contents of `dist/` to a `gh-pages` branch.
-
-`_headers` and `netlify.toml` set MIME types for `.mp4`/`.json` and stop the
-manifest being cached, so a redeploy with more signs is picked up on reload.
+The build writes `vercel.json`, `_headers` and `netlify.toml`: MP4 and JSON
+MIME types, and no caching of the manifest, so a redeploy with more signs is
+picked up on reload. Nothing has been deployed so far.
 
 ## What a viewer downloads
 

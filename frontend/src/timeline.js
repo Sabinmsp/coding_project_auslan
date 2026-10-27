@@ -34,7 +34,7 @@
 // repeat never jumps.
 // ======================================================
 
-export const GAP = { word: 0.22, letter: 0.08 };
+export const GAP = { word: 0.22, letter: 0.16 };
 export const FADE = 6;                 // recorded frames (0.2 s at 30 fps)
 const HANDS = [["left_hand", 15], ["right_hand", 16]];   // hand track, its pose wrist
 

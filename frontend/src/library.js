@@ -157,11 +157,11 @@ export function activeSpan(m, opts = TRIM) {
 // (a five-letter name took ~10 s). Within a fingerspelled word only each
 // letter's held part is needed: the longest run of frames where both
 // wrists are still (each moving under STILL shoulder widths per frame),
-// padded by PAD frames, and centre-cropped to at most MAX seconds. This
+// padded by PAD frames, and centre-cropped to at most MAX seconds (0.9 s: slow enough to read each handshape). This
 // SELECTS measured frames -- nothing is generated, re-timed or reshaped;
 // the hand travel between letters is the timeline's ordinary transition.
 // When no still run of MIN seconds exists, the span is left unchanged.
-export const CORE = { STILL: 0.03, PAD: 2, MIN: 0.2, MAX: 0.6 };
+export const CORE = { STILL: 0.03, PAD: 2, MIN: 0.2, MAX: 0.9 };
 
 export function letterCore(m, span, opts = CORE) {
     const [s, e] = span, fr = m.frames;

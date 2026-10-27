@@ -18,6 +18,7 @@ already -- this is only for running locally.
 Also sends no-cache for .js/.json, so a rebuilt manifest or an edited
 module is picked up on reload instead of served stale.
 """
+import json
 import os
 import re
 import sys
@@ -82,6 +83,21 @@ class RangeHandler(SimpleHTTPRequestHandler):
             outputfile.write(chunk)
             remaining -= len(chunk)
         self._remaining = None
+
+    def do_POST(self):
+        # the only dynamic route: the optional AI summary (backend/summarize_llm.py)
+        if self.path.split("?")[0] != "/api/summarize":
+            self.send_error(404)
+            return
+        from backend.summarize_llm import handle_post
+        n = int(self.headers.get("Content-Length") or 0)
+        status, out = handle_post(self.rfile.read(min(n, 2_000_000)))
+        data = json.dumps(out).encode()
+        self.send_response(status)
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Content-Length", str(len(data)))
+        self.end_headers()
+        self.wfile.write(data)
 
     def log_message(self, *args):
         pass

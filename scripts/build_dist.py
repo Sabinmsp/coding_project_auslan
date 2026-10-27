@@ -205,6 +205,13 @@ def main():
         '  [headers.values]\n    Content-Type = "video/mp4"\n'
     )
 
+    # the optional AI summary as a Vercel Python function (other static hosts
+    # simply don't run it, and the page falls back to its offline summary)
+    (DIST / "api").mkdir(exist_ok=True)
+    shutil.copy2(paths.ROOT / "backend" / "api_summarize.py", DIST / "api" / "summarize.py")
+    shutil.copy2(paths.ROOT / "backend" / "summarize_llm.py", DIST / "api" / "_summarize_llm.py")
+    (DIST / "requirements.txt").write_text("anthropic\n")
+
     # Vercel: same headers; cleanUrls off so /index.html and ?text= links work as-is
     (DIST / "vercel.json").write_text(json.dumps({
         "headers": [

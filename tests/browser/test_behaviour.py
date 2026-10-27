@@ -43,6 +43,9 @@ print("libstat:", J("document.getElementById('libstat').textContent"))
 J("auslan.quick('HELLO')"); wait_tl(); time.sleep(0.8)
 check("1 quick pick HELLO plays", J("auslan.plan.steps[0].id") == "hello" and ink() > 200,
       f"ink {ink()}, video {J('document.getElementById(`reference`).currentSrc.split(`/`).pop()')}")
+for _ in range(30):                     # up to 3 s: right after a disk-heavy suite the first load is slower
+    if J("document.getElementById('reference').readyState") >= 2: break
+    time.sleep(0.1)
 check("  source video loaded & in step", J("document.getElementById('reference').readyState") >= 2)
 check("  face drawn from landmarks", J("auslan.timeline.clips[0].motion.frames.some(f=>f.face)"))
 
@@ -104,10 +107,15 @@ J("auslan.say('thank you doctor')"); wait_tl(); time.sleep(0.6)
 J("document.getElementById('play').click()"); time.sleep(0.15)
 tp = J("auslan.t"); time.sleep(0.6)
 paused_ok = (not J("auslan.playing")) and abs(J("auslan.t") - tp) < 1e-9 and J("document.getElementById('reference').paused")
-J("document.getElementById('play').click()"); time.sleep(0.5)
-resumed = J("auslan.playing") and tp + 0.3 < J("auslan.t") < tp + 0.8
+# measured with the PAGE's clock, so a slow test machine can't fake a jump:
+# right after Play, t must continue from tp, then advance at 1 s per second
+a = J("(()=>{document.getElementById('play').click(); return [auslan.t, performance.now()]})()")
+time.sleep(0.5)
+b = J("[auslan.t, performance.now()]")
+rate = (b[0] - a[0]) / ((b[1] - a[1]) / 1000)
+resumed = J("auslan.playing") and abs(a[0] - tp) < 0.05 and 0.8 < rate < 1.2
 check("pause freezes figure + video; play resumes from the same point", paused_ok and resumed,
-      f"paused at {tp:.2f}s, resumed to {J('auslan.t'):.2f}s")
+      f"paused at {tp:.2f}s, resumed from {a[0]:.2f}s at {rate:.2f}x")
 
 # 8 repeated signs
 J("auslan.say('hello hello')"); wait_tl()

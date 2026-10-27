@@ -63,6 +63,32 @@
                        background: transparent; color: var(--ink); }
     .examples button:hover { background: var(--raised); }
 
+    /* document */
+    .drop { display: block; border: 2px dashed var(--line2); border-radius: 10px; padding: 14px; text-align: center;
+            color: var(--dim); font-size: 13px; cursor: pointer; background: var(--raised); }
+    .drop:hover, .drop.over { border-color: var(--accent); color: var(--ink); }
+    .drop strong { color: var(--ink); }
+    .drop input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+    .drop:focus-within { outline: 2px solid var(--focus); outline-offset: 2px; }
+    .docrow { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 8px; font-size: 12px; color: var(--dim); }
+    .docrow .btn { padding: 5px 10px; font-size: 12px; }
+    #docprog { width: 100%; height: 6px; margin-top: 8px; accent-color: var(--accent); }
+    #docprog[hidden] { display: none; }
+    #docmsg { font-size: 12.5px; margin-top: 6px; color: var(--dim); }
+    #docmsg.error { color: #ffb4ab; }
+    #docstats { font-size: 12.5px; margin: 8px 0 4px; }
+    #docstats b { color: var(--ink); }
+    #points { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+    #points li { border: 1px solid var(--line); border-radius: 8px; background: var(--raised); padding: 7px 9px; }
+    #points li.active { border-color: var(--accent); }
+    #points .pt { display: block; width: 100%; text-align: left; background: none; border: 0; padding: 0;
+                  font-size: 13.5px; line-height: 1.4; color: var(--ink); }
+    #points .pt::before { content: "▶ "; color: var(--accent); font-size: 11px; }
+    #points .meta { font-size: 11px; color: var(--faint); margin-top: 3px; display: flex; gap: 8px; flex-wrap: wrap; }
+    #points .flag { color: var(--warn); }
+    #points details { font-size: 11.5px; color: var(--dim); margin: 3px 0 0; border: 0; padding: 0; }
+    #points summary { font-size: 11px; text-transform: none; letter-spacing: 0; font-weight: 500; color: var(--faint); }
+
     /* plan chips */
     .plan { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 8px; }
     .plan .empty { font-size: 12px; color: var(--faint); }
@@ -202,7 +228,22 @@
 </header>
 
 <aside id="left" class="panel" aria-label="Input and sign plan">
-    <h2><label for="sentence-input">Type English</label></h2>
+    <h2>1 · Document</h2>
+    <label class="drop" id="drop">
+        <input type="file" id="pdf-input" accept="application/pdf,.pdf">
+        <strong>Drop a PDF here</strong> or click to choose<br>
+        <span style="font-size:11.5px">Read in your browser; the file is not uploaded.</span>
+    </label>
+    <div class="docrow">
+        <button class="btn ghost" id="sample-pdf">Try a sample handbook</button>
+        <label title="Rewrite the key points in plain English with Claude, if this server has it set up. Every number and date is checked against the PDF. Without it, the offline summary is used."><input type="checkbox" id="use-ai" checked> AI plain-English summary</label>
+    </div>
+    <progress id="docprog" max="1" value="0" hidden></progress>
+    <div id="docmsg" aria-live="polite"></div>
+    <div id="docstats"></div>
+    <ol id="points" aria-label="Key points: select one to sign it"></ol>
+
+    <h2><label for="sentence-input">2 · Sentence</label></h2>
     <div class="sentbox">
         <input type="text" id="sentence-input" class="field" placeholder="e.g. Please pay your bill tomorrow"
                autocomplete="off" enterkeyhint="go">
@@ -311,6 +352,8 @@
 import { plan as makePlan, toGlossLine, fromGlossLine } from "./src/planner.js";
 import { Library } from "./src/library.js";
 import { buildTimeline, sample, allFrames } from "./src/timeline.js";
+import { readPdf } from "./src/document.js";
+import { summarize, checkPoint } from "./src/summarize.js";
 
 const $ = id => document.getElementById(id);
 const canvas = $("canvas");
@@ -344,7 +387,8 @@ function setStatus(text) {
     el.hidden = !text;
     if (text) el.textContent = text;
 }
-const EXAMPLES = ["Hello, how are you?", "My name is Sabin.", "I need help.", "Where is the hospital?",
+const EXAMPLES = ["Welcome to the university.", "Students must attend classes.", "The examination starts tomorrow.",
+                  "Hello, how are you?", "My name is Sabin.", "I need help.", "Where is the hospital?",
                   "I want to learn Auslan.", "Thank you for helping me.", "Please pay your bill tomorrow."];
 let libOpts = null;        // what the Library was built from (rebuilt by the spike switch)
 let stepTimes = [];        // [{n, t0, t1}] per plan step on the current timeline
@@ -1110,6 +1154,132 @@ function edit(n, value) {
 }
 
 // ======================================================
+// DOCUMENT: PDF -> key points -> pick one -> sign it
+//
+// readPdf (src/document.js) reads the PDF in the browser; summarize
+// (src/summarize.js) picks the key sentences offline, with pages. If the
+// AI switch is on, those sentences go to POST /api/summarize for a plain-
+// English rewrite; every AI point is re-checked against its pages
+// (checkPoint) and flagged if a number or date is not there. Any failure
+// falls back to the offline summary, and says so.
+// ======================================================
+let docSeq = 0, docPoints = [], activePoint = -1;
+
+function docMessage(text, error = false) {
+    const el = $("docmsg");
+    el.textContent = text || "";
+    el.classList.toggle("error", error);
+}
+
+async function openPdf(file) {
+    const seq = ++docSeq;
+    const prog = $("docprog");
+    $("points").innerHTML = ""; $("docstats").textContent = ""; docPoints = []; activePoint = -1;
+    prog.hidden = false; prog.value = 0;
+    docMessage(`Opening ${file.name || "PDF"}…`);
+    let doc;
+    try {
+        doc = await readPdf(file, { onProgress: (n, total) => {
+            if (seq !== docSeq) return;
+            prog.max = total; prog.value = n;
+            docMessage(`Reading page ${n} of ${total}…`);
+        } });
+    } catch (e) {
+        if (seq !== docSeq) return;
+        prog.hidden = true;
+        docMessage(e.message || "This PDF could not be read.", true);
+        return;
+    }
+    if (seq !== docSeq) return;
+    prog.hidden = true;
+    const result = summarize(doc.pages);
+    if (!result.points.length) {
+        docMessage("No readable text was found. This PDF may be scanned images; " +
+                   "text recognition (OCR) is not supported yet.", true);
+        return;
+    }
+    showPoints(doc, result, result.points, "offline summary: key sentences from the document, simplified by rules");
+    if (!$("use-ai").checked) return;
+
+    docMessage("Asking the AI for a plain-English version… (the offline summary is shown meanwhile)");
+    try {
+        const ctl = new AbortController();
+        const timer = setTimeout(() => ctl.abort(), 60000);
+        const r = await fetch("./api/summarize", { method: "POST", signal: ctl.signal,
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ title: doc.title, points: 10, excerpts: result.candidates }) });
+        clearTimeout(timer);
+        const out = await r.json().catch(() => ({}));
+        if (seq !== docSeq) return;
+        if (!r.ok || !out.points || !out.points.length)
+            throw new Error(out.error || (r.status === 404 || r.status === 405 ? "AI summary is not set up on this server" : `AI summary failed (${r.status})`));
+        const points = out.points.map(p => ({ ...p, problems: checkPoint(p, doc.pages) }));
+        showPoints(doc, result, points, `AI plain-English summary (${out.model || "Claude"}), checked against the PDF`);
+        docMessage("");
+    } catch (e) {
+        if (seq !== docSeq) return;
+        docMessage(`${e.name === "AbortError" ? "AI summary timed out" : e.message}. Showing the offline summary.`);
+    }
+}
+
+function showPoints(doc, result, points, how) {
+    docPoints = points; activePoint = -1;
+    const st = result.stats;
+    $("docstats").innerHTML = "";
+    const line = document.createElement("div");
+    line.append("Original: ", Object.assign(document.createElement("b"), { textContent: `${doc.numPages} page${doc.numPages === 1 ? "" : "s"}` }),
+        `, ${st.words.toLocaleString()} words → `, Object.assign(document.createElement("b"), { textContent: `${points.length} key points` }));
+    const sub = Object.assign(document.createElement("div"), { className: "hint", textContent: how +
+        (doc.truncated ? ` · only the first ${doc.pages.length} pages were read` : "") });
+    $("docstats").append(line, sub);
+    const ol = $("points");
+    ol.innerHTML = "";
+    points.forEach((p, i) => {
+        const li = document.createElement("li");
+        const b = document.createElement("button");
+        b.className = "pt";
+        b.textContent = p.simple;
+        b.setAttribute("aria-label", `Sign key point ${i + 1}: ${p.simple}`);
+        b.addEventListener("click", () => signPoint(i));
+        const meta = document.createElement("div");
+        meta.className = "meta";
+        meta.append(`page${p.pages.length > 1 ? "s" : ""} ${p.pages.join(", ")}`);
+        for (const pr of p.problems || []) meta.append(Object.assign(document.createElement("span"), { className: "flag", textContent: `⚠ ${pr}` }));
+        li.append(b, meta);
+        if (p.text && p.text !== p.simple) {
+            const d = document.createElement("details");
+            d.append(Object.assign(document.createElement("summary"), { textContent: "original wording" }), p.text);
+            li.appendChild(d);
+        }
+        ol.appendChild(li);
+    });
+}
+
+function signPoint(i) {
+    activePoint = i;
+    [...$("points").children].forEach((li, k) => li.classList.toggle("active", k === i));
+    $("sentence-input").value = docPoints[i].simple;
+    playTyped();
+}
+
+$("pdf-input").addEventListener("change", e => { const f = e.target.files[0]; if (f) openPdf(f); e.target.value = ""; });
+const drop = $("drop");
+drop.addEventListener("dragover", e => { e.preventDefault(); drop.classList.add("over"); });
+drop.addEventListener("dragleave", () => drop.classList.remove("over"));
+drop.addEventListener("drop", e => {
+    e.preventDefault(); drop.classList.remove("over");
+    const f = e.dataTransfer.files[0];
+    if (f) openPdf(f);
+});
+$("sample-pdf").addEventListener("click", async () => {
+    try {
+        const r = await fetch("./samples/sample_handbook.pdf");
+        if (!r.ok) throw new Error();
+        openPdf(new File([await r.blob()], "sample_handbook.pdf", { type: "application/pdf" }));
+    } catch { docMessage("The sample PDF could not be loaded.", true); }
+});
+
+// ======================================================
 // ENTRY POINTS
 // ======================================================
 function clearPressed() {
@@ -1235,6 +1405,8 @@ window.auslan = {
     quick: name => playQuick(name),
     edit: (n, value) => edit(n, value),
     seek: t => { pause(); tNow = t; dirty = true; },
+    openPdf: f => openPdf(f),
+    get points() { return docPoints; },
 };
 
 (async function start() {

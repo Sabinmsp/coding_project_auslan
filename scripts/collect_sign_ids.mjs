@@ -10,6 +10,7 @@
 import { readFileSync } from "node:fs";
 import { plan } from "../frontend/src/planner.js";
 import { Library } from "../frontend/src/library.js";
+import { simplify } from "../frontend/src/summarize.js";
 
 const root = new URL("../", import.meta.url);
 const readJSON = rel => JSON.parse(readFileSync(new URL(rel, root)));
@@ -18,7 +19,8 @@ const lib = new Library({ manifest: readJSON("assets/signs/manifest.json"),
 const ids = new Set();
 const lines = readFileSync(process.argv[2], "utf8").split("\n").map(l => l.trim()).filter(l => l && !l.startsWith("#"));
 for (const line of lines) {
-    for (const text of [line, ...line.split(/\s+/)]) {
+    // as written, as the summary's plain-English rules would show it, and word by word
+    for (const text of [line, simplify(line), ...simplify(line).split(/\s+/), ...line.split(/\s+/)]) {
         for (const s of plan(text, lib).steps) {
             if (s.kind === "sign") ids.add(s.id);
             for (const o of s.options || []) ids.add(o.id);

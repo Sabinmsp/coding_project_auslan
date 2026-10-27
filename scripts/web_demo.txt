@@ -7,6 +7,31 @@ Where is the hospital?
 I want to learn Auslan.
 Thank you for helping me.
 Please pay your bill tomorrow.
+Welcome to the university.
+Students must attend classes.
+The examination starts tomorrow.
+# The sample handbook (frontend/samples/sample_handbook.pdf):
+Welcome to the university. This handbook explains what you need to know in your first year.
+Please read it carefully and keep it for reference during your studies.
+You must complete your enrolment online no later than 14 February 2027.
+Students who enrol late may not be able to choose their preferred classes.
+If you need assistance with enrolment, contact Student Central on 08 8946 0000 or at studentcentral@example.edu.
+Students must attend classes and tutorials for every unit in which they are enrolled.
+If you miss more than three tutorials without a reason, your lecturer may contact you.
+Lectures are recorded, but recordings are not a replacement for attending tutorials.
+Each unit has at least two assessment tasks, which are listed in the unit outline.
+Assignments are required to be submitted through the learning portal by 11:59 pm on the due date.
+Late assignments lose 5% of the available marks for each day they are late.
+You may apply for an extension prior to the due date if you are ill or have a family emergency.
+The examination starts tomorrow at 9:00 am in the Main Hall.
+The final examination period commences on 2 June 2027 and ends on 13 June 2027.
+Bring your student card to every examination; you cannot enter the room without it.
+Mobile phones are not permitted in the examination room.
+Your tuition fees are due on 31 March 2027.
+If you cannot pay your fees by the due date, please contact the fees office to discuss a payment plan.
+The accessibility service can arrange Auslan interpreters, live captioning and note-takers.
+To obtain these services, register with the accessibility service at least two weeks before classes begin.
+Free counselling is available to all students; appointments can be booked online.
 hello hi bye goodbye thank you thanks please sorry yes no ok fine welcome
 i me my mine you your we us our they them their he she it his her this that here there
 what who where when why how which

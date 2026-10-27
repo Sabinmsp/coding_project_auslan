@@ -1,8 +1,20 @@
 # Workspace map
 
-Every file and folder you have for this project, as of 2026-10-26: what it
-is, whether anything uses it, and whether it can be removed. **Nothing has
-been moved or deleted.** This is a map, not a cleanup.
+Every file and folder you have for this project: what it is, whether
+anything uses it, and whether it can be removed.
+
+**Cleanup done 2026-10-27** (approved: rebuildable files + exact duplicates;
+1,251 MB freed, all tests passing afterwards):
+- deleted `auslan-ai-clean/dist/` and `auslan_2d_demo/dist/`, which are
+  rebuilt by `python3 scripts/build_dist.py`; and Python caches;
+- deleted 3 unreferenced duplicates (`boy.glb`, `hello_auslan_poseqqq.gif`,
+  `08133_motion_world.json`);
+- replaced 3 duplicates that old scripts still open with **links** to their
+  identical twins (`Jake.blend` → `Jake.fbx`, `jakke.glb` → `Jake.fbx`,
+  `08133_kf_rgb.mp4` → `rgb/08133_kf_rgb.mp4`), so those scripts keep working.
+
+Each duplicate was checksum-verified immediately before removal. Nothing
+else was moved or deleted.
 
 ## The three places
 
@@ -46,7 +58,7 @@ is the source data plus history.
 | `datasets/processed/catalog.json`, `extract_log.jsonl`, `validation.json` | 5 MB | KEEP | the library's records (in Git; the log is also the resume point) |
 | `datasets/processed/fingerspell_letters/` | 49 MB | KEEP | letter source clips, in the fingerspelling backup |
 | `datasets/processed/qa/`, `logs/`, `final_status.txt` | ~25 MB | REBUILD | QA images, run logs, status report |
-| `dist/` | 998 MB | REBUILD | deployable copy of the site: `python3 scripts/build_dist.py` |
+| `dist/` | — | REBUILD | **removed 2026-10-27**; recreate with `python3 scripts/build_dist.py` (~1 GB) |
 | `experiments/` | 442 MB | HISTORY | 2D/3D experiments, archived; the code is in Git, the media isn't |
 | `.git/` | — | KEEP | version history (4 commits) |
 
@@ -80,10 +92,10 @@ the tests and QA.
 `extract_landmarks.py`, `extract_motion.py`, `text-to-3d.py`, `hhh.py`) and
 their outputs (`08133_3d_avatar.mp4`, `08133_clean_3d.mp4`,
 `08133_comparison.mp4`, `08133_motion.json`, `08133_kf_rgb_landmarks.npz`).
-Copied to `auslan-ai-clean/experiments/3d/`. **DUPLICATE:** `Jake.blend` and
-`jakke.glb` are both the FBX file `Jake.fbx` under wrong names; `boy.glb` is
-the same file as `jump_3d/boy.glb`; `08133_motion_world.json` is the same as
-`auslan-3d/motion.json`.
+Copied to `auslan-ai-clean/experiments/3d/`. `Jake.blend` and `jakke.glb` are
+now **links** to `Jake.fbx` (they were byte-identical FBX copies with wrong
+names). The duplicate `boy.glb` and `08133_motion_world.json` were removed
+(the copies in `jump_3d/` and `auslan-3d/` remain).
 
 ### `.pt` pose experiment: HISTORY (33 MB)
 `auslan_avatar/`, `signs/`, `extracted_keypoints/`, `build_lexicon.py`,
@@ -102,8 +114,8 @@ the same file as `jump_3d/boy.glb`; `08133_motion_world.json` is the same as
 `final_*.mp4`, `auslan_7_sign_demo*.mp4`, `SABIN_*.mp4`,
 `MIKAELA_alphabet_2d.mp4`, `hello_auslan_pose.gif`). Copied to
 `auslan-ai-clean/experiments/2d/early_video_renderers/`.
-**DUPLICATE:** `08133_kf_rgb.mp4` (= `rgb/08133_kf_rgb.mp4`),
-`hello_auslan_poseqqq.gif` (= `hello_auslan_pose.gif`).
+`08133_kf_rgb.mp4` is now a **link** to `rgb/08133_kf_rgb.mp4`; the duplicate
+`hello_auslan_poseqqq.gif` was removed.
 
 ### Other
 | item | mark | what |
@@ -119,8 +131,8 @@ needs your go-ahead.
 
 | step | frees | risk |
 |---|---|---|
-| delete `auslan-ai-clean/dist/` and `auslan_2d_demo/dist/` | 1.1 GB | none: `python3 scripts/build_dist.py` rebuilds it in ~1 min |
-| delete the verified DUPLICATE files listed above | ~180 MB | none: identical copies remain |
+| ~~delete both `dist/` folders~~ | ~~1.1 GB~~ | **done 2026-10-27** |
+| ~~remove verified duplicates~~ | ~~180 MB~~ | **done 2026-10-27** |
 | move HISTORY items of the original folder into an `_archive/` subfolder | 0 (tidier, not smaller) | low, if the source data and `.venv-1` stay put |
 | delete HISTORY items | ~1 GB | they exist in the clean project's `experiments/` and the backup, but deleting is permanent |
 

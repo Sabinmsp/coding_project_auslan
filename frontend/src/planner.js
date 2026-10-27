@@ -435,6 +435,7 @@ export function plan(text, lex, opts = {}) {
                 const pending = c.sign && !c.sign.available;
                 const unreliable = c.sign && c.sign.available && c.sign.status === "unreliable";
                 push({ kind: "spell", letters: lettersOf(spanWord), key: hit.key,
+                       reason: pending ? "pending" : unreliable ? "unreliable" : "sense",
                        uncertain: c.uncertain || unreliable,
                        why: (pending ? `sign ${c.sign.gloss} exists but is not extracted yet -- fingerspelled`
                              : unreliable ? `sign ${c.sign.gloss} has unreliable tracking ` +
@@ -449,6 +450,8 @@ export function plan(text, lex, opts = {}) {
         if (letters.length) {
             const kwSign = kw && kw.choice.sign;     // listed in the dictionary, but can't play
             push({ kind: "spell", letters, options: kwOptions,
+                   reason: kwSign ? (kwSign.available ? "unreliable" : "pending")
+                         : kw ? "loose" : w.cap ? "name" : "nosign",
                    why: (w.why ? w.why + "; " : "") +
                         (kwSign ? `dictionary sign ${kwSign.gloss} ` +
                                   (kwSign.available ? "has unreliable tracking" : "is not extracted yet") +
@@ -520,7 +523,7 @@ export function fromGlossLine(line, lex) {
         if (/^fs:/i.test(tok)) {
             const letters = lettersOf(tok.slice(3));
             if (letters.length) steps.push({ kind: "spell", letters, en: tok.slice(3).toLowerCase(),
-                                             why: "fingerspelled (gloss line)", options: [], src: [] });
+                                             reason: "requested", why: "fingerspelled (gloss line)", options: [], src: [] });
             continue;
         }
         let info = lex.byId(tok.toLowerCase());
@@ -532,7 +535,7 @@ export function fromGlossLine(line, lex) {
         if (info && info.available && info.status === "unreliable") {
             problems.push(`${tok}: unreliable tracking -- fingerspelled`);
             steps.push({ kind: "spell", letters: lettersOf(info.keys[0]), en: tok.toLowerCase(),
-                         uncertain: true, src: [],
+                         reason: "unreliable", uncertain: true, src: [],
                          options: [{ id: info.id, gloss: info.gloss, sense: info.sense,
                                      available: true, low: info.low, status: info.status }],
                          why: `sign ${info.gloss} has unreliable tracking (${info.flags.join(", ")}) ` +
@@ -549,6 +552,7 @@ export function fromGlossLine(line, lex) {
             else if (!problems.some(p => p.startsWith(tok + ":"))) problems.push(`${tok}: no such sign`);
             const letters = lettersOf(tok);
             if (letters.length) steps.push({ kind: "spell", letters, en: tok.toLowerCase(),
+                                             reason: info ? "pending" : "nosign",
                                              why: `${tok} is not a playable sign -- fingerspelled`,
                                              options: [], src: [] });
         }

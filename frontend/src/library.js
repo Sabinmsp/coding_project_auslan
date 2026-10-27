@@ -69,6 +69,41 @@ export function normalizeMotion(m) {
     return { ...m, width: 1, height: 1, frames, normalized: { cx, cy, s, aspect } };
 }
 
+// ---------- spike removal ---------------------------------------------
+// MediaPipe occasionally misplaces a landmark for ONE frame and puts it
+// back on the next; drawn at 60 Hz that reads as a flicker. A 3-frame
+// running median per coordinate removes exactly those single-frame
+// spikes and nothing else: on any steadily moving (monotonic) track the
+// median of three consecutive samples IS the middle sample, so real
+// motion -- including fast handshape changes -- passes through unchanged,
+// and every output value is one of the three measured values (nothing is
+// interpolated or invented). The cost: at a genuine turning point (a tap,
+// a change of direction) the single extreme frame is clipped to its
+// nearer neighbour. Applied only where a track is present in all three
+// frames; the first and last frame are left alone. Library({despike:false})
+// and the page's "raw tracking" switch turn it off.
+const med3 = (a, b, c) => Math.max(Math.min(a, b), Math.min(Math.max(a, b), c));
+
+export function despike(m) {
+    if (m.despiked !== undefined) return m;
+    const fr = m.frames;
+    let changed = 0;
+    const track = key => fr.map((f, i) => {
+        const b = f[key];
+        if (!b || i === 0 || i === fr.length - 1) return b;
+        const a = fr[i - 1][key], c = fr[i + 1][key];
+        if (!a || !c || a.length !== b.length || c.length !== b.length) return b;
+        return b.map((p, j) => {
+            const x = med3(a[j].x, p.x, c[j].x), y = med3(a[j].y, p.y, c[j].y);
+            if (x !== p.x || y !== p.y) changed++;
+            return { x, y };
+        });
+    });
+    const pose = track("pose"), L = track("left_hand"), R = track("right_hand");
+    const frames = fr.map((f, i) => ({ ...f, pose: pose[i], left_hand: L[i], right_hand: R[i] }));
+    return { ...m, frames, despiked: changed };
+}
+
 // ---------- rest trimming ---------------------------------------------
 // Each corpus clip starts and ends with the hands at rest at hip level.
 // Chained raw, every sign would be bracketed by a full arms-down /
@@ -116,6 +151,42 @@ export function activeSpan(m, opts = TRIM) {
     return [s, e];
 }
 
+// ---------- letter cores ----------------------------------------------
+// The corpus letters are separate recordings: hands rise, the handshape
+// is HELD, hands fall. Played whole inside a word, every letter costs 1-4 s
+// (a five-letter name took ~10 s). Within a fingerspelled word only each
+// letter's held part is needed: the longest run of frames where both
+// wrists are still (each moving under STILL shoulder widths per frame),
+// padded by PAD frames, and centre-cropped to at most MAX seconds. This
+// SELECTS measured frames -- nothing is generated, re-timed or reshaped;
+// the hand travel between letters is the timeline's ordinary transition.
+// When no still run of MIN seconds exists, the span is left unchanged.
+export const CORE = { STILL: 0.03, PAD: 2, MIN: 0.2, MAX: 0.6 };
+
+export function letterCore(m, span, opts = CORE) {
+    const [s, e] = span, fr = m.frames;
+    const speed = i => {
+        const a = fr[i - 1] && fr[i - 1].pose, b = fr[i] && fr[i].pose;
+        if (!a || !b) return Infinity;
+        return Math.max(Math.hypot(b[15].x - a[15].x, b[15].y - a[15].y),
+                        Math.hypot(b[16].x - a[16].x, b[16].y - a[16].y));
+    };
+    let best = null, runStart = null;
+    for (let i = s + 1; i <= e + 1; i++) {
+        const still = i <= e && speed(i) < opts.STILL;
+        if (still && runStart === null) runStart = i - 1;
+        if (!still && runStart !== null) {
+            if (!best || i - 1 - runStart > best[1] - best[0]) best = [runStart, i - 1];
+            runStart = null;
+        }
+    }
+    if (!best || (best[1] - best[0] + 1) / m.fps < opts.MIN) return span;
+    let a = Math.max(s, best[0] - opts.PAD), b = Math.min(e, best[1] + opts.PAD);
+    const max = Math.round(opts.MAX * m.fps);
+    if (b - a + 1 > max) { const mid = (a + b) >> 1; a = mid - (max >> 1); b = a + max - 1; }
+    return [a, b];
+}
+
 // ---------- cache -------------------------------------------------------
 export class LRU {
     constructor(max) { this.max = max; this.map = new Map(); }
@@ -137,7 +208,9 @@ export class LRU {
 // letters:  assets/fingerspelling/letters.json (A-Z, v1 motion files)
 // phrases:  assets/signs.json entries  (pre-stitched SABIN etc., quick picks)
 export class Library {
-    constructor({ manifest, letters = {}, phrases = {}, keywords = null, base = ".", fetchJSON, cacheSize = 80 }) {
+    constructor({ manifest, letters = {}, phrases = {}, keywords = null, base = ".", fetchJSON, cacheSize = 80,
+                  despike: useDespike = true }) {
+        this.prepareMotion = m => normalizeMotion(useDespike ? despike(m) : m);
         this.manifest = manifest || { signs: {}, keys: {}, counts: {} };
         // English keyword -> signs, from the dataset's dictionary (scripts/build_keywords.py)
         this.keywords = (keywords && keywords.keys) || {};
@@ -188,7 +261,7 @@ export class Library {
         const s = this.manifest.signs[id];
         if (!s || !s.clip) return Promise.reject(new Error(`sign ${id} not available`));
         return this._load(`sign:${id}`, `${this.base}/assets/signs/motion/${s.clip}.json`, m => {
-            const motion = normalizeMotion(m);
+            const motion = this.prepareMotion(m);
             return { kind: "sign", id, label: s.gloss, motion, span: activeSpan(motion),
                      video: `${this.base}/assets/signs/videos/${s.clip}.mp4`, low: !!s.low };
         });
@@ -198,8 +271,9 @@ export class Library {
         const e = this.letters[ch];
         if (!e) return Promise.reject(new Error(`no letter ${ch}`));
         return this._load(`letter:${ch}`, `${this.base}/${e.motion}`, m => {
-            const motion = normalizeMotion(m);
-            return { kind: "letter", id: ch, label: ch, motion, span: activeSpan(motion),
+            const motion = this.prepareMotion(m);
+            const span = activeSpan(motion);
+            return { kind: "letter", id: ch, label: ch, motion, span, core: letterCore(motion, span),
                      video: `${this.base}/${e.video}` };
         });
     }
@@ -210,7 +284,7 @@ export class Library {
         const e = this.phrases[name];
         if (!e || !e.motion) return Promise.reject(new Error(`no phrase ${name}`));
         return this._load(`phrase:${name}`, `${this.base}/${e.motion}`, m => {
-            const motion = normalizeMotion(m);
+            const motion = this.prepareMotion(m);
             return { kind: "phrase", id: name, label: name, motion,
                      span: [0, motion.frames.length - 1], video: `${this.base}/${e.video}` };
         });

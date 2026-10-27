@@ -1,0 +1,156 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1255" viewBox="0 0 1600 1255" font-family="-apple-system, Helvetica, Arial, sans-serif">
+<defs><marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2f6fd0"/></marker><marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#c47a00"/></marker><marker id="a3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#7a8599"/></marker><marker id="a4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2a9d6f"/></marker></defs>
+<rect x="0" y="0" width="1600" height="1255" rx="0" fill="#f6f8fb" stroke="#f6f8fb" stroke-width="0"/>
+<text x="800.0" y="44" font-size="30" font-weight="800" fill="#101828" text-anchor="middle">SignBridge: system design</text>
+<text x="800.0" y="70" font-size="15" font-weight="400" fill="#475467" text-anchor="middle">English text or a PDF in, recorded Auslan signs out on a 2D avatar. Planning and animation run in the browser; the cloud only serves files.</text>
+<rect x="560" y="92" width="480" height="62" rx="12" fill="#eef4ff" stroke="#2f6fd0" stroke-width="2"/>
+<text x="800.0" y="118" font-size="16" font-weight="700" fill="#1d4ea8" text-anchor="middle">10,000 monthly users</text>
+<text x="800.0" y="140" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">phone or laptop browser (Chrome, Safari)</text>
+<line x1="800" y1="154" x2="800" y2="190" stroke="#2f6fd0" stroke-width="2.4" marker-end="url(#a1)"/>
+<rect x="40" y="190" width="950" height="600" rx="12" fill="#f0f6ff" stroke="#2f6fd0" stroke-width="2" stroke-dasharray="8 6"/>
+<text x="60" y="218" font-size="15" font-weight="800" fill="#1d4ea8" text-anchor="start">IN THE USER&#x27;S BROWSER</text>
+<text x="290" y="218" font-size="13.5" font-weight="400" fill="#475467" text-anchor="start">no server work per sentence; PDFs never leave the device</text>
+<rect x="64" y="236" width="210" height="84" rx="12" fill="#ffffff" stroke="#2f6fd0" stroke-width="2"/>
+<text x="169.0" y="262" font-size="16" font-weight="700" fill="#1b2330" text-anchor="middle">Type English</text>
+<text x="169.0" y="284" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">“Translate &amp; Play”</text>
+<text x="169.0" y="303" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">(or pick an example)</text>
+<rect x="64" y="350" width="210" height="84" rx="12" fill="#ffffff" stroke="#2f6fd0" stroke-width="2"/>
+<text x="169.0" y="376" font-size="16" font-weight="700" fill="#1b2330" text-anchor="middle">Upload PDF</text>
+<text x="169.0" y="398" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">drag &amp; drop, up to 500 pages</text>
+<text x="169.0" y="417" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">read locally</text>
+<rect x="310" y="350" width="235" height="96" rx="12" fill="#ffffff" stroke="#2f6fd0" stroke-width="2"/>
+<text x="427.5" y="376" font-size="16" font-weight="700" fill="#1b2330" text-anchor="middle">document.js</text>
+<text x="427.5" y="398" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">pdf.js reads each page</text>
+<text x="427.5" y="417" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">removes headers, page numbers</text>
+<rect x="575" y="350" width="215" height="96" rx="12" fill="#ffffff" stroke="#2f6fd0" stroke-width="2"/>
+<text x="682.5" y="376" font-size="16" font-weight="700" fill="#1b2330" text-anchor="middle">summarize.js (offline)</text>
+<text x="682.5" y="398" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">10 key points with pages</text>
+<text x="682.5" y="417" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">plain-English rules</text>
+<text x="682.5" y="436" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">ALWAYS available</text>
+<rect x="815" y="350" width="160" height="96" rx="12" fill="#ffffff" stroke="#2f6fd0" stroke-width="2"/>
+<text x="895.0" y="376" font-size="16" font-weight="700" fill="#1b2330" text-anchor="middle">fact check</text>
+<text x="895.0" y="398" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">numbers, dates</text>
+<text x="895.0" y="417" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">vs the cited pages</text>
+<text x="895.0" y="436" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">⚠ if mismatch</text>
+<rect x="310" y="500" width="235" height="118" rx="12" fill="#ffffff" stroke="#2f6fd0" stroke-width="2"/>
+<text x="427.5" y="526" font-size="16" font-weight="700" fill="#1b2330" text-anchor="middle">planner.js</text>
+<text x="427.5" y="548" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">English → sign plan</text>
+<text x="427.5" y="567" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">plurals · related forms</text>
+<text x="427.5" y="586" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">names fingerspelled</text>
+<text x="427.5" y="605" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">✓ sign · ⚠ guess · ABC</text>
+<rect x="575" y="500" width="215" height="118" rx="12" fill="#ffffff" stroke="#2f6fd0" stroke-width="2"/>
+<text x="682.5" y="526" font-size="16" font-weight="700" fill="#1b2330" text-anchor="middle">library.js</text>
+<text x="682.5" y="548" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">loads only signs needed</text>
+<text x="682.5" y="567" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">LRU cache of 80</text>
+<text x="682.5" y="586" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">normalise · spike removal</text>
+<text x="682.5" y="605" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">rest trimming</text>
+<rect x="815" y="500" width="160" height="118" rx="12" fill="#ffffff" stroke="#2f6fd0" stroke-width="2"/>
+<text x="895.0" y="526" font-size="16" font-weight="700" fill="#1b2330" text-anchor="middle">timeline.js</text>
+<text x="895.0" y="548" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">one clock</text>
+<text x="895.0" y="567" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">smooth transitions</text>
+<text x="895.0" y="586" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">held hands</text>
+<text x="895.0" y="605" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">(no flicker)</text>
+<rect x="310" y="664" width="665" height="100" rx="12" fill="#e9f9f1" stroke="#2a9d6f" stroke-width="2"/>
+<text x="642.5" y="690" font-size="16" font-weight="700" fill="#17704c" text-anchor="middle">2D Canvas avatar + controls</text>
+<text x="642.5" y="712" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">stick figure drawn from motion data alone (the MP4 source video is optional)</text>
+<text x="642.5" y="731" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">play · pause · replay · speed 0.5–1.5× · scrub · previous/next sign · loop</text>
+<text x="642.5" y="750" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">word tiles ✓ signed · ⚠ best guess · ABC fingerspelled · Advanced settings</text>
+<polyline points="274,278 292,278 292,559 310,559" fill="none" stroke="#2f6fd0" stroke-width="2.4" marker-end="url(#a1)"/>
+<line x1="274" y1="392" x2="310" y2="392" stroke="#2f6fd0" stroke-width="2.4" marker-end="url(#a1)"/>
+<line x1="545" y1="398" x2="575" y2="398" stroke="#2f6fd0" stroke-width="2.4" marker-end="url(#a1)"/>
+<polyline points="682,446 682,472 427,472 427,500" fill="none" stroke="#2f6fd0" stroke-width="2.4" marker-end="url(#a1)"/>
+<text x="555" y="466" font-size="12.5" font-weight="600" fill="#2f6fd0" text-anchor="middle">select a key point</text>
+<line x1="545" y1="559" x2="575" y2="559" stroke="#2f6fd0" stroke-width="2.4" marker-end="url(#a1)"/>
+<line x1="790" y1="559" x2="815" y2="559" stroke="#2f6fd0" stroke-width="2.4" marker-end="url(#a1)"/>
+<line x1="895" y1="618" x2="895" y2="664" stroke="#2f6fd0" stroke-width="2.4" marker-end="url(#a1)"/>
+<rect x="1070" y="190" width="490" height="600" rx="12" fill="#fffaf0" stroke="#c47a00" stroke-width="2" stroke-dasharray="8 6"/>
+<text x="1090" y="218" font-size="15" font-weight="800" fill="#9a5b00" text-anchor="start">IN THE CLOUD</text>
+<text x="1205" y="218" font-size="13.5" font-weight="600" fill="#b42318" text-anchor="start">planned: not deployed yet</text>
+<rect x="1094" y="236" width="420" height="118" rx="12" fill="#ffffff" stroke="#c47a00" stroke-width="2"/>
+<text x="1304.0" y="262" font-size="16" font-weight="700" fill="#1b2330" text-anchor="middle">Vercel: the web app (static)</text>
+<text x="1304.0" y="284" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">index.html · src/*.js · pdf.js · sample PDF</text>
+<text x="1304.0" y="303" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">≈ 230 KB gzipped at startup</text>
+<text x="1304.0" y="322" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">served from edge locations</text>
+<text x="1304.0" y="341" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">manifest rechecked on every load</text>
+<rect x="1094" y="384" width="420" height="100" rx="12" fill="#ffffff" stroke="#c47a00" stroke-width="2" stroke-dasharray="6 4"/>
+<text x="1304.0" y="410" font-size="16" font-weight="700" fill="#1b2330" text-anchor="middle">Vercel function: /api/summarize</text>
+<text x="1304.0" y="432" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">OPTIONAL · holds ANTHROPIC_API_KEY</text>
+<text x="1304.0" y="451" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">gets ≈ 60 short excerpts, never the PDF</text>
+<text x="1304.0" y="470" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">rate-limited · on any failure: offline summary</text>
+<rect x="1094" y="512" width="420" height="66" rx="12" fill="#ffffff" stroke="#c47a00" stroke-width="2" stroke-dasharray="6 4"/>
+<text x="1304.0" y="538" font-size="16" font-weight="700" fill="#1b2330" text-anchor="middle">Claude API</text>
+<text x="1304.0" y="560" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">rewrites the key points in plain English</text>
+<rect x="1094" y="606" width="420" height="154" rx="12" fill="#ffffff" stroke="#c47a00" stroke-width="2"/>
+<text x="1304.0" y="632" font-size="16" font-weight="700" fill="#1b2330" text-anchor="middle">Cloudflare R2 + CDN: sign data</text>
+<text x="1304.0" y="654" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">manifest.json · keywords.json · letters A–Z</text>
+<text x="1304.0" y="673" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">3,215 words → 4,480 motion files, avg 52 KB gz</text>
+<text x="1304.0" y="692" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">browser fetches ONLY the signs in the sentence</text>
+<text x="1304.0" y="711" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">cache: 1 day + stale-while-revalidate 7 days</text>
+<text x="1304.0" y="730" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">source videos are NOT deployed</text>
+<line x1="990" y1="295" x2="1094" y2="295" stroke="#2f6fd0" stroke-width="2.4" marker-end="url(#a1)"/>
+<text x="1032" y="285" font-size="12.5" font-weight="600" fill="#2f6fd0" text-anchor="middle">load page</text>
+<polyline points="682,350 682,334 1050,334 1050,424 1094,424" fill="none" stroke="#c47a00" stroke-width="2.4" stroke-dasharray="6 4" marker-end="url(#a2)"/>
+<text x="870" y="328" font-size="12.5" font-weight="600" fill="#c47a00" text-anchor="middle">excerpts (only if the AI switch is on)</text>
+<polyline points="1094,466 1030,466 1030,398 975,398" fill="none" stroke="#c47a00" stroke-width="2.4" stroke-dasharray="6 4" marker-end="url(#a2)"/>
+<text x="1030" y="488" font-size="12.5" font-weight="600" fill="#c47a00" text-anchor="middle">points back</text>
+<line x1="1304" y1="484" x2="1304" y2="512" stroke="#c47a00" stroke-width="2.4" stroke-dasharray="6 4" marker-end="url(#a2)"/>
+<text x="1318" y="503" font-size="12.5" font-weight="600" fill="#c47a00" text-anchor="start">text in, points out</text>
+<polyline points="682,618 682,640 1040,640 1040,680 1094,680" fill="none" stroke="#2f6fd0" stroke-width="2.4" marker-end="url(#a1)"/>
+<text x="1030" y="700" font-size="12.5" font-weight="600" fill="#2f6fd0" text-anchor="middle">only the</text>
+<text x="1030" y="715" font-size="12.5" font-weight="600" fill="#2f6fd0" text-anchor="middle">signs needed</text>
+<rect x="40" y="830" width="1520" height="250" rx="12" fill="#f4f4f7" stroke="#7a8599" stroke-width="2" stroke-dasharray="3 5"/>
+<text x="60" y="858" font-size="15" font-weight="800" fill="#475467" text-anchor="start">OFFLINE BUILD ON YOUR MAC</text>
+<text x="330" y="858" font-size="13.5" font-weight="400" fill="#475467" text-anchor="start">done once; the app never needs the original videos</text>
+<rect x="64" y="880" width="200" height="100" rx="12" fill="#ffffff" stroke="#7a8599" stroke-width="2"/>
+<text x="164.0" y="906" font-size="16" font-weight="700" fill="#1b2330" text-anchor="middle">Original videos</text>
+<text x="164.0" y="928" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">rgb/ · 6,430 MP4 (4.2 GiB)</text>
+<text x="164.0" y="947" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">Test_ITW.json labels:</text>
+<text x="164.0" y="966" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">3,215 words × 2 takes</text>
+<rect x="300" y="880" width="190" height="100" rx="12" fill="#ffffff" stroke="#7a8599" stroke-width="2"/>
+<text x="395.0" y="906" font-size="16" font-weight="700" fill="#1b2330" text-anchor="middle">ingest.py</text>
+<text x="395.0" y="928" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">catalog of words, senses</text>
+<text x="395.0" y="947" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">and takes</text>
+<text x="395.0" y="966" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">negated signs handled</text>
+<rect x="526" y="880" width="240" height="100" rx="12" fill="#ffffff" stroke="#7a8599" stroke-width="2"/>
+<text x="646.0" y="906" font-size="16" font-weight="700" fill="#1b2330" text-anchor="middle">build_library.py</text>
+<text x="646.0" y="928" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">MediaPipe: pose + both hands</text>
+<text x="646.0" y="947" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">+ face; hand-ownership rules</text>
+<text x="646.0" y="966" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">checks: ok / review / unreliable</text>
+<rect x="802" y="880" width="220" height="100" rx="12" fill="#ffffff" stroke="#7a8599" stroke-width="2"/>
+<text x="912.0" y="906" font-size="16" font-weight="700" fill="#1b2330" text-anchor="middle">motion data</text>
+<text x="912.0" y="928" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">4,480 files · 0 failures</text>
+<text x="912.0" y="947" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">all 3,215 words playable</text>
+<text x="912.0" y="966" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">manifest.json: status per sign</text>
+<rect x="1058" y="880" width="200" height="100" rx="12" fill="#ffffff" stroke="#7a8599" stroke-width="2"/>
+<text x="1158.0" y="906" font-size="16" font-weight="700" fill="#1b2330" text-anchor="middle">build_keywords.py</text>
+<text x="1158.0" y="928" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">5,208 English words</text>
+<text x="1158.0" y="947" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">→ signs (dictionary)</text>
+<rect x="1294" y="880" width="242" height="100" rx="12" fill="#e9f9f1" stroke="#2a9d6f" stroke-width="2"/>
+<text x="1415.0" y="906" font-size="16" font-weight="700" fill="#17704c" text-anchor="middle">build_dist.py</text>
+<text x="1415.0" y="928" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">--no-videos · --signs-from</text>
+<text x="1415.0" y="947" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">--asset-base (CDN) · headers</text>
+<text x="1415.0" y="966" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">→ dist/  (demo build 86 MB)</text>
+<line x1="264" y1="930" x2="300" y2="930" stroke="#7a8599" stroke-width="2.4" marker-end="url(#a3)"/>
+<line x1="490" y1="930" x2="526" y2="930" stroke="#7a8599" stroke-width="2.4" marker-end="url(#a3)"/>
+<line x1="766" y1="930" x2="802" y2="930" stroke="#7a8599" stroke-width="2.4" marker-end="url(#a3)"/>
+<line x1="1022" y1="930" x2="1058" y2="930" stroke="#7a8599" stroke-width="2.4" marker-end="url(#a3)"/>
+<line x1="1258" y1="930" x2="1294" y2="930" stroke="#7a8599" stroke-width="2.4" marker-end="url(#a3)"/>
+<rect x="64" y="1000" width="470" height="66" rx="12" fill="#ffffff" stroke="#7a8599" stroke-width="2"/>
+<text x="299.0" y="1026" font-size="16" font-weight="700" fill="#1b2330" text-anchor="middle">Quality gates</text>
+<text x="299.0" y="1048" font-size="13.5" font-weight="400" fill="#3a4558" text-anchor="middle">73 Node · 34 Python · 7 browser suites · library integrity check</text>
+<text x="570" y="1038" font-size="13.5" font-weight="400" fill="#475467" text-anchor="start">Every step is resumable and never changes the original videos.</text>
+<polyline points="1470,880 1470,850 1540,850 1540,295 1514,295" fill="none" stroke="#2a9d6f" stroke-width="2.6" marker-end="url(#a4)"/>
+<text x="1528" y="842" font-size="12.5" font-weight="600" fill="#2a9d6f" text-anchor="end">deploy site</text>
+<polyline points="1340,880 1340,812 1300,812 1300,760" fill="none" stroke="#2a9d6f" stroke-width="2.6" marker-end="url(#a4)"/>
+<text x="1290" y="810" font-size="12.5" font-weight="600" fill="#2a9d6f" text-anchor="end">upload assets/</text>
+<rect x="40" y="1104" width="1520" height="130" rx="12" fill="#ffffff" stroke="#d0d5dd" stroke-width="2"/>
+<text x="60" y="1132" font-size="14" font-weight="800" fill="#101828" text-anchor="start">How to read it</text>
+<line x1="60" y1="1154" x2="130" y2="1154" stroke="#2f6fd0" stroke-width="2.4" marker-end="url(#a1)"/>
+<text x="142" y="1159" font-size="13.5" font-weight="400" fill="#344054" text-anchor="start">runs for every user</text>
+<line x1="330" y1="1154" x2="400" y2="1154" stroke="#c47a00" stroke-width="2.4" stroke-dasharray="6 4" marker-end="url(#a2)"/>
+<text x="412" y="1159" font-size="13.5" font-weight="400" fill="#344054" text-anchor="start">optional: AI summary (falls back to the offline summary on any failure)</text>
+<line x1="920" y1="1154" x2="990" y2="1154" stroke="#2a9d6f" stroke-width="2.4" marker-end="url(#a4)"/>
+<text x="1002" y="1159" font-size="13.5" font-weight="400" fill="#344054" text-anchor="start">one-off deployment</text>
+<text x="60" y="1190" font-size="13.5" font-weight="700" fill="#b42318" text-anchor="start">Status: built and tested locally; NOT deployed yet. Before going public: confirm the licence of the original corpus and credit Auslan Signbank (13 letters, CC BY-NC-ND 4.0).</text>
+<text x="60" y="1210" font-size="13" font-weight="400" fill="#475467" text-anchor="start">Capacity at 10,000 monthly users is an estimate from measured file sizes; no load test has been run. Output is automated sign matching, not verified Auslan translation.</text>
+</svg>

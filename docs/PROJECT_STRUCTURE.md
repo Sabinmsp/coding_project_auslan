@@ -1,5 +1,9 @@
 # Project structure
 
+![System design](images/system_design.png)
+
+(Editable vector version: [system_design.svg](images/system_design.svg).)
+
 Four rules keep this layout clean:
 
 1. **The browser only loads `frontend/` and `assets/`.** Nothing under

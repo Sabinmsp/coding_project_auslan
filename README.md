@@ -70,7 +70,10 @@ Run from this folder. `V=../.venv-1/bin/python` below.
 | regenerate the test PDFs | `python3 tests/fixtures/make_pdfs.py` |
 | check every library file is present and well-formed (read-only) | `python3 scripts/check_library.py` |
 | build the deployable site (full library, ~1 GB) | `python3 scripts/build_dist.py` -> `dist/` ([docs/DEPLOY.md](docs/DEPLOY.md)) |
-| build the small web demo (~75 MB, fits Vercel Hobby) | `python3 scripts/build_dist.py --signs-from scripts/web_demo.txt --small-videos` |
+| build the full library without any videos (483 MB; playback needs none) | `python3 scripts/build_dist.py --no-videos` |
+| ... with assets served from a CDN | `python3 scripts/build_dist.py --no-videos --asset-base https://signs.example.com` ([docs/DEPLOY.md](docs/DEPLOY.md)) |
+| extract the 1,950 not-yet-needed second recordings (resumable, ~2.6 h) | `caffeinate -i $V scripts/build_library.py --takes all` |
+| build the small web demo (~88 MB, fits Vercel Hobby) | `python3 scripts/build_dist.py --signs-from scripts/web_demo.txt --small-videos` |
 
 How the parts connect, and how to add a sign or process a new video in
 detail: [docs/PIPELINE.md](docs/PIPELINE.md). Why some animations looked
@@ -90,7 +93,7 @@ sh tests/run_all.sh 8003             # everything below, in one go
 | `tests/test_pipeline.py` (16) | catalog, keywords, ownership, validator, lossless format |
 | `tests/test_llm_plan.py` (9) | LLM plan validation, offline |
 | `tests/test_summarize_llm.py` (9) | AI summary endpoint, offline (stubbed model) |
-| `tests/browser/` (4 suites, headless Chrome) | behaviour, failure paths, controls + end-to-end, PDF → key points → signing |
+| `tests/browser/` (5 suites, headless Chrome) | behaviour, failure paths, controls + end-to-end, PDF → key points → signing, motion-only playback |
 
 These test the engineering. None of them says whether the signing is
 correct Auslan.

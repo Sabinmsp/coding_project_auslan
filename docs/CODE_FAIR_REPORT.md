@@ -4,6 +4,49 @@
 document assistant.** Section 0 covers the PDF workflow; sections 1–10 the
 earlier animation, UI and deployment work, all still in force.
 
+## 00. Motion-only playback and scaling (27 Oct, third sprint)
+
+| metric | result |
+|---|---|
+| RGB source videos | 6,430 MP4s, 4.2 GiB (4.51 GB), untouched |
+| mapped sign IDs (Test_ITW.json) | 6,430, every one with a video, none extra |
+| unique glosses | 3,215, each with exactly 2 recordings |
+| extracted animations | 4,480 clips; **all 3,215 glosses playable**; 0 failures |
+| not extracted | 1,950 second recordings, not needed (their first recording validated) |
+| source video of the clips in use | 2,250 MB |
+| motion data of the clips in use | 460 MB JSON, **167 MB gzip** |
+| average motion file | 143 KB, 52 KB gzip |
+| average download per sentence | 137 KB (3 signs) to 260 KB (5 signs), gzip |
+| startup download | 229 KB gzip |
+| motion-only playback | **working**; tested with every MP4 blocked |
+| deployment | **not deployed**: no Vercel login on this machine, and the corpus licence is unconfirmed |
+| public URL | none |
+
+**Pipeline verified on three fresh videos.** HELLO (one hand), FINISH (two
+hands) and HELP (flagged for review) were re-extracted with the production
+job (`build_library.process`) into a scratch folder: 17–21 s each on this Mac,
+validated, and **byte-identical** to the stored files. MP4 421–890 KB → JSON
+117–129 KB. At ~19 s per clip with 4 workers, the remaining 1,950 recordings
+would take about 2.6 hours.
+
+**Variants:** each gloss has two recordings, kept as distinct IDs. The library
+plays the one that passed validation best and records the other as `alt`; 904
+signs use their second recording.
+
+**Changed:** a missing or blocked video no longer keeps the page busy
+(paused cost 14.8 → 1.6 ms/s) and the panel says "Source video unavailable";
+`--no-videos` and `--asset-base` builds; cache and CORS headers; a fifth
+browser suite. The old `auslan_2d_demo/` app was not modified (standing
+rule); this project is its successor.
+
+**Tests:** `sh tests/run_all.sh 8003`: all 10 suites pass. The motion-only
+suite checks I LOVE AUSTRALIA (I · LOVE · AUSTRALIA, three files fetched,
+label follows), a single sign, a multi-word gloss (THANK YOU as one sign),
+a sequence, fingerspelling, caching, pause, replay, speed, a failed motion
+request, and an idle page while paused. Against the motion-only build: the
+motion-only, controls and document suites pass; the behaviour suite's video
+check does not apply there.
+
 ## 0. PDF → key points → Auslan-supported signing
 
 ![PDF workflow](images/codefair_pdf.png)

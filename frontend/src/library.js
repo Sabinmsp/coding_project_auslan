@@ -215,6 +215,9 @@ export class Library {
         // why an existing sign can't play: a partial web build (build_dist.py
         // --signs-from) ships only some signs and says so in its manifest
         this.unavailableText = this.manifest.unavailable_text || "not extracted yet";
+        // a motion-only build (build_dist.py --no-videos) ships no reference
+        // videos: playback never needs them, so the page just hides the panel
+        this.videos = this.manifest.videos !== false;
         this.partial = !!this.manifest.unavailable_text;
         // English keyword -> signs, from the dataset's dictionary (scripts/build_keywords.py)
         this.keywords = (keywords && keywords.keys) || {};
@@ -267,7 +270,7 @@ export class Library {
         return this._load(`sign:${id}`, `${this.base}/assets/signs/motion/${s.clip}.json`, m => {
             const motion = this.prepareMotion(m);
             return { kind: "sign", id, label: s.gloss, motion, span: activeSpan(motion),
-                     video: `${this.base}/assets/signs/videos/${s.clip}.mp4`, low: !!s.low };
+                     video: this.videos ? `${this.base}/assets/signs/videos/${s.clip}.mp4` : null, low: !!s.low };
         });
     }
 
@@ -278,7 +281,7 @@ export class Library {
             const motion = this.prepareMotion(m);
             const span = activeSpan(motion);
             return { kind: "letter", id: ch, label: ch, motion, span, core: letterCore(motion, span),
-                     video: `${this.base}/${e.video}` };
+                     video: this.videos && e.video ? `${this.base}/${e.video}` : null };
         });
     }
 
@@ -290,7 +293,7 @@ export class Library {
         return this._load(`phrase:${name}`, `${this.base}/${e.motion}`, m => {
             const motion = this.prepareMotion(m);
             return { kind: "phrase", id: name, label: name, motion,
-                     span: [0, motion.frames.length - 1], video: `${this.base}/${e.video}` };
+                     span: [0, motion.frames.length - 1], video: this.videos && e.video ? `${this.base}/${e.video}` : null };
         });
     }
 }

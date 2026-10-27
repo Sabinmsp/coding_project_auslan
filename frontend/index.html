@@ -3,6 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- where assets/ is served from: empty = this site; or a CDN origin, e.g.
+     https://signs.example.com (set by build_dist.py --asset-base). The CDN
+     must send Access-Control-Allow-Origin for the JSON files. -->
+<meta name="asset-base" content="">
 <title>SignBridge Auslan</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='26' font-size='26'%3E%F0%9F%A4%9F%3C/text%3E%3C/svg%3E">
 <style>
@@ -306,7 +310,7 @@
     <section>
         <h2>Source recording</h2>
         <video id="reference" muted playsinline preload="auto" aria-label="Original corpus video of the current sign"></video>
-        <p class="refnote">The corpus video the motion was extracted from, kept in step with the avatar.</p>
+        <p class="refnote" id="refnote">The corpus video the motion was extracted from, kept in step with the avatar.</p>
     </section>
     <section id="info">
         <h2>Current sign</h2>
@@ -360,6 +364,19 @@ const $ = id => document.getElementById(id);
 const canvas = $("canvas");
 const ctx = canvas.getContext("2d");
 const video = $("reference");
+const ASSET_BASE = (document.querySelector('meta[name="asset-base"]')?.content || ".").replace(/\/$/, "");
+// the reference video is OPTIONAL: the figure plays from motion data alone.
+// A video that fails to load (missing file, motion-only build, offline) is
+// noted once and then left alone -- playback never waits for it.
+let videoFailed = null;
+video.addEventListener("error", () => {
+    videoFailed = video.getAttribute("src");
+    $("refnote").textContent = "Source video unavailable. The avatar plays from motion data only.";
+    dirty = true;
+});
+video.addEventListener("loadeddata", () => {
+    $("refnote").textContent = "The corpus video the motion was extracted from, kept in step with the avatar.";
+});
 const wordEl = $("word");
 const subEl = $("sub");
 const scrub = $("scrub");
@@ -835,6 +852,10 @@ function render() {
 
 function syncVideo(s) {
     const c = tl.clips[s.clip];
+    if (!c.video || videoFailed === c.video) {   // no video for this clip: nothing to sync
+        if (!video.paused) video.pause();
+        return true;
+    }
     if (s.local === null) {                  // a transition: no source frame
         if (!video.paused) video.pause();
         return true;
@@ -1420,9 +1441,9 @@ window.auslan = {
         } catch (e) { return fallback; }
     };
     const [manifest, letters, signs, topo, keywords] = await Promise.all([
-        get("./assets/signs/manifest.json", null), get("./assets/fingerspelling/letters.json", {}),
-        get("./assets/signs.json", {}), get("./assets/signs/face_topology.json", null),
-        get("./assets/signs/keywords.json", null)]);
+        get(`${ASSET_BASE}/assets/signs/manifest.json`, null), get(`${ASSET_BASE}/assets/fingerspelling/letters.json`, {}),
+        get(`${ASSET_BASE}/assets/signs.json`, {}), get(`${ASSET_BASE}/assets/signs/face_topology.json`, null),
+        get(`${ASSET_BASE}/assets/signs/keywords.json`, null)]);
     faceTopo = topo;
     quick = signs;
     const phrases = Object.fromEntries(Object.entries(signs).filter(([, e]) => e.motion));
@@ -1432,7 +1453,10 @@ window.auslan = {
         $("libstat").textContent = "library missing";
         return;
     }
-    libOpts = { manifest, letters, phrases, keywords };
+    libOpts = { manifest, letters, phrases, keywords, base: ASSET_BASE };
+    if (manifest.videos === false) {            // motion-only build: no video panel
+        video.closest("section").hidden = true;
+    }
     lib = new Library({ ...libOpts, despike: $("despike").checked });
     setStatus("Type a sentence or pick an example.");
     for (const text of EXAMPLES) {

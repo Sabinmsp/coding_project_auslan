@@ -93,10 +93,16 @@ def main():
     ap.add_argument("--signs-from", metavar="FILE",
                     help="partial build: only the signs the planner needs for the text in FILE "
                          "(e.g. scripts/web_demo.txt); the rest are marked 'not included in this web demo'")
+    ap.add_argument("--no-videos", action="store_true",
+                    help="motion-only build: no reference videos at all (playback never needs them)")
+    ap.add_argument("--asset-base", default="", metavar="URL",
+                    help="serve assets/ from this origin (a CDN / R2 bucket) instead of the site itself")
     args = ap.parse_args()
-    ffmpeg = paths.find_tool("ffmpeg") if args.small_videos else None
+    ffmpeg = paths.find_tool("ffmpeg") if args.small_videos and not args.no_videos else None
 
     def copy_video(src, dst):
+        if args.no_videos:
+            return
         if ffmpeg:
             subprocess.run([ffmpeg, "-y", "-v", "error", "-i", str(src), "-vf", "scale=-2:240",
                             "-c:v", "libx264", "-preset", "veryfast", "-crf", "28",
@@ -155,7 +161,7 @@ def main():
         dest = DIST / rel
         dest.parent.mkdir(parents=True, exist_ok=True)
         copy_video(paths.ROOT / rel, dest)
-        video_bytes += dest.stat().st_size
+        video_bytes += dest.stat().st_size if dest.exists() else 0
 
     # ---- the sign library ----
     dlib = DIST / paths.SIGNS.relative_to(paths.ROOT)
@@ -177,7 +183,16 @@ def main():
         manifest["counts"]["available"] = len(shipped)
         for k in ("review", "unreliable"):
             manifest["counts"][k] = sum(1 for s in shipped if s.get("status") == k)
+    if args.no_videos:
+        manifest["videos"] = False          # the page hides its video panel
+    if subset is not None or args.no_videos:
         (dlib / paths.MANIFEST.name).write_text(json.dumps(manifest, separators=(",", ":")))
+    if args.asset_base:
+        # assets/ is uploaded to the CDN separately; the site deploy leaves it out
+        (DIST / ".vercelignore").write_text("assets/\n")
+        page = DIST / "index.html"
+        page.write_text(page.read_text().replace('<meta name="asset-base" content="">',
+                                                 f'<meta name="asset-base" content="{args.asset_base}">', 1))
     clips = sorted({s["clip"] for s in manifest["signs"].values() if s["clip"]})
     lib_motion = lib_video = 0
     for clip in clips:
@@ -186,24 +201,24 @@ def main():
         lib_motion += m_src.stat().st_size
         v_dst = dlib / "videos" / v_src.name
         copy_video(v_src, v_dst)
-        lib_video += v_dst.stat().st_size
+        lib_video += v_dst.stat().st_size if v_dst.exists() else 0
 
-    # correct MIME types + caching, for hosts that need telling
-    (DIST / "_headers").write_text(
-        "/*\n"
-        "  Cache-Control: public, max-age=3600\n"
-        "/assets/*.json\n"
-        "  Content-Type: application/json\n"
-        "/assets/*.mp4\n"
-        "  Content-Type: video/mp4\n"
-        "/assets/signs/manifest.json\n"
-        "  Cache-Control: no-cache\n"
-    )
-    (DIST / "netlify.toml").write_text(
-        '[build]\n  publish = "."\n\n'
-        '[[headers]]\n  for = "/assets/*.mp4"\n'
-        '  [headers.values]\n    Content-Type = "video/mp4"\n'
-    )
+    # caching: motion and video files change only when a sign is re-extracted,
+    # so browsers and the CDN keep them a day and revalidate in the background
+    # for a week; the small index files are revalidated on every load, so a
+    # redeploy is picked up at once. CORS on assets/ so the files also work
+    # when served from a separate CDN origin (--asset-base).
+    MEDIA = "public, max-age=86400, stale-while-revalidate=604800"
+    INDEX = ["/assets/signs/manifest.json", "/assets/signs/keywords.json",
+             "/assets/fingerspelling/letters.json", "/assets/signs.json"]
+    rules = ([("/assets/*", [("Access-Control-Allow-Origin", "*")]),
+              ("/assets/*.json", [("Content-Type", "application/json"), ("Cache-Control", MEDIA)]),
+              ("/assets/*.mp4", [("Content-Type", "video/mp4"), ("Cache-Control", MEDIA)])]
+             + [(u, [("Cache-Control", "no-cache")]) for u in INDEX])
+    (DIST / "_headers").write_text("".join(f"{u}\n" + "".join(f"  {k}: {v}\n" for k, v in h) for u, h in rules))
+    (DIST / "netlify.toml").write_text('[build]\n  publish = "."\n' + "".join(
+        f'\n[[headers]]\n  for = "{u}"\n  [headers.values]\n' + "".join(f'    {k} = "{v}"\n' for k, v in h)
+        for u, h in rules))
 
     # the optional AI summary as a Vercel Python function (other static hosts
     # simply don't run it, and the page falls back to its offline summary)
@@ -213,11 +228,10 @@ def main():
     (DIST / "requirements.txt").write_text("anthropic\n")
 
     # Vercel: same headers; cleanUrls off so /index.html and ?text= links work as-is
-    (DIST / "vercel.json").write_text(json.dumps({
-        "headers": [
-            {"source": "/assets/(.*).mp4", "headers": [{"key": "Content-Type", "value": "video/mp4"}]},
-            {"source": "/assets/signs/manifest.json", "headers": [{"key": "Cache-Control", "value": "no-cache"}]},
-        ]}, indent=1) + "\n")
+    # (Vercel applies matching rules in order, later ones winning)
+    vsrc = lambda u: u.replace("*.json", "(.*)\\.json").replace("*.mp4", "(.*)\\.mp4").replace("/*", "/(.*)")
+    (DIST / "vercel.json").write_text(json.dumps({"headers": [
+        {"source": vsrc(u), "headers": [{"key": k, "value": v} for k, v in h]} for u, h in rules]}, indent=1) + "\n")
 
     files = [p for p in DIST.rglob("*") if p.is_file()]
     total = sum(p.stat().st_size for p in files)

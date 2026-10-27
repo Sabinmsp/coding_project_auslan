@@ -8,6 +8,7 @@ API. Any static host works.
 | build | command | size (measured 2026-10-27) | fits |
 |---|---|---|---|
 | full library | `python3 scripts/build_dist.py` | 1,034 MB, 6,499 files, largest file 8.5 MB | Cloudflare Pages (20,000 files, 25 MiB/file); Netlify; **not** Vercel (CLI upload cap 100 MB Hobby, 1 GB Pro) |
+| **full library, motion only** | `python3 scripts/build_dist.py --no-videos` | **483 MB, 3,264 files, no MP4s** | Cloudflare Pages, Netlify, Vercel Pro; or Vercel (page) + CDN bucket (assets), below |
 | full library, small videos | `python3 scripts/build_dist.py --small-videos` | ~0.55 GB (estimate) | Cloudflare Pages, Netlify, Vercel Pro |
 | **web demo** | `python3 scripts/build_dist.py --signs-from scripts/web_demo.txt --small-videos` | **88 MB, 858 files** | **everything, including Vercel Hobby (100 MB, little headroom)** |
 
@@ -27,6 +28,54 @@ video panel is lower resolution.
 `assets/` only what the page can request. Catalog, extraction log and QA
 sheets live in `datasets/processed/` and never ship. Host limits change:
 check them before deploying.
+
+### Playback never needs the MP4s
+
+The figure is drawn from the motion JSON alone. The source video panel is a
+reference: if a video is missing or blocked, the panel says "Source video
+unavailable" and playback continues (tested with every `.mp4` blocked:
+`tests/browser/test_motion_only.py`). A `--no-videos` build ships none and
+hides the panel. The original 4.2 GiB of `rgb/` videos never ship in any build.
+
+### Scaling to ~10,000 monthly users: page on Vercel, assets on a CDN
+
+```sh
+python3 scripts/build_dist.py --no-videos --asset-base https://signs.example.com
+# upload dist/assets/ to the bucket (e.g. Cloudflare R2 with a public custom domain), then
+npx vercel deploy dist --prod        # .vercelignore leaves assets/ out of the site deploy
+```
+
+- Everything is static: no database, no server for playback. The browser
+  fetches the small index files at startup and then **only the motion files
+  of the signs in the current sentence**, cached in memory for the session
+  (LRU of 80 signs) and by HTTP caching between visits.
+- Headers written by the build (`vercel.json`, `_headers`, `netlify.toml`):
+  motion and video files `public, max-age=86400, stale-while-revalidate=604800`;
+  manifest, keywords, letters and quick picks `no-cache` (a redeploy shows at
+  once); `Access-Control-Allow-Origin: *` on `assets/` so a separate CDN
+  origin works. A bucket served directly (not through these files) needs the
+  same CORS and cache rules set in its own settings.
+- No secrets in the browser. The only secret is `ANTHROPIC_API_KEY` for the
+  optional AI summary, held by the serverless function.
+
+Measured transfer (2026-10-27, gzip, which CDNs apply to JSON):
+
+| | size |
+|---|---|
+| startup (page, scripts, manifest, keywords, letters) | 229 KB |
+| "I love Australia" (3 signs) | 137 KB |
+| "Thank you doctor, pay the bill tomorrow" (5 signs) | 260 KB |
+| average sign | 52 KB (143 KB uncompressed) |
+
+A rough monthly volume, assuming each of 10,000 users plays 20 sentences of 4
+signs with nothing cached: 10,000 × (0.23 MB + 20 × 0.2 MB) ≈ 42 GB. This is
+an estimate from the measured sizes above, not a measurement of real use.
+
+**Load testing still needed:** none has been done. Before claiming any
+capacity, test the deployed CDN with a tool such as k6 or `hey`: cold-cache
+fetches of random sign files at the expected peak rate, cache hit ratio,
+p95 latency from Australia, and the AI endpoint's rate limits (it is the
+only part that is not static).
 
 ### The AI summary (optional)
 

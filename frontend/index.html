@@ -379,13 +379,15 @@
 // ======================================================
 import { plan as makePlan, toGlossLine, fromGlossLine } from "./src/planner.js";
 import { Library } from "./src/library.js";
-import { buildTimeline, sample, allFrames } from "./src/timeline.js";
+import { buildTimeline, allFrames } from "./src/timeline.js";
+import { Player, stepSpans } from "./src/player.js";
+import { createRenderer, computeLayout } from "./src/renderer.js";
 import { readPdf } from "./src/document.js";
 import { summarize, checkPoint } from "./src/summarize.js";
 
 const $ = id => document.getElementById(id);
 const canvas = $("canvas");
-const ctx = canvas.getContext("2d");
+const renderer = createRenderer(canvas);     // drawing only (src/renderer.js)
 const video = $("reference");
 const ASSET_BASE = (document.querySelector('meta[name="asset-base"]')?.content || ".").replace(/\/$/, "");
 // the reference video is OPTIONAL: the figure plays from motion data alone.
@@ -395,7 +397,7 @@ let videoFailed = null;
 video.addEventListener("error", () => {
     videoFailed = video.getAttribute("src");
     $("refnote").textContent = "Source video unavailable. The avatar plays from motion data only.";
-    dirty = true;
+    player.markDirty();
 });
 video.addEventListener("loadeddata", () => {
     $("refnote").textContent = "The corpus video the motion was extracted from, kept in step with the avatar.";
@@ -406,15 +408,18 @@ const scrub = $("scrub");
 const countEl = $("count");
 const loopEl = $("loop");
 const playBtn = $("play");
+// ONE clock for the figure, captions, scrubber, tiles and video (src/player.js)
+const player = new Player({ onState: on => {
+    playBtn.textContent = on ? "❚❚ Pause" : "▶ Play";
+    if (on) videoClip = -1;                  // force a video re-sync
+    else video.pause();
+} });
 
 let lib = null;
 let quick = {};            // signs.json: quick-pick signs + pre-stitched phrases
-let faceTopo = null;       // assets/signs/face_topology.json
 let currentPlan = null;    // what is shown in the plan editor
 let tl = null;             // the timeline being played
 let layout = null;         // ONE camera for the whole timeline
-let playing = false, startClock = 0, tNow = 0, speed = 1;
-let dirty = true;          // paused, but something changed: draw again
 let scrubStep = 1;         // ms of timeline per pixel of slider: smaller moves are invisible
 
 // Write text only when it changes. An unchanged write still costs a style
@@ -433,222 +438,6 @@ const EXAMPLES = ["I love Australia.", "My name is Sabin.", "Welcome to the univ
 let libOpts = null;        // what the Library was built from (rebuilt by the spike switch)
 let stepTimes = [];        // [{n, t0, t1}] per plan step on the current timeline
 let buildSeq = 0, videoClip = -1, activeStep = -1;
-
-// ---- MediaPipe topology -------------------------------------------
-const POSE = {
-    NOSE: 0, L_EYE: 2, R_EYE: 5,
-    L_SHOULDER: 11, R_SHOULDER: 12, L_ELBOW: 13, R_ELBOW: 14,
-    L_WRIST: 15, R_WRIST: 16, L_HIP: 23, R_HIP: 24
-};
-const TORSO = [[11, 12], [11, 23], [12, 24], [23, 24]];
-const HAND_LINKS = [
-    [0,1],[1,2],[2,3],[3,4],
-    [0,5],[5,6],[6,7],[7,8],
-    [0,9],[9,10],[10,11],[11,12],
-    [0,13],[13,14],[14,15],[15,16],
-    [0,17],[17,18],[18,19],[19,20],
-    [5,9],[9,13],[13,17]
-];
-
-// ======================================================
-// LAYOUT
-//
-// Computed once per sign from the whole clip, not per frame: fitting to
-// each frame's own extent would make the figure breathe as the arms
-// move. One transform for the clip keeps it still.
-// ======================================================
-function computeLayout(motion) {
-    const aspect = motion.width / motion.height;
-    let minX = 1e9, maxX = -1e9, minY = 1e9, maxY = -1e9;
-
-    const see = (x, y) => {
-        minX = Math.min(minX, x); maxX = Math.max(maxX, x);
-        minY = Math.min(minY, y); maxY = Math.max(maxY, y);
-    };
-
-    for (const frame of motion.frames) {
-        const p = frame.pose;
-        if (!p) continue;
-        for (const i of [POSE.NOSE, POSE.L_SHOULDER, POSE.R_SHOULDER,
-                         POSE.L_ELBOW, POSE.R_ELBOW, POSE.L_WRIST, POSE.R_WRIST,
-                         POSE.L_HIP, POSE.R_HIP]) {
-            see(p[i].x * aspect, p[i].y);
-        }
-        for (const key of ["left_hand", "right_hand"]) {
-            const h = frame[key];
-            if (!h) continue;
-            for (const lm of h) see(lm.x * aspect, lm.y);
-        }
-        if (frame.face) for (const lm of frame.face) see(lm.x * aspect, lm.y);
-    }
-    // Centre on the BODY, not on the full extent. A raised arm reaches
-    // further to one side than the other, and centring on that pushes
-    // the figure off to the opposite side of the frame. The box is
-    // widened symmetrically about the torso instead, so the signer stays
-    // put and the arm still fits.
-    let cx = 0, n = 0;
-    for (const frame of motion.frames) {
-        const p = frame.pose;
-        if (!p) continue;
-        cx += (p[POSE.L_SHOULDER].x + p[POSE.R_SHOULDER].x +
-               p[POSE.L_HIP].x + p[POSE.R_HIP].x) / 4 * aspect;
-        n++;
-    }
-    cx = n ? cx / n : (minX + maxX) / 2;
-
-    const half = Math.max(maxX - cx, cx - minX) * 1.16 + 0.04;
-    const padTop = (maxY - minY) * 0.28 + 0.04;
-    const padBottom = (maxY - minY) * 0.10 + 0.03;
-    return { aspect,
-             minX: cx - half, maxX: cx + half,
-             minY: minY - padTop, maxY: maxY + padBottom };
-}
-
-function project(x, y, layout, W, H) {
-    const boxW = layout.maxX - layout.minX;
-    const boxH = layout.maxY - layout.minY;
-    const scale = Math.min(W / boxW, H / boxH);
-    const offX = (W - boxW * scale) / 2;
-    const offY = (H - boxH * scale) / 2;
-    return [offX + (x * layout.aspect - layout.minX) * scale,
-            offY + (y - layout.minY) * scale];
-}
-
-// ======================================================
-// DRAWING
-// ======================================================
-function limb(a, b, width, colour) {
-    ctx.strokeStyle = colour;
-    ctx.lineWidth = width;
-    ctx.lineCap = "round";
-    ctx.beginPath();
-    ctx.moveTo(a[0], a[1]);
-    ctx.lineTo(b[0], b[1]);
-    ctx.stroke();
-}
-
-function dot(p, r, colour) {
-    ctx.fillStyle = colour;
-    ctx.beginPath();
-    ctx.arc(p[0], p[1], r, 0, Math.PI * 2);
-    ctx.fill();
-}
-
-function drawFrame(frame, layout) {
-    const W = canvas.width, H = canvas.height;
-    ctx.clearRect(0, 0, W, H);
-    if (!frame || !frame.pose) return;
-
-    const p = frame.pose;
-    const P = i => project(p[i].x, p[i].y, layout, W, H);
-    const unit = Math.min(W, H);
-    const thick = unit * 0.022;
-
-    // ---- torso as a filled shape, so the figure reads as a body -----
-    const ls = P(POSE.L_SHOULDER), rs = P(POSE.R_SHOULDER);
-    const lh = P(POSE.L_HIP), rh = P(POSE.R_HIP);
-    ctx.fillStyle = "rgba(126,232,200,0.13)";
-    ctx.beginPath();
-    ctx.moveTo(ls[0], ls[1]); ctx.lineTo(rs[0], rs[1]);
-    ctx.lineTo(rh[0], rh[1]); ctx.lineTo(lh[0], lh[1]);
-    ctx.closePath(); ctx.fill();
-
-    for (const [a, b] of TORSO) limb(P(a), P(b), thick * 0.8, "#7ee8c8");
-    // The pose model and the hand model each estimate the wrist. Drawing the
-    // forearm to one and the hand from the other left a visible gap, so
-    // when a hand is present and attached (its wrist within 0.35 shoulder
-    // widths of the arm's), the forearm ends at the hand's own wrist point.
-    // Both are measurements; this only picks the one arm and hand share.
-    const swPx = Math.hypot(ls[0] - rs[0], ls[1] - rs[1]) || 1;
-    const wristFor = (key, wristIndex) => {
-        const h = frame[key], w = P(wristIndex);
-        if (!h || h.length !== 21) return w;
-        const root = project(h[0].x, h[0].y, layout, W, H);
-        return Math.hypot(root[0] - w[0], root[1] - w[1]) <= 0.35 * swPx ? root : w;
-    };
-    const wristL = wristFor("left_hand", POSE.L_WRIST), wristR = wristFor("right_hand", POSE.R_WRIST);
-    limb(P(POSE.L_SHOULDER), P(POSE.L_ELBOW), thick, "#ff8f6b");
-    limb(P(POSE.L_ELBOW), wristL, thick, "#ff8f6b");
-    limb(P(POSE.R_SHOULDER), P(POSE.R_ELBOW), thick, "#6fb4ff");
-    limb(P(POSE.R_ELBOW), wristR, thick, "#6fb4ff");
-
-    // ---- head ------------------------------------------------------
-    const nose = P(POSE.NOSE);
-    const neck = [(ls[0] + rs[0]) / 2, (ls[1] + rs[1]) / 2];
-    // 0.49 x nose-neck: the median face-outline radius measured over the
-    // sign library, so a head without face landmarks (letters) is the same
-    // size as one with them
-    const headR = Math.max(unit * 0.02, Math.hypot(nose[0] - neck[0], nose[1] - neck[1]) * 0.49);
-    limb(neck, nose, thick * 0.7, "#7ee8c8");
-    if (frame.face && faceTopo && $("face").checked) {
-        drawFace(frame.face, layout, W, H, thick);
-    } else {
-        ctx.fillStyle = "#0f1318";
-        ctx.strokeStyle = "#7ee8c8";
-        ctx.lineWidth = thick * 0.55;
-        ctx.beginPath();
-        ctx.arc(nose[0], nose[1], headR, 0, Math.PI * 2);
-        ctx.fill(); ctx.stroke();
-    }
-
-    for (const i of [POSE.L_SHOULDER, POSE.R_SHOULDER, POSE.L_ELBOW, POSE.R_ELBOW])
-        dot(P(i), thick * 0.52, "#cfe8ff");
-
-    // ---- hands -----------------------------------------------------
-    for (const [key, colour, wristIndex] of
-         [["left_hand", "#ff8f6b", POSE.L_WRIST], ["right_hand", "#6fb4ff", POSE.R_WRIST]]) {
-        const h = frame[key];
-        if (!h || h.length !== 21) {
-            dot(wristIndex === POSE.L_WRIST ? wristL : wristR, thick * 0.6, colour);
-            continue;
-        }
-        const Q = i => project(h[i].x, h[i].y, layout, W, H);
-        // a HELD hand (tracking lost for a moment, see timeline.js) is drawn
-        // translucent and without fingertip highlights: visibly not measured
-        const held = frame.held && frame.held[key] !== undefined ? frame.held[key] : null;
-        if (held !== null) ctx.globalAlpha = 0.65 * held;
-        for (const [a, b] of HAND_LINKS) limb(Q(a), Q(b), thick * 0.42, colour);
-        for (let i = 0; i < 21; i++) {
-            const tip = (i % 4 === 0 && i > 0) && held === null;
-            dot(Q(i), thick * (tip ? 0.30 : 0.20), tip ? "#ffffff" : colour);
-        }
-        ctx.globalAlpha = 1;
-    }
-}
-
-
-// The face from the source clip's own landmarks: outline, brows, eyes,
-// lips. Brow position and mouth shape carry grammar in Auslan; a circle
-// for a head shows none of it. Drawn only where the clip has a tracked
-// face -- letters and the pre-stitched phrases fall back to the circle.
-function drawFace(face, layout, W, H, thick) {
-    const F = i => project(face[i].x, face[i].y, layout, W, H);
-    ctx.fillStyle = "#0f1318";
-    ctx.strokeStyle = "#7ee8c8";
-    ctx.lineWidth = thick * 0.45;
-    ctx.beginPath();
-    faceTopo.oval_loop.forEach((i, k) => {
-        const p = F(i);
-        if (k) ctx.lineTo(p[0], p[1]); else ctx.moveTo(p[0], p[1]);
-    });
-    ctx.closePath(); ctx.fill(); ctx.stroke();
-
-    const lines = (edges, width, colour) => {
-        ctx.strokeStyle = colour; ctx.lineWidth = width; ctx.lineCap = "round";
-        ctx.beginPath();
-        for (const [a, b] of edges) {
-            const p = F(a), q = F(b);
-            ctx.moveTo(p[0], p[1]); ctx.lineTo(q[0], q[1]);
-        }
-        ctx.stroke();
-    };
-    const parts = faceTopo.parts;
-    lines(parts.left_eyebrow, thick * 0.3, "#e8ecf3");
-    lines(parts.right_eyebrow, thick * 0.3, "#e8ecf3");
-    lines(parts.left_eye, thick * 0.16, "#cfe8ff");
-    lines(parts.right_eye, thick * 0.16, "#cfe8ff");
-    lines(parts.lips, thick * 0.2, "#f2a3b6");
-}
 
 // ======================================================
 // FINGERSPELLING PROGRESS
@@ -709,7 +498,7 @@ function resize() {
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     canvas.width = stage.clientWidth * dpr;
     canvas.height = stage.clientHeight * dpr;
-    dirty = true;            // resizing clears the canvas
+    player.markDirty();      // resizing clears the canvas
     if (tl) scrubStep = Math.max(1, scrub.max / Math.max(1, scrub.clientWidth));
 }
 window.addEventListener("resize", resize);
@@ -769,7 +558,8 @@ async function playPlan(p) {
     }
     if (!clips.length) {
         tl = null;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        player.clear();
+        renderer.clear();
         wordEl.textContent = "—";
         subEl.textContent = "nothing to sign";
         countEl.textContent = "—";
@@ -785,20 +575,14 @@ async function playPlan(p) {
     // next sentence loads, the old timeline keeps drawing but currentPlan
     // already holds the new one (rapid switching)
     tl.plan = p;
-    stepTimes = [];
-    for (const it of tl.items) {
-        if (it.type !== "clip") continue;
-        const n = tl.clips[it.clip].step, last = stepTimes[stepTimes.length - 1];
-        if (last && last.n === n) last.t1 = it.t1; else stepTimes.push({ n, t0: it.t0, t1: it.t1 });
-    }
+    stepTimes = stepSpans(tl);
     renderSteps();
     layout = computeLayout({ width: 1, height: 1, frames: [...allFrames(tl)] });
     scrub.max = Math.round(tl.duration * 1000);
     scrubStep = Math.max(1, scrub.max / Math.max(1, scrub.clientWidth));
     videoClip = -1; activeStep = -1;
-    tNow = 0;
-    dirty = true;
-    play();
+    player.load(tl, stepTimes);
+    player.play();
 }
 
 // ======================================================
@@ -808,68 +592,27 @@ async function playPlan(p) {
 // position comes from elapsed time x speed; the video is told where to be,
 // never asked, so a dropped video frame cannot drag the figure out of step.
 // ======================================================
-function play() {
-    if (!tl) return;
-    if (tNow >= tl.duration - 1e-3) tNow = 0;
-    startClock = performance.now() - tNow / speed * 1000;
-    playing = true;
-    videoClip = -1;                          // force a video re-sync
-    playBtn.textContent = "❚❚ Pause";
-}
-
-function pause() {
-    playing = false;
-    dirty = true;
-    playBtn.textContent = "▶ Play";
-    video.pause();
-}
-
-// move the playhead, keeping play/pause as it is
-function jumpTo(t) {
-    if (!tl) return;
-    tNow = Math.max(0, Math.min(t, tl.duration - 1e-3));
-    if (playing) startClock = performance.now() - tNow / speed * 1000;
-    videoClip = -1;
-    scrub.value = Math.round(tNow * 1000);
-    dirty = true;
-}
-function stepBy(d) {
-    if (!tl || !stepTimes.length) return;
-    let i = stepTimes.findIndex(st => tNow < st.t1);
-    if (i === -1) i = stepTimes.length - 1;
-    // "previous" from well inside a sign restarts that sign first
-    if (d < 0 && tNow - stepTimes[i].t0 > 0.4) d = 0;
-    const j = Math.max(0, Math.min(stepTimes.length - 1, i + d));
-    jumpTo(stepTimes[j].t0);
-}
+// thin wrappers: the Player owns the state, the page keeps its own bits in step
+function pause() { player.pause(); }
+function jumpTo(t) { player.jumpTo(t); scrub.value = Math.round(player.t * 1000); }
+function stepBy(d) { player.stepBy(d); scrub.value = Math.round(player.t * 1000); }
 
 function render() {
     requestAnimationFrame(render);
-    if (!tl) return;
-    const looping = loopEl.checked;
-    if (playing) {
-        tNow = (performance.now() - startClock) / 1000 * speed;
-        // looping plays the wrap transition (last pose -> first) up to loopEnd
-        const end = looping ? tl.loopEnd : tl.duration;
-        if (tNow >= end) {
-            if (looping) {
-                tNow %= end;
-                startClock = performance.now() - tNow / speed * 1000;
-                videoClip = -1;
-            } else { tNow = tl.duration; pause(); }
-        }
+    player.loop = loopEl.checked;
+    const f = player.tick();
+    if (!f) return;                  // paused and nothing changed: the canvas is already right
+    if (f.wrapped) videoClip = -1;   // looped or jumped: the video must find its place again
+    if (player.playing) {
         // moving the slider costs a layout; only move it when the thumb would
-        const ms = Math.round(Math.min(tNow, tl.duration) * 1000);
+        const ms = Math.round(f.time * 1000);
         if (Math.abs(ms - scrub.value) >= scrubStep) scrub.value = ms;
-    } else if (!dirty) {
-        return;                  // paused and nothing changed: the canvas is already right
     }
-    const s = sample(tl, (playing && looping) ? tNow : Math.min(tNow, tl.duration - 1e-6));
-    drawFrame(s.frame, layout);
-    const settled = syncVideo(s);
-    caption(s);
-    setText(countEl, `${Math.min(tNow, tl.duration).toFixed(1)} / ${tl.duration.toFixed(1)}s`);
-    dirty = !playing && !settled;    // keep going while a paused video catches up
+    renderer.drawFrame(f.sample.frame, layout);
+    const settled = syncVideo(f.sample);
+    caption(f.sample);
+    setText(countEl, `${f.time.toFixed(1)} / ${tl.duration.toFixed(1)}s`);
+    if (!player.playing && !settled) player.markDirty();    // keep going while a paused video catches up
 }
 
 function syncVideo(s) {
@@ -886,16 +629,16 @@ function syncVideo(s) {
     if (videoClip !== s.clip) {
         videoClip = s.clip;
         if (video.getAttribute("src") !== c.video) video.src = c.video;
-        video.playbackRate = speed;
+        video.playbackRate = player.speed;
         video.currentTime = want;
-        if (playing) video.play().catch(() => {});
+        if (player.playing) video.play().catch(() => {});
         return false;
     }
     // While a load or seek is in flight, currentTime still reads the OLD
     // position; correcting "drift" then would issue a new seek every frame,
     // each restarting the load, and the video would never show at all.
     if (video.seeking || video.readyState < 2) return false;
-    if (playing) {
+    if (player.playing) {
         if (video.paused) { video.currentTime = want; video.play().catch(() => {}); }
         else if (Math.abs(video.currentTime - want) > 0.25) video.currentTime = want;
         return true;
@@ -1409,13 +1152,13 @@ $("order").addEventListener("change", () => {
 });
 $("trim").addEventListener("change", () => { if (currentPlan) playPlan(currentPlan); });
 $("compact").addEventListener("change", () => { if (currentPlan) playPlan(currentPlan); });
-$("face").addEventListener("change", () => { dirty = true; });
+$("face").addEventListener("change", () => { renderer.setShowFace($("face").checked); player.markDirty(); });
 
 playBtn.addEventListener("click", () => {
     if (!tl) return;
-    if (playing) pause(); else play();
+    player.toggle();
 });
-$("replay").addEventListener("click", () => { tNow = 0; play(); });
+$("replay").addEventListener("click", () => player.replay());
 $("prev").addEventListener("click", () => stepBy(-1));
 $("next").addEventListener("click", () => stepBy(1));
 $("despike").addEventListener("change", () => {
@@ -1425,20 +1168,17 @@ $("despike").addEventListener("change", () => {
 });
 // a hidden tab gets no animation frames; resume where it was, not ahead
 document.addEventListener("visibilitychange", () => {
-    if (!document.hidden && playing) startClock = performance.now() - tNow / speed * 1000;
+    if (!document.hidden) player.resumeAfterHidden();
 });
 
 scrub.addEventListener("input", () => {
     if (!tl) return;
-    pause();
-    tNow = +scrub.value / 1000;
-    dirty = true;
+    player.seek(+scrub.value / 1000);
 });
 
 $("speed").addEventListener("change", () => {
-    speed = +$("speed").value;
-    video.playbackRate = speed;
-    if (playing) startClock = performance.now() - tNow / speed * 1000;
+    player.setSpeed(+$("speed").value);
+    video.playbackRate = player.speed;
 });
 
 window.addEventListener("keydown", e => {
@@ -1461,14 +1201,14 @@ window.auslan = {
     get lib() { return lib; },
     get plan() { return currentPlan; },
     get timeline() { return tl; },
-    get t() { return tNow; },
-    get playing() { return playing; },
+    get t() { return player.t; },
+    get playing() { return player.playing; },
     get activeStep() { return activeStep; },
     say: text => { $("sentence-input").value = text; playTyped(); },
     gloss: line => { $("glossline").value = line; playGlossLine(); },
     quick: name => playQuick(name),
     edit: (n, value) => edit(n, value),
-    seek: t => { pause(); tNow = t; dirty = true; },
+    seek: t => player.seek(t),
     openPdf: f => openPdf(f),
     get points() { return docPoints; },
 };
@@ -1486,7 +1226,8 @@ window.auslan = {
         get(`${ASSET_BASE}/assets/signs/manifest.json`, null), get(`${ASSET_BASE}/assets/fingerspelling/letters.json`, {}),
         get(`${ASSET_BASE}/assets/signs.json`, {}), get(`${ASSET_BASE}/assets/signs/face_topology.json`, null),
         get(`${ASSET_BASE}/assets/signs/keywords.json`, null)]);
-    faceTopo = topo;
+    renderer.setFaceTopology(topo);
+    renderer.setShowFace($("face").checked);
     quick = signs;
     const phrases = Object.fromEntries(Object.entries(signs).filter(([, e]) => e.motion));
     if (!manifest) {

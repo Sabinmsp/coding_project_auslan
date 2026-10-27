@@ -135,6 +135,14 @@ function numberToWords(raw) {
 // ------------------------------------------------------
 // tokenising
 // ------------------------------------------------------
+// A full stop after one of these does not end a sentence ("Dr. Smith", "e.g. rent")
+const ABBREVIATION = /\b(?:dr|mr|mrs|ms|prof|st|vs|etc|no|e\.g|i\.e)\.\s*$/i;
+
+// -> { tokens, question, sentences }
+//   tokens     every word of the text, indexed (captions highlight by index)
+//   sentences  the same tokens grouped into sentences, each with its own
+//              question flag: planning is done per sentence, so one
+//              sentence's "?" or time word never reorders another's
 export function tokenize(text) {
     const clean = text.replace(/[‘’]/g, "'");
     const out = [];
@@ -143,12 +151,24 @@ export function tokenize(text) {
     while ((m = re.exec(clean))) {
         const before = clean.slice(0, m.index);
         const sentenceStart = first || /[.!?]\s*$/.test(before);
-        out.push({ raw: m[0], word: m[0].toLowerCase(),
-                   cap: /^[A-Z]/.test(m[0]), sentenceStart, index: out.length });
+        // a real boundary needs whitespace after the mark ("2.0" is one number)
+        const boundary = !first && /[.!?]["')\]]*\s+$/.test(before) && !ABBREVIATION.test(before);
+        out.push({ raw: m[0], word: m[0].toLowerCase(), cap: /^[A-Z]/.test(m[0]), sentenceStart,
+                   boundary, index: out.length, start: m.index, end: m.index + m[0].length });
         first = false;
     }
+    const sentences = [];
+    for (const t of out) {
+        if (!sentences.length || t.boundary) sentences.push({ tokens: [] });
+        sentences[sentences.length - 1].tokens.push(t);
+    }
+    sentences.forEach((sent, i) => {
+        const last = sent.tokens[sent.tokens.length - 1];
+        const next = sentences[i + 1] && sentences[i + 1].tokens[0];
+        sent.question = clean.slice(last.end, next ? next.start : clean.length).includes("?");
+    });
     const trimmed = clean.trim();
-    return { tokens: out, question: trimmed.endsWith("?") };
+    return { tokens: out, question: trimmed.endsWith("?"), sentences };
 }
 
 // Expanded word list: contractions split, numbers spelled out. Each entry
@@ -351,7 +371,26 @@ function lettersOf(word) {
 //        maxKeyWords }
 export function plan(text, lex, opts = {}) {
     const auslanOrder = opts.auslanOrder !== false;
-    const { tokens, question } = tokenize(text);
+    const { tokens, sentences } = tokenize(text);
+    const steps = [], notes = [];
+    let qtype = null;
+    for (const sent of sentences) {
+        const r = planSentence(sent.tokens, sent.question, lex, auslanOrder);
+        steps.push(...r.steps);
+        for (const n of r.notes) if (!notes.includes(n)) notes.push(n);
+        qtype = qtype || r.qtype;
+    }
+    steps.forEach((s, i) => { s.n = i; });
+    return { text, tokens: tokens.map(t => t.raw), question: qtype, sentences: sentences.length,
+             steps, notes, verified: false };
+}
+
+// One sentence: its words -> sign steps, then the (optional) ordering rules.
+// The stages, in order: normalise (contractions, numbers, clipped words) ->
+// concept mapping (gloss / stem / dictionary keyword) -> gloss selection (sense
+// evidence, quality) -> fallback (fingerspell or omit). Motion lookup and
+// sequencing happen later, in library.js and timeline.js: this file never touches motion.
+function planSentence(tokens, question, lex, auslanOrder) {
     const words = expand(tokens);
     const contextWords = new Set(words.map(w => w.w.toUpperCase()));
     for (const w of words) stems(w.w).forEach(s => contextWords.add(s.toUpperCase()));
@@ -535,9 +574,7 @@ export function plan(text, lex, opts = {}) {
         }
     }
 
-    steps.forEach((s, i) => { s.n = i; });
-    return { text, tokens: tokens.map(t => t.raw), question: qtype, steps, notes,
-             verified: false };
+    return { steps, notes, qtype };
 }
 
 // ------------------------------------------------------

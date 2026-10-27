@@ -100,7 +100,9 @@ for text in ["Welcome to the university.", "Students must attend classes.", "The
     played = wait_playing(text)
     t0 = J("auslan.t"); time.sleep(0.5)
     signs = J("auslan.plan.steps.filter(s=>s.kind==='sign').map(s=>s.gloss).join(' ')")
-    check(f"'{text}' plays (signs: {signs})", played and J("auslan.t") != t0)
+    t1 = J("auslan.t")
+    check(f"'{text}' plays (signs: {signs})", played and t1 != t0,
+          f"played={played} playing={J('auslan.playing')} t {t0:.2f}->{t1:.2f} errs={J('window.__errs')}")
 
 check("no page errors", not J("window.__errs"), J("window.__errs"))
 print("ALL PASS" if ok_all else "SOME FAILED")

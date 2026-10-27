@@ -69,3 +69,36 @@ test("no usable sign is disabled: typing a plain sign's own name plays a sign", 
     }
     assert.ok(checked > 2000, `${checked} signs checked`);
 });
+
+// ---- sentence segmentation (added with the per-sentence planner) -------------
+const shapeOf = text => plan(text, lex).steps.map(s => s.kind === "sign" ? s.gloss : s.kind === "spell" ? `fs:${s.letters.join("")}` : `-${s.en}`).join(" ");
+
+test("sentences are planned separately: a question mark applies to its own sentence", () => {
+    const p = plan("Where is the hospital? I need help.", lex);
+    assert.equal(p.sentences, 2);
+    assert.equal(p.question, "wh");
+    assert.match(shapeOf("Where is the hospital? I need help."), /WHEREABOUTS .*I NEED HELP$/);
+    // the second sentence is not a question and nothing of it moves
+    assert.ok(!p.steps.some(s => s.moved && /help/i.test(s.en || "")));
+});
+
+test("a time word moves to the front of ITS sentence only", () => {
+    const out = shapeOf("Thank you. I pay tomorrow.");
+    assert.match(out, /^THANK YOU TOMORROW I PAY$/, out);
+    assert.match(shapeOf("I pay tomorrow."), /^TOMORROW I PAY$/);
+});
+
+test("abbreviations and decimals do not split sentences; blank text has none", () => {
+    assert.equal(plan("Dr. Smith is here.", lex).sentences, 1);
+    assert.equal(plan("Version 2.0 is out", lex).sentences, 1);
+    assert.equal(plan("I pay. You help. We go!", lex).sentences, 3);
+    assert.equal(plan("", lex).sentences, 0);
+    assert.equal(plan("   ", lex).steps.length, 0);
+});
+
+test("caption tokens keep their position across sentences", () => {
+    const p = plan("Hello. How are you?", lex);
+    assert.deepEqual(p.tokens, ["Hello", "How", "are", "you"]);
+    const you = p.steps.find(s => s.gloss === "YOU");
+    assert.deepEqual(you.src, [3]);
+});

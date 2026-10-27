@@ -15,9 +15,9 @@ PDF ─► text per page (pdf.js, in the browser) ─► key points + pages (off
     ─► select a point ─► sign plan (planner.js) ─► sign library / fingerspelling ─► 2D figure
 ```
 
-The original workspace (`../`) is unchanged. Old experiments and status
-documents were archived on 2026-10-27 to `~/SignBridge-archive-2026-10-27/`
-([docs/PROJECT_STRUCTURE.md](docs/PROJECT_STRUCTURE.md)).
+The original workspace (`../`) is unchanged. Old experiments were removed
+from this project on 2026-10-27 (their originals remain in `../`); see
+[docs/PROJECT_STRUCTURE.md](docs/PROJECT_STRUCTURE.md).
 
 ## Start
 

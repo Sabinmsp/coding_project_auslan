@@ -79,12 +79,13 @@ auslan-ai-clean/
 
 ## Archived (outside the project)
 
-On 2026-10-27 the experiments and old status documents were moved to
-`~/SignBridge-archive-2026-10-27/`: `experiments/` (2D renderers, 3D/Blender
-work, a screen recording; 442 MB), `datasets_processed/` (old QA images and
-batch logs), and `docs/` (the earlier audit, cleanup report, stabilisation
-log, next-steps list). Nothing in the app, scripts or tests referenced them,
-and the tracked ones are also in Git history (tag `pre-cleanup-2026-10-27`).
+On 2026-10-27 the experiments (2D renderers, 3D/Blender work; 442 MB) were
+removed from the project after checking that every one of their 250 files has
+a byte-identical copy in the original workspace (`../`). The old batch logs
+and four superseded status documents are in `~/SignBridge-archive-2026-10-27/`
+(9 MB); the documents are also in Git history (tag `pre-cleanup-2026-10-27`).
+Also removed: the 1,265 web videos of second takes that no sign plays (243 MB;
+regenerable from `rgb/` with ffmpeg). Their motion files were kept.
 
 ## The linked datasets
 

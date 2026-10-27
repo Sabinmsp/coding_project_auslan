@@ -5,8 +5,9 @@ anything uses it, and whether it can be removed.
 
 **Update 2026-10-27:** `auslan-ai-clean/experiments/` (442 MB), the old QA
 images and batch logs, and four obsolete status documents were moved to
-`~/SignBridge-archive-2026-10-27/` (see its README). References to
-`auslan-ai-clean/experiments/` below now mean that archive folder.
+`~/SignBridge-archive-2026-10-27/`; the experiments copy was then deleted
+(all 250 files verified identical to the originals in the original workspace).
+References to `auslan-ai-clean/experiments/` below are historical.
 
 **Cleanup done 2026-10-27** (approved: rebuildable files + exact duplicates;
 1,251 MB freed, all tests passing afterwards):

@@ -1,7 +1,7 @@
 #!/bin/sh
 # Every test, from the project root:   sh tests/run_all.sh [port]
 #
-#   node tests        planner, keywords, library, timeline, reliability
+#   node tests        planner, keywords, library, timeline, reliability, playback
 #   python tests      catalog, keywords, manifest, ownership, validation,
 #                     failed extraction, lossless storage (re-runs MediaPipe once)
 #   LLM validation    offline, no network
@@ -23,6 +23,7 @@ run "LLM validation tests" python3 -m unittest tests/test_llm_plan.py
 if curl -s -o /dev/null "http://localhost:$PORT/"; then
     run "browser: behaviour" python3 tests/browser/test_behaviour.py "$PORT"
     run "browser: robustness" python3 tests/browser/test_robustness.py "$PORT"
+    run "browser: controls + end-to-end" python3 tests/browser/test_controls.py "$PORT"
 else
     echo "== browser tests SKIPPED: nothing on port $PORT (start: python3 backend/serve.py $PORT)"
 fi

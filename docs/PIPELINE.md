@@ -160,7 +160,7 @@ slider: figure and video must stay aligned.
 ## Which implementation each stage uses, and why
 
 The workspace had several implementations of most stages. The clean copy
-keeps one of each in production and archives the rest under `experiments/`.
+keeps one of each in production; the rest were archived (see PROJECT_STRUCTURE.md).
 
 | stage | in production | archived alternatives | why |
 |---|---|---|---|

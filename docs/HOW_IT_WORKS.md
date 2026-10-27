@@ -43,7 +43,7 @@ and was checked on 2026-10-24. Planned features are labelled **planned**.
  │  index.html drawFrame() ──► 2D figure on <canvas>   +   source video bottom-right      │
  └────────────────────────────────────────────────────────────────────────────────────────┘
 
- NOT CONNECTED (experiments/): 3D avatar (jump_3d, Blender), OpenCV renderer (pt_pose_pipeline),
+ NOT CONNECTED (archived 2026-10-27, outside the project): 3D avatar (jump_3d, Blender), OpenCV renderer (pt_pose_pipeline),
  early video scripts. llm_plan.py runs only by hand and is never called by the page.
 ```
 
@@ -105,7 +105,7 @@ arms, fingers, a face outline, brows and lips. It's like a dot-to-dot
 puzzle redrawn 60 times a second.
 
 **8. How are the 3D animations made?**
-They aren't, in the app. The `experiments/3d/` work tried to rotate the
+They aren't, in the app. The archived 3D work (`experiments/3d/`) tried to rotate the
 bones of a 3D character to match the same points. It struggled with arm
 proportions and wrist rotation, and was parked in favour of 2D.
 
@@ -136,7 +136,7 @@ The planner, library, timeline and renderer, all through files built by
 `ingest`, `build_library`, `validate_signs` and `build_keywords`.
 
 **13. What is an isolated experiment?**
-Everything in `experiments/`:
+Everything in the archived `experiments/` folder:
 - the 3D avatar
 - the Blender scripts
 - the OpenCV video renderer (`auslan_avatar`)

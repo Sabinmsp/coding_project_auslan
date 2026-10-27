@@ -15,8 +15,9 @@ PDF ─► text per page (pdf.js, in the browser) ─► key points + pages (off
     ─► select a point ─► sign plan (planner.js) ─► sign library / fingerspelling ─► 2D figure
 ```
 
-This is the cleaned-up project. The original workspace (`../`) is unchanged;
-what moved where, and why, is in [docs/CLEANUP_REPORT.md](docs/CLEANUP_REPORT.md).
+The original workspace (`../`) is unchanged. Old experiments and status
+documents were archived on 2026-10-27 to `~/SignBridge-archive-2026-10-27/`
+([docs/PROJECT_STRUCTURE.md](docs/PROJECT_STRUCTURE.md)).
 
 ## Start
 
@@ -42,10 +43,9 @@ frontend/      the web app: index.html + src/ (planner, library, timeline)
 assets/        what the app loads: signs/ (library), fingerspelling/, signs.json
 backend/       Python modules: extract_motion, paths, serve (dev server), llm_plan
 scripts/       commands: ingest, build_library, add_sign, qa_overlay, build_dist, ...
-datasets/      raw/ labels, videos/ + landmarks/ (linked), processed/ (catalog, logs, QA)
-tests/         JS + Python tests
-experiments/   2d/ and 3d/ prior work, archived as-is -- not used by the app
-docs/          structure, pipeline, datasets, deploy, cleanup report
+datasets/      raw/ labels, videos/ + landmarks/ (linked), processed/ (catalog, extract log, validation)
+tests/         JS + Python + browser tests, fixtures
+docs/          how it works, pipeline, deploy, datasets, reports
 ```
 
 Full map: [docs/PROJECT_STRUCTURE.md](docs/PROJECT_STRUCTURE.md). Every file in the whole workspace, and what is safe to remove: [docs/WORKSPACE_MAP.md](docs/WORKSPACE_MAP.md).

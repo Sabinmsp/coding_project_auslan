@@ -1,5 +1,7 @@
 # Dataset report
 
+> **State of 23 Oct 2026.** Counts of extracted signs below are from that date. All 3,215 signs are extracted now: see CODE_FAIR_REPORT.md.
+
 Every number here was measured from the files, not taken from file names
 or documentation. Raw files were read with checksums recorded before and
 after the cleanup; all 6,442 were unchanged.
@@ -104,7 +106,7 @@ The two files are complementary, not duplicates: one has clip names,
 signers and splits, the other frame and time ranges. Poses are present for
 only **3 of the 90 videos** -- `video_1.pt` (94 clips), `video_2.pt` (128),
 `video_55.pt` (163): 385 clips, 2.7% of the set. The archived
-`experiments/2d/pt_pose_pipeline` built a 5-word lexicon from them; the
+the archived `experiments/2d/pt_pose_pipeline` built a 5-word lexicon from them; the
 production app does not use this data.
 
 ## Licensing

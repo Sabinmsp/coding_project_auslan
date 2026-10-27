@@ -29,20 +29,6 @@ datasets/processed/final_status.txt
 # tracked, never their contents
 datasets/videos/rgb/
 
-# Experiments: code and notes are tracked; their media and model files are
-# not (they remain in the original workspace and the cleanup backup)
-experiments/**/*.mp4
-experiments/**/*.mov
-experiments/**/*.gif
-experiments/**/*.glb
-experiments/**/*.fbx
-experiments/**/*.blend
-experiments/**/*.blend1
-experiments/**/*.npz
-experiments/**/*.npy
-experiments/**/*.pt
-experiments/2d/legacy_sign_files/
-
 # Python / OS / editor
 __pycache__/
 *.pyc
@@ -50,3 +36,4 @@ __pycache__/
 .DS_Store
 .env
 .env.*
+!.env.example

@@ -19,7 +19,7 @@ Automated tests check engineering, not Auslan. Nothing here claims linguistic ac
 - [x] One clear on-screen statement in the page header: "It is not a full Auslan translation" (2026-10-27)
 - [x] Every fingerspelled step says why (name / no sign / unreliable / loose match / requested)
 
-## 3. Quality signalling (see NEXT_STEPS #2)
+## 3. Quality signalling
 - [x] Plan chips show icon + word for each state
 - [x] One consistent 4-state indicator (✓ Sign / ⚠ Check / ✋ Fingerspelled / — Omitted)
 - [x] A sentence summary
@@ -32,7 +32,7 @@ Automated tests check engineering, not Auslan. Nothing here claims linguistic ac
 - [x] Tracking drop-outs fade instead of blinking; single-frame spikes removed; compact fingerspelling (see CODE_FAIR_REPORT.md)
 - [x] A sign's file failing to load mid-sentence is reported; the rest plays (tested)
 
-## 5. Testing (see NEXT_STEPS #3)
+## 5. Testing
 - [x] 55 JS + 16 Python + 9 LLM-validation tests, library integrity check, 3 browser suites pass (2026-10-27)
 - [x] Browser tests in `tests/browser/`; `sh tests/run_all.sh` runs everything
 - [x] Tests for failed extraction, a missing motion file, fast switching, pause in a transition

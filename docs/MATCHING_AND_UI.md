@@ -138,6 +138,10 @@ time-first and wh-last ordering rules; and the fingerspelling letter timing.
 
 ![main screen](images/ui_main.png)
 
+On a phone (390 px wide):
+
+![phone](images/ui_phone.png)
+
 The first screen now has: the SignBridge name with About and Help, one large
 text box, **Translate & Play**, six examples, the figure, a caption in plain
 words ("✓ Sign", "⚠ Best guess", "✋ Fingerspelled (no sign for this word)"),

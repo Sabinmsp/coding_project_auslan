@@ -61,7 +61,8 @@ Speak ─► browser speech recognition (Web Speech API, en-AU)
 | Node unit tests, including 12 new voice tests (fake speech engine) | 100 / 100 pass |
 | Library integrity check | pass |
 | Python pipeline, AI-summary and LLM-validation tests | 34 / 34 pass |
-| Browser suites (headless Chrome), including the new voice suite (25 checks) | see the commit message for this run |
+| Browser suites (headless Chrome), including the new voice suite (25 checks) | 9 / 9 pass on the full library. The stress suite failed once inside a full run (clock check), then passed 3 times alone; cause not found. |
+| Same suites against the deploy build (`dist/`, 90.2 MB) | 7 pass. Robustness fails only because its test picks an unreliable sign that the partial build does not ship. |
 
 The browser voice suite replaces the microphone with a scripted engine
 that behaves like the Web Speech API. It covers speaking, live subtitles,

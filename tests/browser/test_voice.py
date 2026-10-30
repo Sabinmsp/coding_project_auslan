@@ -87,13 +87,17 @@ live = "document.getElementById('live')"
 
 # ---- A: speak -> transcript -> signs ---------------------------------------
 open_page(c, "ok")
-check("microphone button is the first control, enabled, with a label",
-      J("!document.getElementById('mic').disabled") and J("document.getElementById('mic-label').textContent") == "Speak")
+check("microphone button is the first control, enabled, named 'Tap to speak'",
+      J("!document.getElementById('mic').disabled") and J("document.getElementById('mic').getAttribute('aria-label')") == "Tap to speak"
+      and J("document.getElementById('mic-label').textContent") == "Tap to speak")
+phase = "document.getElementById('phase').dataset.phase"
+check("status above the figure: Ready", J(phase) == "ready", J(phase))
 check("privacy note next to the microphone", "does not record or keep audio" in J("document.getElementById('mic-note').textContent"))
 J("document.getElementById('mic').click()")
 check("press Speak: listening state shown (button pressed, label changes)",
       wait(c, "document.getElementById('mic').getAttribute('aria-pressed') === 'true'", 1)
       and "Listening" in J("document.getElementById('mic-label').textContent"))
+check("  status says Listening…", J(phase) == "listening" and J("document.getElementById('phase-text').textContent") == "Listening…")
 check("  recognition language is Australian English", J("window.__lang") == "en-AU", J("window.__lang"))
 check("  live subtitle shows the words while speaking",
       wait(c, f"{live}.className === 'interim' && {live}.textContent.startsWith('my name')", 3), J(f"{live}.textContent"))
@@ -104,10 +108,20 @@ check("  and is shown as what was heard", J(f"{live}.textContent").startswith("H
 check("  the signs play automatically",
       wait(c, "!!(auslan.playing && auslan.plan && auslan.plan.text === 'My name is sabin' && auslan.timeline)", 8))
 steps = J("auslan.plan.steps.map(s => s.kind === 'sign' ? s.gloss : s.kind === 'spell' ? 'fs:' + s.letters.join('') : '-').join(' ')")
+check("  status: Playing signs…, and 'You said' shows the transcript",
+      J(phase) == "playing" and J("document.getElementById('yousaid-text').textContent") == "My name is sabin")
+check("  the caption names the English word, not the internal sign name",
+      J("document.getElementById('word-label').textContent") in ("Now showing:", "Now spelling:"), J("document.getElementById('word').textContent"))
 check("  available sign played, unknown words fingerspelled and marked", steps.startswith("MY") and "fs:SABIN" in steps
       and J("document.querySelectorAll('#steps .spell').length") >= 1, steps)
 check("  microphone off again afterwards", J("document.getElementById('mic').getAttribute('aria-pressed')") == "false"
       and not J("auslan.listening"))
+
+# the end: Finished + a Replay button (no endless loop by default)
+check("at the end: status Finished and a Replay button", wait(c, f"{phase} === 'finished'", 15)
+      and J("!document.getElementById('replay-big').hidden") and not J("auslan.playing"))
+J("document.getElementById('replay-big').click()")
+check("  Replay plays it again from the start", wait(c, "auslan.playing && auslan.t < 1", 2) and J(phase) == "playing")
 
 # replay and speed still work on a spoken sentence
 J("document.getElementById('replay').click()"); time.sleep(0.1)
@@ -169,7 +183,7 @@ for d in ("Page", "Runtime"):
 c.call("Page.addScriptToEvaluateOnNewDocument", source=FAKE)
 open_page(c, "ok")
 r = c.js("(b => [b.top, b.bottom, b.width])(document.getElementById('mic').getBoundingClientRect())")
-check("phone: Speak button visible without scrolling, full width, 56px tall", r[1] < c.js("innerHeight") and r[2] > 250,
+check("phone: microphone visible without scrolling, at least 64px", r[1] < c.js("innerHeight") and r[2] >= 64,
       f"top {r[0]:.0f} bottom {r[1]:.0f} width {r[2]:.0f}")
 check("phone: no horizontal scrolling", c.js("document.documentElement.scrollWidth <= innerWidth + 1"))
 proc.kill()

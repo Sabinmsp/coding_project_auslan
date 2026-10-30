@@ -80,23 +80,40 @@
     .or { display: block; font-size: 13px; color: var(--muted); margin-bottom: 8px; }
 
     /* ---- voice: the main way in ---- */
-    .voice { margin-top: 24px; display: flex; align-items: center; gap: 16px; padding: 16px; border: 1px solid var(--line);
-             border-radius: var(--r-surface); background: var(--surface); }
-    .mic { flex: none; display: inline-flex; align-items: center; gap: 10px; min-height: 56px; padding: 0 22px 0 18px;
-           border: 0; border-radius: 999px; background: var(--accent); color: var(--on-accent); font-size: 17px; font-weight: 700;
+    .voice { margin-top: 20px; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 24px 16px 16px;
+             border: 1px solid var(--line); border-radius: var(--r-surface); background: var(--surface); text-align: center; }
+    .mic { display: grid; place-items: center; width: 88px; height: 88px; border: 0; border-radius: 50%;
+           background: var(--accent); color: var(--on-accent); box-shadow: 0 4px 14px rgba(37, 99, 235, .3);
            transition: background-color .15s; }
-    .mic svg.i { width: 24px; height: 24px; }
+    .mic svg.i { width: 40px; height: 40px; }
+    .mic:focus-visible { outline: 3px solid var(--ink); outline-offset: 4px; }
+    #mic-label { font-size: 17px; font-weight: 700; margin-top: 4px; }
     .mic:hover { background: var(--accent-hover); }
-    .mic.on { background: var(--bad); }
+    .mic.on { background: var(--bad); box-shadow: 0 0 0 8px var(--bad-soft); }
     .mic.on svg { animation: pulse 1.2s ease-in-out infinite; }
     .mic:disabled { background: var(--subtle); color: var(--muted); cursor: not-allowed; }
     @keyframes pulse { 50% { opacity: .35; } }
-    .voice-text { min-width: 0; }
-    #live { font-size: 16px; color: var(--ink); overflow-wrap: anywhere; }
+    #live { font-size: 16px; color: var(--ink); overflow-wrap: anywhere; max-width: 40ch; }
+    #live:empty { display: none; }
     #live.interim { font-style: italic; color: var(--muted); }
     #live.error { color: var(--bad); }
-    #mic-note { margin-top: 4px; font-size: 12px; color: var(--muted); }
-    #sentence-input { display: block; width: 100%; min-height: 132px; resize: vertical; padding: 14px 16px;
+    #mic-note { margin-top: 4px; font-size: 12px; color: var(--muted); max-width: 46ch; }
+    .linkbtn { margin-top: 16px; background: none; border: 0; padding: 8px 0; min-height: 44px; color: var(--accent);
+               font-size: 14px; text-decoration: underline; text-underline-offset: 3px; }
+    /* status of the whole interaction, above the figure */
+    .phasebar { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 60px;
+                padding: 8px 16px 8px 20px; border-bottom: 1px solid var(--line); }
+    #phase { display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 600; }
+    #phase .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--field); flex: none; }
+    #phase[data-phase="listening"] .dot { background: var(--bad); }
+    #phase[data-phase="preparing"] .dot { background: var(--warn); }
+    #phase[data-phase="playing"] .dot { background: var(--ok); }
+    #phase[data-phase="finished"] .dot { background: var(--accent); }
+    #yousaid { display: flex; align-items: baseline; gap: 8px; margin-bottom: 10px; }
+    #yousaid .k { flex: none; color: var(--muted); font-size: 14px; }
+    #yousaid #sentence { margin-top: 0; font-size: 17px; color: var(--ink); max-height: 3.2em; }
+    .speedlbl { font-size: 13px; color: var(--muted); margin-left: 8px; }
+    #sentence-input { display: block; width: 100%; min-height: 64px; resize: vertical; padding: 14px 16px;
                       font-size: 17px; line-height: 1.5; background: var(--surface); color: var(--ink);
                       border: 1px solid var(--field); border-radius: 12px; }
     #sentence-input::placeholder { color: var(--muted); opacity: 1; }
@@ -195,7 +212,7 @@
               background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-surface); overflow: hidden; }
     #warn { margin: 16px 16px 0; padding: 10px 14px; border-radius: var(--r-control); background: var(--bad-soft);
             color: var(--bad); font-size: 14px; border: 1px solid #FECACA; }
-    #stage { position: relative; height: clamp(320px, calc(100vh - 310px), 780px); }
+    #stage { position: relative; height: clamp(300px, calc(100vh - 400px), 760px); }
     canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
     #status { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
               gap: 16px; padding: 32px; text-align: center; color: var(--muted); font-size: 15px; pointer-events: none; }
@@ -297,8 +314,9 @@
         #stage { height: clamp(280px, 52vh, 520px); }
         .intro h1 { font-size: 26px; }
         .composer-actions { flex-direction: column; }
-        .voice { flex-direction: column; align-items: stretch; text-align: center; }
-        .mic { justify-content: center; }
+        .voice { padding: 16px 12px 12px; }
+        .mic { width: 76px; height: 76px; }
+        .examples-label, .examples { display: none; }
         .composer-actions .btn { width: 100%; }
         .below { padding: 0 16px 32px; }
         .topbar-inner { padding: 0 16px; }
@@ -307,6 +325,8 @@
         #controls { flex-wrap: wrap; padding: 8px; justify-content: space-between; }
         #scrub { order: 10; flex-basis: 100%; margin: 0 4px; }
         #speed { margin-left: auto; }
+        .speedlbl { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+        #sub { white-space: normal; }
     }
     @media (prefers-reduced-motion: reduce) {
         /* decorative transitions only: sign playback is content and keeps running */
@@ -336,33 +356,29 @@
 <main class="app">
     <div class="side">
         <section class="intro" aria-labelledby="title">
-            <h1 id="title">Translate to Auslan</h1>
-            <p class="lede" id="lede">Speak or type English to see recorded Auslan signs played on a figure.</p>
+            <h1 id="title">Speak to SignBridge</h1>
+            <p class="lede" id="lede">Tap the microphone and say something.</p>
             <div class="voice">
-                <button id="mic" class="mic" aria-pressed="false" aria-describedby="live mic-note" title="Speak (M)">
-                    <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                    <span id="mic-label">Speak</span></button>
-                <div class="voice-text">
-                    <p id="live" aria-live="polite">Press <strong>Speak</strong> and say a short sentence.</p>
-                    <p id="mic-note">Your browser turns speech into text (Chrome and Edge send the audio to their speech
-                        service). SignBridge does not record or keep audio.</p>
-                </div>
+                <button id="mic" class="mic" aria-pressed="false" aria-label="Tap to speak" aria-describedby="live" title="Speak (M)">
+                    <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+                <p id="mic-label" aria-hidden="true">Tap to speak</p>
+                <p id="live" aria-live="polite"></p>
+                <p id="mic-note">Your browser turns your speech into text. Chrome and Edge send the audio to their
+                    speech service to do this. SignBridge does not record or keep audio.</p>
             </div>
             <div class="composer">
-                <label for="sentence-input" class="or">or type</label>
-                <textarea id="sentence-input" rows="4" placeholder="Type English here…" aria-describedby="lede input-hint"
+                <label for="sentence-input" class="or">Or type instead</label>
+                <textarea id="sentence-input" rows="2" placeholder="For example: I need to see a doctor" aria-describedby="lede input-hint"
                           autocomplete="off" enterkeyhint="go"></textarea>
                 <p id="input-hint" aria-live="polite"></p>
                 <div class="composer-actions">
-                    <button id="sentence-go" class="btn btn-primary" title="Translate (Enter)">
-                        <span class="spinner" aria-hidden="true"></span>Translate</button>
-                    <button id="upload-pdf" class="btn">
-                        <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V4M7.5 8.5 12 4l4.5 4.5M5 20h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                        Upload PDF</button>
+                    <button id="sentence-go" class="btn" title="Show signs (Enter)">
+                        <span class="spinner" aria-hidden="true"></span>Show signs</button>
                 </div>
             </div>
-            <p class="examples-label" id="examples-label">Try an example</p>
+            <p class="examples-label" id="examples-label">Or try an example</p>
             <div class="examples" id="examples" role="group" aria-labelledby="examples-label"></div>
+            <button id="upload-pdf" class="linkbtn">Have a document? Upload a PDF</button>
         </section>
 
         <section id="docpanel" class="panel" hidden aria-labelledby="doc-title">
@@ -385,20 +401,20 @@
 
         <section id="seqpanel" class="panel" hidden aria-labelledby="seq-title">
             <div class="panel-head">
-                <h2 id="seq-title">Sign sequence</h2>
+                <h2 id="seq-title">Signs in your sentence</h2>
                 <span class="muted" id="seq-count"></span>
             </div>
             <div id="steps" role="group" aria-label="Signs in this text: select one to jump to it"></div>
             <ul class="legend" aria-label="What the markers mean">
-                <li><b class="sign" aria-hidden="true">✓</b>Available sign</li>
-                <li><b class="spell" aria-hidden="true">ABC</b>Fingerspelled</li>
-                <li><b class="check" aria-hidden="true">⚠</b>Needs review</li>
-                <li><b class="bad" aria-hidden="true">✕</b>Unavailable</li>
+                <li><b class="sign" aria-hidden="true">✓</b>Recorded sign</li>
+                <li><b class="spell" aria-hidden="true">ABC</b>Spelled out (no sign recorded)</li>
+                <li><b class="check" aria-hidden="true">⚠</b>Needs verification</li>
+                <li><b class="bad" aria-hidden="true">✕</b>Could not load</li>
             </ul>
         </section>
 
         <details id="details" class="panel details" hidden>
-            <summary>Translation details
+            <summary>How each word was handled
                 <svg class="i chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
             <div class="details-body">
                 <div>
@@ -418,7 +434,13 @@
         </details>
     </div>
 
-    <section id="stagecol" class="viewer" aria-label="Signing avatar">
+    <section id="stagecol" class="viewer" aria-label="Signing figure">
+        <div class="phasebar">
+            <p id="phase" role="status"><span class="dot" aria-hidden="true"></span><span id="phase-text">Loading signs…</span></p>
+            <button id="replay-big" class="btn btn-primary" hidden>
+                <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3M4.5 4.5v4h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Replay</button>
+        </div>
         <div id="warn" role="alert" hidden></div>
         <div id="stage">
             <canvas id="canvas" role="img" aria-label="Figure signing the current sign"></canvas>
@@ -427,9 +449,10 @@
         </div>
         <div class="nowbar">
             <div class="now">
+                <div id="yousaid" hidden><span class="k">You said:</span>
+                    <span id="yousaid-text" class="sr-only"></span><div id="sentence" aria-hidden="true"></div></div>
                 <p class="now-line"><span id="word-label">Nothing playing yet</span> <span id="word"></span></p>
                 <p id="sub"></p>
-                <div id="sentence"></div>
             </div>
             <ul class="handkey" aria-label="Hand colours">
                 <li><i style="background:var(--fig-right)"></i>Signer's right hand</li>
@@ -447,9 +470,10 @@
                 <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3M4.5 4.5v4h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
             <input type="range" id="scrub" min="0" max="0" value="0" step="1" aria-label="position in the sentence">
             <span id="count" aria-hidden="true">0.0 / 0.0s</span>
-            <select id="speed" aria-label="playback speed" title="Playback speed">
-                <option value="0.5">0.5×</option><option value="0.75">0.75×</option>
-                <option value="1" selected>1×</option><option value="1.25">1.25×</option><option value="1.5">1.5×</option>
+            <label class="speedlbl" for="speed">Speed</label>
+            <select id="speed" title="Playback speed">
+                <option value="0.5">Slow (0.5×)</option><option value="0.75">0.75×</option>
+                <option value="1" selected>Normal</option><option value="1.25">1.25×</option><option value="1.5">1.5×</option>
             </select>
             <button id="fullscreen" class="icon-btn" aria-label="full screen" title="Full screen (F)">
                 <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -477,7 +501,7 @@
                 <label title="Draw the face (eyebrows, eyes, lips) from the recording. Off: a plain head outline.">
                     <input type="checkbox" id="face"> Show face</label>
                 <label title="Start again from the beginning when the sequence ends.">
-                    <input type="checkbox" id="loop" checked> Loop playback</label>
+                    <input type="checkbox" id="loop"> Loop playback</label>
             </div>
             <p id="libstat" aria-live="polite">loading…</p>
             <p class="keys">Keys: <kbd>M</kbd> speak · <kbd>Space</kbd> play/pause · <kbd>←</kbd> <kbd>→</kbd> previous/next sign ·
@@ -542,18 +566,20 @@
 <dialog id="help" aria-labelledby="help-title">
     <h2 id="help-title">How it works</h2>
     <ul>
-        <li>Press <strong>Speak</strong> (or <kbd>M</kbd>) and say a short English sentence. When you stop, the words
-            appear as text and the signs play. Press again or <kbd>Esc</kbd> to stop early. Works in Chrome, Edge and Safari.</li>
-        <li>Or type text and press <strong>Translate</strong> (or <kbd>Enter</kbd>; <kbd>Shift</kbd>+<kbd>Enter</kbd> adds a line).</li>
-        <li>The figure plays each sign in turn. Below it you can see the sign being shown, and the matching English words.</li>
-        <li>The <strong>sign sequence</strong> lists every sign: <strong>✓</strong> available sign, <strong>ABC</strong>
-            fingerspelled because no recorded sign is available, <strong>⚠</strong> needs review, <strong>✕</strong> unavailable.
-            Select one to jump to it.</li>
-        <li><strong>Upload PDF</strong> to get the document's key points; select a point to sign it.</li>
-        <li>Keys: <kbd>M</kbd> speak, <kbd>Space</kbd> play/pause, <kbd>←</kbd> <kbd>→</kbd> previous/next sign, <kbd>Home</kbd> restart,
-            <kbd>F</kbd> full screen.</li>
-        <li><strong>Translation details</strong> shows how each word was handled and lets you change it.
-            <strong>Advanced settings</strong> has the source recording, the gloss line and playback options.</li>
+        <li><strong>Tap the microphone</strong> (or press <kbd>M</kbd>) and say a short sentence in English. When you stop
+            talking, your words appear on screen and the figure signs them. Tap again, or press <kbd>Esc</kbd>, to stop.</li>
+        <li>Prefer typing? Type in the box and press <strong>Show signs</strong> (or <kbd>Enter</kbd>).</li>
+        <li>Above the figure you see what is happening: Listening, Preparing signs, Playing signs, Finished.
+            Press <strong>Replay</strong> to watch again; choose <strong>Slow</strong> under Speed to slow it down.</li>
+        <li>Below the figure: what you said, with the current word underlined, and the word being shown now.</li>
+        <li>Words with no recorded sign are <strong>spelled out</strong> letter by letter (marked <strong>ABC</strong>).
+            A sign marked <strong>⚠</strong> needs verification: it is the app's best guess.</li>
+        <li>Voice works in Chrome, Edge and Safari. Your browser turns speech into text (Chrome and Edge use an online
+            service); SignBridge does not record or keep audio.</li>
+        <li>More: <strong>Upload a PDF</strong> to sign its key points; <strong>How each word was handled</strong> lets you
+            change a sign; <strong>Advanced settings</strong> has the original recording and playback options.</li>
+        <li>Keys: <kbd>M</kbd> speak, <kbd>Space</kbd> play/pause, <kbd>←</kbd> <kbd>→</kbd> previous/next sign,
+            <kbd>Home</kbd> replay, <kbd>F</kbd> full screen.</li>
     </ul>
     <form method="dialog"><button class="btn btn-primary">Close</button></form>
 </dialog>
@@ -615,6 +641,25 @@ const ICON = {
     play: '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg>',
     pause: '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" fill="currentColor"/></svg>',
 };
+// ---- what is happening, in one line above the figure:
+// Ready -> Listening… -> Preparing signs… -> Playing signs… -> Finished (Replay)
+const PHASES = { ready: "Ready", listening: "Listening…", preparing: "Preparing signs…", playing: "Playing signs…",
+                 paused: "Paused", finished: "Finished" };
+function setPhase(ph) {
+    const el = $("phase");
+    if (el.dataset.phase === ph) return;
+    el.dataset.phase = ph;
+    setText($("phase-text"), PHASES[ph]);
+    $("replay-big").hidden = ph !== "finished";
+}
+// the phase that follows from the current state (after listening, a pause, the end)
+function refreshPhase() {
+    if (typeof listener !== "undefined" && listener.state === "listening") return setPhase("listening");
+    if (!tl) return setPhase("ready");
+    if (player.playing) return setPhase("playing");
+    setPhase(player.t >= tl.duration - 1e-3 ? "finished" : "paused");
+}
+
 // ONE clock for the figure, captions, scrubber, tiles and video (src/player.js)
 const player = new Player({ onState: on => {
     playBtn.innerHTML = on ? ICON.pause : ICON.play;
@@ -622,6 +667,7 @@ const player = new Player({ onState: on => {
     playBtn.title = on ? "Pause (Space)" : "Play (Space)";
     if (on) videoClip = -1;                  // force a video re-sync
     else video.pause();
+    if ($("phase").dataset.phase !== "preparing") refreshPhase();
 } });
 
 let lib = null;
@@ -764,6 +810,9 @@ async function playPlan(p) {
     failedSteps = new Set();
     renderPlan();
     pause();
+    setPhase("preparing");
+    $("yousaid").hidden = !p.text;
+    setText($("yousaid-text"), p.text || "");
     subEl.textContent = "Loading…";
     const toLoad = p.steps.filter(s => s.kind !== "omit").length;
     // only say so if loading is noticeable (cached signs resolve at once)
@@ -793,6 +842,7 @@ async function playPlan(p) {
         subEl.textContent = "Nothing to sign";
         countEl.textContent = "0.0 / 0.0s";
         stepTimes = []; renderSteps(); showStepInfo(null);
+        refreshPhase();
         setStatus(failed.length ? "These signs could not be loaded. Check your connection and that the server " +
                                   "is running, then try again."
                                 : "Nothing to sign: every word was left out. Try another sentence.",
@@ -813,6 +863,7 @@ async function playPlan(p) {
     videoClip = -1; activeStep = -1;
     player.load(tl, stepTimes);
     player.play();
+    refreshPhase();
 }
 
 // ======================================================
@@ -900,7 +951,7 @@ function caption(s) {
     if (c.kind === "phrase") {
         const m = c.motion;
         if (s.local === null) return;
-        setText(label, "Fingerspelling");
+        setText(label, "Now spelling:");
         if (m.words) drawSentenceProgress(m.words, m.letters, s.local);
         else {
             setText(wordEl, c.label);
@@ -908,21 +959,24 @@ function caption(s) {
         }
         return;
     }
+    // plain words here: the English being shown, not the sign's internal name
+    // (that, and the full reasoning, is in "How each word was handled")
     if (step.kind === "sign") {
-        setText(label, "Currently showing");
-        setText(wordEl, step.gloss);
-        // plain words here; the full reasoning is in Translation details
-        const notes = [step.uncertain ? "⚠ Needs review: best guess among several possible signs"
-                       : step.status ? "⚠ Needs review: motion tracking flagged by automated checks" : "✓ Recorded sign"];
-        if (step.en && step.en.toLowerCase() !== step.gloss.toLowerCase()) notes.push(`for “${step.en}”`);
-        setText(subEl, notes.join(" "));
+        setText(label, "Now showing:");
+        setText(wordEl, upperFirst(step.en || step.gloss.toLowerCase()));
+        setText(subEl, step.uncertain || step.status ? "⚠ This sign needs verification." : "✓ Recorded Auslan sign");
     } else if (step.kind === "spell") {
-        setText(label, "Fingerspelling");
-        setText(wordEl, step.letters.join(""));
-        setText(subEl, `${stateText(step)} (${SPELL_SHORT[step.reason] || "no sign available"}): ` + step.letters
-            .map((l, i) => i === c.li ? l : l.toLowerCase()).join(" – "));
+        setText(label, "Now spelling:");
+        setText(wordEl, upperFirst(step.en || step.letters.join("").toLowerCase()));
+        setText(subEl, `${stateText(step)}, ${SPELL_SHORT[step.reason] || "no sign available"}: ` + step.letters
+            .map((l, i) => i === c.li ? `[${l}]` : l).join(" – "));
     }
 }
+
+const upperFirst = t => t ? t[0].toUpperCase() + t.slice(1) : t;
+// the English a step stands for, for tiles and announcements
+const wordsOf = step => step.en || (step.kind === "sign" ? step.gloss.toLowerCase()
+                                    : step.letters ? step.letters.join("").toLowerCase() : "");
 
 function setActiveStep(n) {
     activeStep = n;
@@ -945,8 +999,8 @@ function setActiveStep(n) {
     showStepInfo(step);
     // screen readers: say which sign is on (polite, once per sign)
     const pos = stepTimes.findIndex(x => x.n === n) + 1;
-    const said = `${step.kind === "spell" ? "Fingerspelling" : "Signing"} ${step.kind === "sign" ? step.gloss : step.letters ? step.letters.join("") : step.en}` +
-                 (stepTimes.length ? `, ${pos} of ${stepTimes.length}` : "") + (step.uncertain ? ", best guess" : "");
+    const said = `${step.kind === "sign" ? "Signing" : "Spelling"} ${wordsOf(step)}` +
+                 (stepTimes.length ? `, ${pos} of ${stepTimes.length}` : "") + (step.uncertain || step.status ? ", needs verification" : "");
     $("announce").textContent = said;
     scrub.setAttribute("aria-valuetext", said);
     canvas.setAttribute("aria-label", `Figure ${said.charAt(0).toLowerCase()}${said.slice(1)}`);
@@ -992,8 +1046,8 @@ function setActiveStep(n) {
 // One indicator for every step, with icon AND text (never colour alone).
 // "Sign" means AUTOMATED checks passed -- not that a signer verified it.
 const STATES = {
-    sign:  { icon: "✓", label: "Available sign", note: "recorded sign; automated tracking checks passed" },
-    check: { icon: "⚠", label: "Needs review", note: "best guess, or tracking flagged" },
+    sign:  { icon: "✓", label: "Recorded sign", note: "recorded sign; automated tracking checks passed" },
+    check: { icon: "⚠", label: "Needs verification", note: "best guess, or tracking flagged" },
     spell: { icon: "✋", label: "Fingerspelled", note: "no usable recorded sign" },
     omit:  { icon: "—", label: "Left out", note: "left out by the current planner" },
 };
@@ -1039,8 +1093,7 @@ function renderSteps() {
     for (const step of plan ? plan.steps : []) {
         const seg = segs.get(step.n);
         if (!seg && !failedSteps.has(step.n)) continue;          // left-out words have no tile
-        const label = step.kind === "sign" ? step.gloss : step.kind === "spell" ? step.letters.join("")
-                    : step.kind === "phrase" ? (step.en || "").toUpperCase() : (step.en || "");
+        const label = wordsOf(step);
         tiles++;
         if (!seg) {
             const span = document.createElement("span");
@@ -1059,7 +1112,7 @@ function renderSteps() {
         b.append(Object.assign(document.createElement("span"), { className: "lbl", textContent: label }),
                  Object.assign(document.createElement("span"), { className: "ico", "ariaHidden": "true",
                      textContent: st === "sign" ? "✓" : st === "check" ? "⚠" : "ABC" }));
-        b.title = `${STATES[st].label} · ${label} — ${detailOf(step)}`;
+        b.title = `${STATES[st].label} · ${label}${step.gloss ? ` (sign: ${step.gloss})` : ""} — ${detailOf(step)}`;
         b.setAttribute("aria-label", `jump to ${label}, ${STATES[st].label}`);
         b.addEventListener("click", () => jumpTo(seg.t0));
         bar.appendChild(b);
@@ -1463,13 +1516,16 @@ const listener = new Listener({
         const on = s === "listening";
         mic.classList.toggle("on", on);
         mic.setAttribute("aria-pressed", String(on));
-        $("mic-label").textContent = on ? "Listening… press to stop" : "Speak";
-        if (on) setLive("Listening… say a short sentence in English.", "interim");
+        const label = on ? "Listening… tap to stop" : "Tap to speak";
+        $("mic-label").textContent = label;
+        mic.setAttribute("aria-label", label);
+        if (on) setLive("Say a short sentence in English.", "interim");
+        refreshPhase();
     },
     onInterim: t => setLive(t, "interim"),
     onFinal: t => {
         const text = asSentence(t);
-        setLive(`Heard: “${text}”`);
+        setLive(`Heard: “${text}”. Wrong word? Fix it in the box below and press Enter.`);
         $("sentence-input").value = text;
         playTyped();
     },
@@ -1514,6 +1570,7 @@ playBtn.addEventListener("click", () => {
     player.toggle();
 });
 $("replay").addEventListener("click", () => player.replay());
+$("replay-big").addEventListener("click", () => { player.replay(); playBtn.focus(); });
 $("prev").addEventListener("click", () => stepBy(-1));
 // full screen for the avatar (the Fullscreen API is missing on some phones: hide the button there)
 const fsRoot = $("stagecol");
@@ -1553,7 +1610,7 @@ $("speed").addEventListener("change", () => {
 window.addEventListener("keydown", e => {
     // never while typing in a field (a space there must stay a space), and
     // never steal keys a focused control already handles
-    if (e.key === "Escape" && listener.state === "listening") { listener.cancel(); setLive("Stopped. Nothing was translated."); return; }
+    if (e.key === "Escape" && listener.state === "listening") { listener.cancel(); setLive("Stopped. Nothing was sent."); return; }
     if (e.target.closest("input, select, textarea, button, summary") || e.metaKey || e.ctrlKey || e.altKey) return;
     const act = { " ": () => playBtn.click(), ArrowLeft: () => stepBy(-1), ArrowRight: () => stepBy(1),
                   Home: () => $("replay").click(), f: toggleFullscreen, F: toggleFullscreen,
@@ -1613,7 +1670,8 @@ window.auslan = {
         video.closest("section").hidden = true;
     }
     lib = new Library({ ...libOpts, despike: $("despike").checked });
-    setStatus(listener.supported && window.isSecureContext ? "Press Speak, type a sentence, or pick an example." : "Type a sentence or pick an example.");
+    setStatus(listener.supported && window.isSecureContext ? "Tap the microphone and say something, or type a sentence." : "Type a sentence, or pick an example.");
+    setPhase("ready");
     for (const text of EXAMPLES) {
         const b = document.createElement("button");
         b.textContent = text;

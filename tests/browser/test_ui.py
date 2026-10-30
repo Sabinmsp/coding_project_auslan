@@ -43,7 +43,7 @@ def key(k, code=None, text=None, mods=0):
 
 visible = lambda sel: J(f"(()=>{{const e=document.querySelector({sel!r});return !!e && e.getClientRects().length>0}})()")
 
-check("first screen: input, Translate & Play, avatar, controls visible",
+check("first screen: input, Show signs, avatar, controls visible",
       all(visible(s) for s in ("#sentence-input", "#sentence-go", "#canvas", "#play")))
 check("first screen: developer panels hidden (gloss editor, source video, alternatives, tracking, document)",
       not any(visible(s) for s in ("#glossline", "#reference", "#alts", "#tracking", "#docpanel")))
@@ -65,10 +65,10 @@ for _ in range(60):
     if J("!!(auslan.timeline && auslan.playing && auslan.plan.text==='I love Australia')"):
         break
 tiles = J("[...document.querySelectorAll('#steps button')].map(b=>b.textContent)")
-check("Enter plays; one tile per sign with its marker", tiles == ["I✓", "LOVE✓", "AUSTRALIA✓"], tiles)
+check("Enter plays; one tile per sign, labelled with the user's words, with its marker", tiles == ["I✓", "love✓", "Australia✓"], tiles)
 J("auslan.say('My name is Sabin.')"); time.sleep(1.5)
 tiles = J("[...document.querySelectorAll('#steps button')].map(b=>b.textContent)")
-check("fingerspelled words are marked ABC", tiles == ["MY✓", "NAMEABC", "SABINABC"], tiles)
+check("fingerspelled words are marked ABC", tiles == ["My✓", "nameABC", "SabinABC"], tiles)
 
 # Tab order reaches the main actions
 J("document.getElementById('sentence-input').focus()")
@@ -76,7 +76,7 @@ order = []
 for _ in range(8):
     key("Tab", "Tab")
     order.append(J("document.activeElement.id || document.activeElement.textContent.trim().slice(0,20)"))
-check("Tab from the text box reaches Translate & Play", "sentence-go" in order, order)
+check("Tab from the text box reaches Show signs", "sentence-go" in order, order)
 
 # Advanced drawer
 J("document.getElementById('adv-toggle').click()"); time.sleep(0.2)
@@ -116,9 +116,49 @@ opened = J("document.getElementById('about').open")
 key("Escape", "Escape"); time.sleep(0.2)
 check("About opens and Escape closes it", opened and not J("document.getElementById('about').open"))
 
+# ---- accessibility, measured (not described) ----------------------------------
+# every interactive element has an accessible name (Chrome's own accessibility tree)
+c.call("Accessibility.enable")
+nodes = c.call("Accessibility.getFullAXTree")["nodes"]
+ROLES = {"button", "combobox", "textbox", "slider", "checkbox", "link", "PopUpButton"}
+unnamed = [n.get("role", {}).get("value") for n in nodes if not n.get("ignored")
+           and n.get("role", {}).get("value") in ROLES and not (n.get("name") or {}).get("value", "").strip()]
+check("every button, field, slider and menu has an accessible name", not unnamed, unnamed)
+
+# keyboard: from the top of the page, the microphone is the first control after the skip link
+J("document.activeElement && document.activeElement.blur(); scrollTo(0, 0)")
+J("document.body.focus()")
+first = []
+for _ in range(5):
+    key("Tab", "Tab")
+    first.append(J("document.activeElement.id || document.activeElement.className"))
+check("keyboard: the microphone comes first, before the text box", "mic" in first
+      and first.index("mic") < (first.index("sentence-input") if "sentence-input" in first else 99), first)
+check("keyboard focus is visible (outline on the focused control)",
+      J("(e => { e.focus(); const s = getComputedStyle(e); return s.outlineStyle !== 'none' && parseFloat(s.outlineWidth) >= 2 })(document.getElementById('mic'))"))
+
+# text contrast (WCAG AA 4.5:1) for the text a first-time user reads
+CONTRAST = r"""(() => {
+  const lum = c => { const [r, g, b] = c.match(/\d+(\.\d+)?/g).slice(0, 3).map(v => { v /= 255; return v <= .03928 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4; }); return .2126 * r + .7152 * g + .0722 * b; };
+  const bg = e => { while (e) { const c = getComputedStyle(e).backgroundColor; if (!/rgba\(0, 0, 0, 0\)|transparent/.test(c)) return c; e = e.parentElement; } return 'rgb(255,255,255)'; };
+  const out = [];
+  for (const sel of ['#title', '#lede', '#mic-label', '#live', '#mic-note', '.or', '#phase-text', '#word-label', '#word', '#sub', '#yousaid .k', '#seq-title', '.legend li', '#sentence-go', '.linkbtn']) {
+    const e = document.querySelector(sel); if (!e || !e.offsetParent) continue;
+    const a = lum(getComputedStyle(e).color), b = lum(bg(e));
+    out.push([sel, Math.round((Math.max(a, b) + .05) / (Math.min(a, b) + .05) * 100) / 100]);
+  }
+  return out; })()"""
+ratios = J(CONTRAST)
+low = [r for r in ratios if r[1] < 4.5]
+check(f"text contrast >= 4.5:1 on {len(ratios)} key texts", ratios and not low, low or min(r[1] for r in ratios))
+
+# no feature depends on audio: the page works with text only (the voice suite covers no-microphone browsers)
+check("everything spoken is also shown as text (live region + 'You said')",
+      J("document.getElementById('live').getAttribute('aria-live')") == "polite" and J("!!document.getElementById('yousaid-text')"))
+
 # phone width
 c.call("Emulation.setDeviceMetricsOverride", width=390, height=844, deviceScaleFactor=2, mobile=True); time.sleep(0.5)
-check("phone: no sideways scroll; Translate button full width",
+check("phone: no sideways scroll; Show signs button full width",
       not J("document.documentElement.scrollWidth > document.documentElement.clientWidth")
       and J("document.getElementById('sentence-go').getBoundingClientRect().width") > 300)
 

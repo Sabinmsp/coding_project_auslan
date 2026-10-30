@@ -207,14 +207,14 @@ export function createRenderer(canvas) {
             // translucent and without fingertip highlights: visibly not measured
             const held = frame.held && frame.held[key] !== undefined ? frame.held[key] : null;
             const alpha = held !== null ? 0.65 * held : 1;
-            ctx.globalAlpha = alpha * 0.16;
+            ctx.globalAlpha = alpha * 0.28;          // palm tint: reads as a hand at a glance
             ctx.fillStyle = colour;
             ctx.beginPath();
             PALM.forEach((i, k) => k ? ctx.lineTo(q[i][0], q[i][1]) : ctx.moveTo(q[i][0], q[i][1]));
             ctx.closePath(); ctx.fill();
             ctx.globalAlpha = alpha;
             ctx.strokeStyle = colour;
-            ctx.lineWidth = thick * 0.42;
+            ctx.lineWidth = thick * 0.52;            // fingers: thick enough to follow on a phone
             ctx.beginPath();
             for (const [a, b] of HAND_LINKS) { ctx.moveTo(q[a][0], q[a][1]); ctx.lineTo(q[b][0], q[b][1]); }
             ctx.stroke();

@@ -29,7 +29,8 @@ python3 backend/serve.py 8003     # http://localhost:8003
 Code Fair notes (what changed, test results, limits, deploying):
 [docs/CODE_FAIR_REPORT.md](docs/CODE_FAIR_REPORT.md).
 Judging: [docs/JUDGING_READINESS.md](docs/JUDGING_READINESS.md) (evidence per criterion) and
-[docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md) (the 5 November demo).
+[docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md) (the 5 November demo),
+[docs/USABILITY_REVIEW.md](docs/USABILITY_REVIEW.md) (first-time-user review and fixes).
 Voice input needs Chrome, Edge or Safari on `https://` or `localhost`.
 
 Needs nothing but Python 3 to view. `?text=I go home tomorrow` in the URL

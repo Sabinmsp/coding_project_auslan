@@ -64,7 +64,7 @@ check("I LOVE AUSTRALIA: plans three signs and plays them without any MP4",
 check("  only that sentence's motion files were downloaded", len(reqs) == 3, [r[0] for r in reqs])
 sentence_kb = sum(r[2] for r in reqs) / 1e3
 print(f"  download for this sentence: {sentence_kb:.0f} KB of motion JSON (as served)")
-check("  active sign label follows playback", J("document.getElementById('word').textContent") in ("I", "LOVE", "AUSTRALIA"),
+check("  active sign label follows playback", J("document.getElementById('word').textContent") in ("I", "Love", "Australia"),
       J("document.getElementById('word').textContent"))
 check("  the video panel says the source video is unavailable",
       "unavailable" in J("document.getElementById('refnote').textContent")

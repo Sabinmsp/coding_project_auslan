@@ -16283,8 +16283,15 @@
      "frames": 57,
      "fps": 30.0,
      "path": "rgb/84300_kf_rgb.mp4"
+    },
+    {
+     "clip": "sb38630_1",
+     "frames": 59,
+     "fps": 25.0,
+     "path": "signbank/sb38630_1.mp4"
     }
-   ]
+   ],
+   "signbank": "https://auslan.org.au/dictionary/words/crocodile-1.html"
   },
   "croissant": {
    "gloss": "CROISSANT",
@@ -32416,7 +32423,8 @@
    "gloss": "HOUR",
    "kind": "plain",
    "keys": [
-    "HOUR"
+    "HOUR",
+    "HR"
    ],
    "head": "HOUR",
    "sense": null,
@@ -47829,7 +47837,8 @@
    "gloss": "PLASTICINE",
    "kind": "plain",
    "keys": [
-    "PLASTICINE"
+    "PLASTICINE",
+    "PLASTICENE"
    ],
    "head": "PLASTICINE",
    "sense": null,
@@ -47845,8 +47854,15 @@
      "frames": 51,
      "fps": 30.0,
      "path": "rgb/00606_kf_rgb.mp4"
+    },
+    {
+     "clip": "sb42520_1",
+     "frames": 54,
+     "fps": 25.0,
+     "path": "signbank/sb42520_1.mp4"
     }
-   ]
+   ],
+   "signbank": "https://auslan.org.au/dictionary/words/plasticine-1.html"
   },
   "plate": {
    "gloss": "PLATE",
@@ -50283,8 +50299,15 @@
      "frames": 64,
      "fps": 30.0,
      "path": "rgb/43301_kf_rgb.mp4"
+    },
+    {
+     "clip": "sb30190_1",
+     "frames": 66,
+     "fps": 25.0,
+     "path": "signbank/sb30190_1.mp4"
     }
-   ]
+   ],
+   "signbank": "https://auslan.org.au/dictionary/words/pumpkin-1.html"
   },
   "punch": {
    "gloss": "PUNCH",
@@ -60412,7 +60435,8 @@
    "gloss": "SQUARE",
    "kind": "plain",
    "keys": [
-    "SQUARE"
+    "SQUARE",
+    "SQ"
    ],
    "head": "SQUARE",
    "sense": null,
@@ -60589,8 +60613,15 @@
      "frames": 67,
      "fps": 30.0,
      "path": "rgb/53573_kf_rgb.mp4"
+    },
+    {
+     "clip": "sb36610_1",
+     "frames": 87,
+     "fps": 25.0,
+     "path": "signbank/sb36610_1.mp4"
     }
-   ]
+   ],
+   "signbank": "https://auslan.org.au/dictionary/words/stack-1.html"
   },
   "stage": {
    "gloss": "STAGE",
@@ -61217,7 +61248,8 @@
    "gloss": "STING",
    "kind": "plain",
    "keys": [
-    "STING"
+    "STING",
+    "STUNG"
    ],
    "head": "STING",
    "sense": null,
@@ -61233,8 +61265,15 @@
      "frames": 44,
      "fps": 30.0,
      "path": "rgb/40723_kf_rgb.mp4"
+    },
+    {
+     "clip": "sb4480_1",
+     "frames": 87,
+     "fps": 25.0,
+     "path": "signbank/sb4480_1.mp4"
     }
-   ]
+   ],
+   "signbank": "https://auslan.org.au/dictionary/words/sting-1.html"
   },
   "stingray": {
    "gloss": "STINGRAY",
@@ -73957,6 +73996,1711 @@
      "path": "rgb/08967_kf_rgb.mp4"
     }
    ]
+  },
+  "afternoon": {
+   "gloss": "AFTERNOON",
+   "kind": "plain",
+   "keys": [
+    "AFTERNOON"
+   ],
+   "head": "AFTERNOON",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb24720_1",
+     "frames": 216,
+     "fps": 25.0,
+     "path": "signbank/sb24720_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/afternoon-1.html"
+  },
+  "allow": {
+   "gloss": "ALLOW",
+   "kind": "plain",
+   "keys": [
+    "ALLOW"
+   ],
+   "head": "ALLOW",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb38410_1",
+     "frames": 60,
+     "fps": 25.0,
+     "path": "signbank/sb38410_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/allow-1.html"
+  },
+  "anyone": {
+   "gloss": "ANYONE",
+   "kind": "plain",
+   "keys": [
+    "ANYONE"
+   ],
+   "head": "ANYONE",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb28000_1",
+     "frames": 58,
+     "fps": 25.0,
+     "path": "signbank/sb28000_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/anyone-1.html"
+  },
+  "art": {
+   "gloss": "ART",
+   "kind": "plain",
+   "keys": [
+    "ART",
+    "CRAFT"
+   ],
+   "head": "ART",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb49130",
+     "frames": 55,
+     "fps": 14.985,
+     "path": "signbank/sb49130.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/art-1.html"
+  },
+  "awake": {
+   "gloss": "AWAKE",
+   "kind": "plain",
+   "keys": [
+    "AWAKE",
+    "WAKE"
+   ],
+   "head": "AWAKE",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb63380",
+     "frames": 114,
+     "fps": 29.97,
+     "path": "signbank/sb63380.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/awake-1.html"
+  },
+  "belong": {
+   "gloss": "BELONG",
+   "kind": "plain",
+   "keys": [
+    "BELONG"
+   ],
+   "head": "BELONG",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb26870_1",
+     "frames": 75,
+     "fps": 25.0,
+     "path": "signbank/sb26870_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/belong-1.html"
+  },
+  "blend": {
+   "gloss": "BLEND",
+   "kind": "plain",
+   "keys": [
+    "BLEND"
+   ],
+   "head": "BLEND",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb10870",
+     "frames": 136,
+     "fps": 29.97,
+     "path": "signbank/sb10870.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/blend-1.html"
+  },
+  "brown": {
+   "gloss": "BROWN",
+   "kind": "plain",
+   "keys": [
+    "BROWN"
+   ],
+   "head": "BROWN",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb32650",
+     "frames": 14,
+     "fps": 29.97,
+     "path": "signbank/sb32650.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/brown-1.html"
+  },
+  "bubbly": {
+   "gloss": "BUBBLY",
+   "kind": "plain",
+   "keys": [
+    "BUBBLY"
+   ],
+   "head": "BUBBLY",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb9360_1",
+     "frames": 90,
+     "fps": 25.0,
+     "path": "signbank/sb9360_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/bubbly-1.html"
+  },
+  "camp": {
+   "gloss": "CAMP",
+   "kind": "plain",
+   "keys": [
+    "CAMP"
+   ],
+   "head": "CAMP",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb48100_1",
+     "frames": 93,
+     "fps": 25.0,
+     "path": "signbank/sb48100_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/camp-1.html"
+  },
+  "chicken": {
+   "gloss": "CHICKEN",
+   "kind": "plain",
+   "keys": [
+    "CHICKEN",
+    "HEN"
+   ],
+   "head": "CHICKEN",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb51190_1",
+     "frames": 134,
+     "fps": 25.0,
+     "path": "signbank/sb51190_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/chicken-1.html"
+  },
+  "colour": {
+   "gloss": "COLOUR",
+   "kind": "plain",
+   "keys": [
+    "COLOUR",
+    "COLORED",
+    "COLOR",
+    "COLOURED"
+   ],
+   "head": "COLOUR",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb12710_1",
+     "frames": 79,
+     "fps": 25.0,
+     "path": "signbank/sb12710_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/colour-1.html"
+  },
+  "confuse": {
+   "gloss": "CONFUSE",
+   "kind": "plain",
+   "keys": [
+    "CONFUSE"
+   ],
+   "head": "CONFUSE",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb11390",
+     "frames": 139,
+     "fps": 29.97,
+     "path": "signbank/sb11390.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/confuse-1.html"
+  },
+  "cucumber": {
+   "gloss": "CUCUMBER",
+   "kind": "plain",
+   "keys": [
+    "CUCUMBER"
+   ],
+   "head": "CUCUMBER",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb46330_1",
+     "frames": 54,
+     "fps": 25.0,
+     "path": "signbank/sb46330_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/cucumber-1.html"
+  },
+  "cultivate": {
+   "gloss": "CULTIVATE",
+   "kind": "plain",
+   "keys": [
+    "CULTIVATE"
+   ],
+   "head": "CULTIVATE",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb2310_1",
+     "frames": 65,
+     "fps": 25.0,
+     "path": "signbank/sb2310_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/cultivate-1.html"
+  },
+  "damp": {
+   "gloss": "DAMP",
+   "kind": "plain",
+   "keys": [
+    "DAMP"
+   ],
+   "head": "DAMP",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb34030_1",
+     "frames": 78,
+     "fps": 25.0,
+     "path": "signbank/sb34030_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/damp-1.html"
+  },
+  "deep": {
+   "gloss": "DEEP",
+   "kind": "plain",
+   "keys": [
+    "DEEP"
+   ],
+   "head": "DEEP",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb1551",
+     "frames": 202,
+     "fps": 25.0,
+     "path": "signbank/sb1551.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/deep-1.html"
+  },
+  "deliver": {
+   "gloss": "DELIVER",
+   "kind": "plain",
+   "keys": [
+    "DELIVER"
+   ],
+   "head": "DELIVER",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb59220",
+     "frames": 12,
+     "fps": 29.97,
+     "path": "signbank/sb59220.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/deliver-1.html"
+  },
+  "dig": {
+   "gloss": "DIG",
+   "kind": "plain",
+   "keys": [
+    "DIG"
+   ],
+   "head": "DIG",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb59340_1",
+     "frames": 78,
+     "fps": 25.0,
+     "path": "signbank/sb59340_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/dig-2.html"
+  },
+  "digger": {
+   "gloss": "DIGGER",
+   "kind": "plain",
+   "keys": [
+    "DIGGER"
+   ],
+   "head": "DIGGER",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb29800_1",
+     "frames": 76,
+     "fps": 25.0,
+     "path": "signbank/sb29800_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/digger-1.html"
+  },
+  "dirty": {
+   "gloss": "DIRTY",
+   "kind": "plain",
+   "keys": [
+    "DIRTY"
+   ],
+   "head": "DIRTY",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb27710_1",
+     "frames": 56,
+     "fps": 25.0,
+     "path": "signbank/sb27710_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/dirty-1.html"
+  },
+  "drip": {
+   "gloss": "DRIP",
+   "kind": "plain",
+   "keys": [
+    "DRIP"
+   ],
+   "head": "DRIP",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb14370",
+     "frames": 143,
+     "fps": 29.97,
+     "path": "signbank/sb14370.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/drip-1.html"
+  },
+  "electric": {
+   "gloss": "ELECTRIC",
+   "kind": "plain",
+   "keys": [
+    "ELECTRIC"
+   ],
+   "head": "ELECTRIC",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb423",
+     "frames": 177,
+     "fps": 50.0,
+     "path": "signbank/sb423.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/electric-1.html"
+  },
+  "equal": {
+   "gloss": "EQUAL",
+   "kind": "plain",
+   "keys": [
+    "EQUAL"
+   ],
+   "head": "EQUAL",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb41050_1",
+     "frames": 81,
+     "fps": 25.0,
+     "path": "signbank/sb41050_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/equal-1.html"
+  },
+  "everybody": {
+   "gloss": "EVERYBODY",
+   "kind": "plain",
+   "keys": [
+    "EVERYBODY"
+   ],
+   "head": "EVERYBODY",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb26200_1",
+     "frames": 71,
+     "fps": 25.0,
+     "path": "signbank/sb26200_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/everybody-1.html"
+  },
+  "family": {
+   "gloss": "FAMILY",
+   "kind": "plain",
+   "keys": [
+    "FAMILY"
+   ],
+   "head": "FAMILY",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb27750_1",
+     "frames": 73,
+     "fps": 25.0,
+     "path": "signbank/sb27750_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/family-1.html"
+  },
+  "favourite": {
+   "gloss": "FAVOURITE",
+   "kind": "plain",
+   "keys": [
+    "FAVOURITE",
+    "FAVORITE"
+   ],
+   "head": "FAVOURITE",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb39730",
+     "frames": 10,
+     "fps": 29.97,
+     "path": "signbank/sb39730.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/favourite-1.html"
+  },
+  "flap": {
+   "gloss": "FLAP",
+   "kind": "plain",
+   "keys": [
+    "FLAP"
+   ],
+   "head": "FLAP",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb35920",
+     "frames": 70,
+     "fps": 14.985,
+     "path": "signbank/sb35920.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/flap-1.html"
+  },
+  "flatten": {
+   "gloss": "FLATTEN",
+   "kind": "plain",
+   "keys": [
+    "FLATTEN"
+   ],
+   "head": "FLATTEN",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb39230_1",
+     "frames": 62,
+     "fps": 25.0,
+     "path": "signbank/sb39230_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/flatten-1.html"
+  },
+  "freezer": {
+   "gloss": "FREEZER",
+   "kind": "plain",
+   "keys": [
+    "FREEZER"
+   ],
+   "head": "FREEZER",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb27230",
+     "frames": 75,
+     "fps": 14.985,
+     "path": "signbank/sb27230.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/freezer-1.html"
+  },
+  "glad": {
+   "gloss": "GLAD",
+   "kind": "plain",
+   "keys": [
+    "GLAD"
+   ],
+   "head": "GLAD",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb42800",
+     "frames": 137,
+     "fps": 29.97,
+     "path": "signbank/sb42800.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/glad-1.html"
+  },
+  "goodbye": {
+   "gloss": "GOODBYE",
+   "kind": "plain",
+   "keys": [
+    "GOODBYE",
+    "GOOD BYE",
+    "BYE"
+   ],
+   "head": "GOODBYE",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb24820_1",
+     "frames": 173,
+     "fps": 25.0,
+     "path": "signbank/sb24820_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/good-bye-1.html"
+  },
+  "guest": {
+   "gloss": "GUEST",
+   "kind": "plain",
+   "keys": [
+    "GUEST"
+   ],
+   "head": "GUEST",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb34110_1",
+     "frames": 91,
+     "fps": 25.0,
+     "path": "signbank/sb34110_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/guest-1.html"
+  },
+  "halve": {
+   "gloss": "HALVE",
+   "kind": "plain",
+   "keys": [
+    "HALVE"
+   ],
+   "head": "HALVE",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb43190_1",
+     "frames": 102,
+     "fps": 25.0,
+     "path": "signbank/sb43190_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/halve-2.html"
+  },
+  "helmet": {
+   "gloss": "HELMET",
+   "kind": "plain",
+   "keys": [
+    "HELMET"
+   ],
+   "head": "HELMET",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb45670_1",
+     "frames": 80,
+     "fps": 25.0,
+     "path": "signbank/sb45670_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/helmet-2.html"
+  },
+  "hope": {
+   "gloss": "HOPE",
+   "kind": "plain",
+   "keys": [
+    "HOPE"
+   ],
+   "head": "HOPE",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb40140_1",
+     "frames": 48,
+     "fps": 15.683,
+     "path": "signbank/sb40140_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/hope-1.html"
+  },
+  "hurt": {
+   "gloss": "HURT",
+   "kind": "plain",
+   "keys": [
+    "HURT"
+   ],
+   "head": "HURT",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb5341",
+     "frames": 86,
+     "fps": 25.0,
+     "path": "signbank/sb5341.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/hurt-1.html"
+  },
+  "jar": {
+   "gloss": "JAR",
+   "kind": "plain",
+   "keys": [
+    "JAR"
+   ],
+   "head": "JAR",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb31100_1",
+     "frames": 69,
+     "fps": 25.0,
+     "path": "signbank/sb31100_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/jar-1.html"
+  },
+  "kettle": {
+   "gloss": "KETTLE",
+   "kind": "plain",
+   "keys": [
+    "KETTLE"
+   ],
+   "head": "KETTLE",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb65910_1",
+     "frames": 90,
+     "fps": 25.0,
+     "path": "signbank/sb65910_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/kettle-1.html"
+  },
+  "key": {
+   "gloss": "KEY",
+   "kind": "plain",
+   "keys": [
+    "KEY"
+   ],
+   "head": "KEY",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb62610_1",
+     "frames": 154,
+     "fps": 25.0,
+     "path": "signbank/sb62610_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/key-1.html"
+  },
+  "knowledgeable": {
+   "gloss": "KNOWLEDGEABLE",
+   "kind": "plain",
+   "keys": [
+    "KNOWLEDGEABLE"
+   ],
+   "head": "KNOWLEDGEABLE",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb1904",
+     "frames": 58,
+     "fps": 25.0,
+     "path": "signbank/sb1904.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/knowledgeable-1.html"
+  },
+  "lazy": {
+   "gloss": "LAZY",
+   "kind": "plain",
+   "keys": [
+    "LAZY"
+   ],
+   "head": "LAZY",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb65590_1",
+     "frames": 72,
+     "fps": 25.0,
+     "path": "signbank/sb65590_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/lazy-1.html"
+  },
+  "lucky": {
+   "gloss": "LUCKY",
+   "kind": "plain",
+   "keys": [
+    "LUCKY"
+   ],
+   "head": "LUCKY",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb50710_1",
+     "frames": 53,
+     "fps": 25.0,
+     "path": "signbank/sb50710_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/lucky-1.html"
+  },
+  "map": {
+   "gloss": "MAP",
+   "kind": "plain",
+   "keys": [
+    "MAP",
+    "CHART"
+   ],
+   "head": "MAP",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb17150",
+     "frames": 132,
+     "fps": 29.97,
+     "path": "signbank/sb17150.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/map-1.html"
+  },
+  "metal": {
+   "gloss": "METAL",
+   "kind": "plain",
+   "keys": [
+    "METAL"
+   ],
+   "head": "METAL",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb13990",
+     "frames": 129,
+     "fps": 29.97,
+     "path": "signbank/sb13990.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/metal-1.html"
+  },
+  "mixture": {
+   "gloss": "MIXTURE",
+   "kind": "plain",
+   "keys": [
+    "MIXTURE"
+   ],
+   "head": "MIXTURE",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb30480_1",
+     "frames": 84,
+     "fps": 25.0,
+     "path": "signbank/sb30480_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/mixture-1.html"
+  },
+  "neat": {
+   "gloss": "NEAT",
+   "kind": "plain",
+   "keys": [
+    "NEAT"
+   ],
+   "head": "NEAT",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb19200_1",
+     "frames": 53,
+     "fps": 25.0,
+     "path": "signbank/sb19200_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/neat-1.html"
+  },
+  "nervous": {
+   "gloss": "NERVOUS",
+   "kind": "plain",
+   "keys": [
+    "NERVOUS"
+   ],
+   "head": "NERVOUS",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb27500_1",
+     "frames": 266,
+     "fps": 25.0,
+     "path": "signbank/sb27500_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/nervous-1.html"
+  },
+  "nest": {
+   "gloss": "NEST",
+   "kind": "plain",
+   "keys": [
+    "NEST"
+   ],
+   "head": "NEST",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb46290_1",
+     "frames": 70,
+     "fps": 25.0,
+     "path": "signbank/sb46290_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/nest-1.html"
+  },
+  "none": {
+   "gloss": "NONE",
+   "kind": "plain",
+   "keys": [
+    "NONE"
+   ],
+   "head": "NONE",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb3420_1",
+     "frames": 80,
+     "fps": 25.0,
+     "path": "signbank/sb3420_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/none-1.html"
+  },
+  "odd": {
+   "gloss": "ODD",
+   "kind": "plain",
+   "keys": [
+    "ODD"
+   ],
+   "head": "ODD",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb30070",
+     "frames": 94,
+     "fps": 29.97,
+     "path": "signbank/sb30070.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/odd-1.html"
+  },
+  "organise": {
+   "gloss": "ORGANISE",
+   "kind": "plain",
+   "keys": [
+    "ORGANISE",
+    "ORGANIZE"
+   ],
+   "head": "ORGANISE",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sbGloss_3471",
+     "frames": 80,
+     "fps": 29.97,
+     "path": "signbank/sbGloss_3471.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/organise-1.html"
+  },
+  "outline": {
+   "gloss": "OUTLINE",
+   "kind": "plain",
+   "keys": [
+    "OUTLINE"
+   ],
+   "head": "OUTLINE",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb7476_FWjksCf",
+     "frames": 109,
+     "fps": 29.97,
+     "path": "signbank/sb7476_FWjksCf.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/outline-2.html"
+  },
+  "paddle": {
+   "gloss": "PADDLE",
+   "kind": "plain",
+   "keys": [
+    "PADDLE"
+   ],
+   "head": "PADDLE",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb58300_1",
+     "frames": 135,
+     "fps": 25.0,
+     "path": "signbank/sb58300_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/paddle-1.html"
+  },
+  "picnic": {
+   "gloss": "PICNIC",
+   "kind": "plain",
+   "keys": [
+    "PICNIC"
+   ],
+   "head": "PICNIC",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb5490_1",
+     "frames": 38,
+     "fps": 15.0,
+     "path": "signbank/sb5490_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/picnic-3.html"
+  },
+  "pleasure": {
+   "gloss": "PLEASURE",
+   "kind": "plain",
+   "keys": [
+    "PLEASURE"
+   ],
+   "head": "PLEASURE",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb46180_1",
+     "frames": 167,
+     "fps": 25.0,
+     "path": "signbank/sb46180_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/pleasure-1.html"
+  },
+  "pretty": {
+   "gloss": "PRETTY",
+   "kind": "plain",
+   "keys": [
+    "PRETTY"
+   ],
+   "head": "PRETTY",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb32900_1",
+     "frames": 61,
+     "fps": 25.0,
+     "path": "signbank/sb32900_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/pretty-1.html"
+  },
+  "purple": {
+   "gloss": "PURPLE",
+   "kind": "plain",
+   "keys": [
+    "PURPLE"
+   ],
+   "head": "PURPLE",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb21480_1",
+     "frames": 147,
+     "fps": 25.0,
+     "path": "signbank/sb21480_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/purple-1.html"
+  },
+  "queen": {
+   "gloss": "QUEEN",
+   "kind": "plain",
+   "keys": [
+    "QUEEN"
+   ],
+   "head": "QUEEN",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb29030_1",
+     "frames": 72,
+     "fps": 25.0,
+     "path": "signbank/sb29030_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/queen-1.html"
+  },
+  "race": {
+   "gloss": "RACE",
+   "kind": "plain",
+   "keys": [
+    "RACE"
+   ],
+   "head": "RACE",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb10750",
+     "frames": 144,
+     "fps": 29.97,
+     "path": "signbank/sb10750.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/race-2.html"
+  },
+  "reason": {
+   "gloss": "REASON",
+   "kind": "plain",
+   "keys": [
+    "REASON"
+   ],
+   "head": "REASON",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb51490_1",
+     "frames": 182,
+     "fps": 25.0,
+     "path": "signbank/sb51490_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/reason-1.html"
+  },
+  "ring": {
+   "gloss": "RING",
+   "kind": "plain",
+   "keys": [
+    "RING"
+   ],
+   "head": "RING",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb13400",
+     "frames": 133,
+     "fps": 29.97,
+     "path": "signbank/sb13400.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/ring-1.html"
+  },
+  "rotate": {
+   "gloss": "ROTATE",
+   "kind": "plain",
+   "keys": [
+    "ROTATE"
+   ],
+   "head": "ROTATE",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb10900",
+     "frames": 153,
+     "fps": 29.97,
+     "path": "signbank/sb10900.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/rotate-1.html"
+  },
+  "ruin": {
+   "gloss": "RUIN",
+   "kind": "plain",
+   "keys": [
+    "RUIN"
+   ],
+   "head": "RUIN",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb63130",
+     "frames": 83,
+     "fps": 12.005,
+     "path": "signbank/sb63130.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/ruin-2.html"
+  },
+  "save": {
+   "gloss": "SAVE",
+   "kind": "plain",
+   "keys": [
+    "SAVE"
+   ],
+   "head": "SAVE",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb42980_1",
+     "frames": 50,
+     "fps": 25.0,
+     "path": "signbank/sb42980_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/save-1.html"
+  },
+  "seed": {
+   "gloss": "SEED",
+   "kind": "plain",
+   "keys": [
+    "SEED",
+    "SEEDS"
+   ],
+   "head": "SEED",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb2210_1",
+     "frames": 42,
+     "fps": 25.0,
+     "path": "signbank/sb2210_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/seed-2.html"
+  },
+  "seem": {
+   "gloss": "SEEM",
+   "kind": "plain",
+   "keys": [
+    "SEEM"
+   ],
+   "head": "SEEM",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb16691_1",
+     "frames": 53,
+     "fps": 25.0,
+     "path": "signbank/sb16691_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/seem-2.html"
+  },
+  "shoe": {
+   "gloss": "SHOE",
+   "kind": "plain",
+   "keys": [
+    "SHOE"
+   ],
+   "head": "SHOE",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb46610",
+     "frames": 75,
+     "fps": 14.985,
+     "path": "signbank/sb46610.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/shoe-2.html"
+  },
+  "spell": {
+   "gloss": "SPELL",
+   "kind": "plain",
+   "keys": [
+    "SPELL"
+   ],
+   "head": "SPELL",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb1500",
+     "frames": 86,
+     "fps": 14.985,
+     "path": "signbank/sb1500.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/spell-1.html"
+  },
+  "spot": {
+   "gloss": "SPOT",
+   "kind": "plain",
+   "keys": [
+    "SPOT"
+   ],
+   "head": "SPOT",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb12620_1",
+     "frames": 73,
+     "fps": 25.0,
+     "path": "signbank/sb12620_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/spot-1.html"
+  },
+  "sprain": {
+   "gloss": "SPRAIN",
+   "kind": "plain",
+   "keys": [
+    "SPRAIN"
+   ],
+   "head": "SPRAIN",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb58150",
+     "frames": 165,
+     "fps": 29.97,
+     "path": "signbank/sb58150.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/sprain-1.html"
+  },
+  "spring": {
+   "gloss": "SPRING",
+   "kind": "plain",
+   "keys": [
+    "SPRING"
+   ],
+   "head": "SPRING",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb56050_1",
+     "frames": 85,
+     "fps": 25.0,
+     "path": "signbank/sb56050_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/spring-2.html"
+  },
+  "steam": {
+   "gloss": "STEAM",
+   "kind": "plain",
+   "keys": [
+    "STEAM"
+   ],
+   "head": "STEAM",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb25580",
+     "frames": 73,
+     "fps": 14.985,
+     "path": "signbank/sb25580.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/steam-1.html"
+  },
+  "stuck": {
+   "gloss": "STUCK",
+   "kind": "plain",
+   "keys": [
+    "STUCK"
+   ],
+   "head": "STUCK",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb53240_1",
+     "frames": 89,
+     "fps": 25.0,
+     "path": "signbank/sb53240_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/stuck-1.html"
+  },
+  "thick": {
+   "gloss": "THICK",
+   "kind": "plain",
+   "keys": [
+    "THICK"
+   ],
+   "head": "THICK",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb44490_1",
+     "frames": 49,
+     "fps": 25.0,
+     "path": "signbank/sb44490_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/thick-2.html"
+  },
+  "thinking": {
+   "gloss": "THINKING",
+   "kind": "plain",
+   "keys": [
+    "THINKING"
+   ],
+   "head": "THINKING",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb6854",
+     "frames": 107,
+     "fps": 29.97,
+     "path": "signbank/sb6854.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/thinking-1.html"
+  },
+  "thoughtful": {
+   "gloss": "THOUGHTFUL",
+   "kind": "plain",
+   "keys": [
+    "THOUGHTFUL"
+   ],
+   "head": "THOUGHTFUL",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb5040",
+     "frames": 75,
+     "fps": 29.97,
+     "path": "signbank/sb5040.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/thoughtful-1.html"
+  },
+  "tighten": {
+   "gloss": "TIGHTEN",
+   "kind": "plain",
+   "keys": [
+    "TIGHTEN"
+   ],
+   "head": "TIGHTEN",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb32910_1",
+     "frames": 50,
+     "fps": 25.0,
+     "path": "signbank/sb32910_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/tighten-1.html"
+  },
+  "tonight": {
+   "gloss": "TONIGHT",
+   "kind": "plain",
+   "keys": [
+    "TONIGHT"
+   ],
+   "head": "TONIGHT",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb6630_1",
+     "frames": 64,
+     "fps": 25.0,
+     "path": "signbank/sb6630_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/tonight-2.html"
+  },
+  "tray": {
+   "gloss": "TRAY",
+   "kind": "plain",
+   "keys": [
+    "TRAY"
+   ],
+   "head": "TRAY",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb32020_1",
+     "frames": 67,
+     "fps": 25.0,
+     "path": "signbank/sb32020_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/tray-1.html"
+  },
+  "treasure": {
+   "gloss": "TREASURE",
+   "kind": "plain",
+   "keys": [
+    "TREASURE"
+   ],
+   "head": "TREASURE",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb2130_1",
+     "frames": 98,
+     "fps": 25.0,
+     "path": "signbank/sb2130_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/treasure-1.html"
+  },
+  "twelve": {
+   "gloss": "TWELVE",
+   "kind": "plain",
+   "keys": [
+    "TWELVE"
+   ],
+   "head": "TWELVE",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb63780",
+     "frames": 151,
+     "fps": 25.0,
+     "path": "signbank/sb63780.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/twelve-2.html"
+  },
+  "underneath": {
+   "gloss": "UNDERNEATH",
+   "kind": "plain",
+   "keys": [
+    "UNDERNEATH"
+   ],
+   "head": "UNDERNEATH",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb41270_1",
+     "frames": 96,
+     "fps": 25.0,
+     "path": "signbank/sb41270_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/underneath-1.html"
+  },
+  "valuable": {
+   "gloss": "VALUABLE",
+   "kind": "plain",
+   "keys": [
+    "VALUABLE"
+   ],
+   "head": "VALUABLE",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb61630_1",
+     "frames": 197,
+     "fps": 25.0,
+     "path": "signbank/sb61630_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/valuable-2.html"
+  },
+  "want": {
+   "gloss": "WANT",
+   "kind": "plain",
+   "keys": [
+    "WANT",
+    "WANNA"
+   ],
+   "head": "WANT",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb34540",
+     "frames": 58,
+     "fps": 14.985,
+     "path": "signbank/sb34540.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/want-2.html"
+  },
+  "win": {
+   "gloss": "WIN",
+   "kind": "plain",
+   "keys": [
+    "WIN"
+   ],
+   "head": "WIN",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb24260",
+     "frames": 95,
+     "fps": 14.985,
+     "path": "signbank/sb24260.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/win-3.html"
+  },
+  "windy": {
+   "gloss": "WINDY",
+   "kind": "plain",
+   "keys": [
+    "WINDY"
+   ],
+   "head": "WINDY",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb35720",
+     "frames": 68,
+     "fps": 29.97,
+     "path": "signbank/sb35720.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/windy-2.html"
+  },
+  "x-ray": {
+   "gloss": "X-RAY",
+   "kind": "plain",
+   "keys": [
+    "X RAY",
+    "XRAY"
+   ],
+   "head": "X RAY",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb6675",
+     "frames": 46,
+     "fps": 15.0,
+     "path": "signbank/sb6675.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/x-ray-1.html"
+  },
+  "zero": {
+   "gloss": "ZERO",
+   "kind": "plain",
+   "keys": [
+    "ZERO"
+   ],
+   "head": "ZERO",
+   "sense": null,
+   "takes": [
+    {
+     "clip": "sb730_1",
+     "frames": 75,
+     "fps": 11.952,
+     "path": "signbank/sb730_1.mp4"
+    }
+   ],
+   "source": "signbank",
+   "page": "https://auslan.org.au/dictionary/words/zero-1.html"
   }
  },
  "keys": {
@@ -76835,7 +78579,8 @@
    "epistle"
   ],
   "EQUAL": [
-   "equal-mathematics"
+   "equal-mathematics",
+   "equal"
   ],
   "EQUALIZE": [
    "equalize"
@@ -78110,6 +79855,9 @@
    "hot"
   ],
   "HOUR": [
+   "hour"
+  ],
+  "HR": [
    "hour"
   ],
   "HOUSE": [
@@ -80093,6 +81841,9 @@
   "PLASTICINE": [
    "plasticine"
   ],
+  "PLASTICENE": [
+   "plasticine"
+  ],
   "PLATE": [
    "plate"
   ],
@@ -80791,7 +82542,8 @@
    "rightwards"
   ],
   "RING": [
-   "ring-telephone"
+   "ring-telephone",
+   "ring"
   ],
   "RISK": [
    "risk"
@@ -81627,7 +83379,8 @@
    "speedway"
   ],
   "SPELL": [
-   "spell-magic"
+   "spell-magic",
+   "spell"
   ],
   "SPENDTHRIFT": [
    "spendthrift"
@@ -81702,6 +83455,9 @@
   "SQUARE": [
    "square",
    "square-mathematics"
+  ],
+  "SQ": [
+   "square"
   ],
   "SQUARE ROOT": [
    "square-root"
@@ -81799,6 +83555,9 @@
    "stiletto"
   ],
   "STING": [
+   "sting"
+  ],
+  "STUNG": [
    "sting"
   ],
   "STINGRAY": [
@@ -82353,7 +84112,8 @@
    "think"
   ],
   "THINKING": [
-   "thinking-reflection"
+   "thinking-reflection",
+   "thinking"
   ],
   "THIRD": [
    "third",
@@ -83434,6 +85194,303 @@
   ],
   "ZOOM": [
    "zoom"
+  ],
+  "AFTERNOON": [
+   "afternoon"
+  ],
+  "ALLOW": [
+   "allow"
+  ],
+  "ANYONE": [
+   "anyone"
+  ],
+  "ART": [
+   "art"
+  ],
+  "CRAFT": [
+   "art"
+  ],
+  "AWAKE": [
+   "awake"
+  ],
+  "WAKE": [
+   "awake"
+  ],
+  "BELONG": [
+   "belong"
+  ],
+  "BLEND": [
+   "blend"
+  ],
+  "BROWN": [
+   "brown"
+  ],
+  "BUBBLY": [
+   "bubbly"
+  ],
+  "CAMP": [
+   "camp"
+  ],
+  "CHICKEN": [
+   "chicken"
+  ],
+  "HEN": [
+   "chicken"
+  ],
+  "COLOUR": [
+   "colour"
+  ],
+  "COLORED": [
+   "colour"
+  ],
+  "COLOR": [
+   "colour"
+  ],
+  "COLOURED": [
+   "colour"
+  ],
+  "CONFUSE": [
+   "confuse"
+  ],
+  "CUCUMBER": [
+   "cucumber"
+  ],
+  "CULTIVATE": [
+   "cultivate"
+  ],
+  "DAMP": [
+   "damp"
+  ],
+  "DEEP": [
+   "deep"
+  ],
+  "DELIVER": [
+   "deliver"
+  ],
+  "DIG": [
+   "dig"
+  ],
+  "DIGGER": [
+   "digger"
+  ],
+  "DIRTY": [
+   "dirty"
+  ],
+  "DRIP": [
+   "drip"
+  ],
+  "ELECTRIC": [
+   "electric"
+  ],
+  "EVERYBODY": [
+   "everybody"
+  ],
+  "FAMILY": [
+   "family"
+  ],
+  "FAVOURITE": [
+   "favourite"
+  ],
+  "FAVORITE": [
+   "favourite"
+  ],
+  "FLAP": [
+   "flap"
+  ],
+  "FLATTEN": [
+   "flatten"
+  ],
+  "FREEZER": [
+   "freezer"
+  ],
+  "GLAD": [
+   "glad"
+  ],
+  "GOODBYE": [
+   "goodbye"
+  ],
+  "GOOD BYE": [
+   "goodbye"
+  ],
+  "BYE": [
+   "goodbye"
+  ],
+  "GUEST": [
+   "guest"
+  ],
+  "HALVE": [
+   "halve"
+  ],
+  "HELMET": [
+   "helmet"
+  ],
+  "HOPE": [
+   "hope"
+  ],
+  "HURT": [
+   "hurt"
+  ],
+  "JAR": [
+   "jar"
+  ],
+  "KETTLE": [
+   "kettle"
+  ],
+  "KEY": [
+   "key"
+  ],
+  "KNOWLEDGEABLE": [
+   "knowledgeable"
+  ],
+  "LAZY": [
+   "lazy"
+  ],
+  "LUCKY": [
+   "lucky"
+  ],
+  "MAP": [
+   "map"
+  ],
+  "CHART": [
+   "map"
+  ],
+  "METAL": [
+   "metal"
+  ],
+  "MIXTURE": [
+   "mixture"
+  ],
+  "NEAT": [
+   "neat"
+  ],
+  "NERVOUS": [
+   "nervous"
+  ],
+  "NEST": [
+   "nest"
+  ],
+  "NONE": [
+   "none"
+  ],
+  "ODD": [
+   "odd"
+  ],
+  "ORGANISE": [
+   "organise"
+  ],
+  "ORGANIZE": [
+   "organise"
+  ],
+  "OUTLINE": [
+   "outline"
+  ],
+  "PADDLE": [
+   "paddle"
+  ],
+  "PICNIC": [
+   "picnic"
+  ],
+  "PLEASURE": [
+   "pleasure"
+  ],
+  "PRETTY": [
+   "pretty"
+  ],
+  "PURPLE": [
+   "purple"
+  ],
+  "QUEEN": [
+   "queen"
+  ],
+  "RACE": [
+   "race"
+  ],
+  "REASON": [
+   "reason"
+  ],
+  "ROTATE": [
+   "rotate"
+  ],
+  "RUIN": [
+   "ruin"
+  ],
+  "SAVE": [
+   "save"
+  ],
+  "SEED": [
+   "seed"
+  ],
+  "SEEDS": [
+   "seed"
+  ],
+  "SEEM": [
+   "seem"
+  ],
+  "SHOE": [
+   "shoe"
+  ],
+  "SPOT": [
+   "spot"
+  ],
+  "SPRAIN": [
+   "sprain"
+  ],
+  "SPRING": [
+   "spring"
+  ],
+  "STEAM": [
+   "steam"
+  ],
+  "STUCK": [
+   "stuck"
+  ],
+  "THICK": [
+   "thick"
+  ],
+  "THOUGHTFUL": [
+   "thoughtful"
+  ],
+  "TIGHTEN": [
+   "tighten"
+  ],
+  "TONIGHT": [
+   "tonight"
+  ],
+  "TRAY": [
+   "tray"
+  ],
+  "TREASURE": [
+   "treasure"
+  ],
+  "TWELVE": [
+   "twelve"
+  ],
+  "UNDERNEATH": [
+   "underneath"
+  ],
+  "VALUABLE": [
+   "valuable"
+  ],
+  "WANT": [
+   "want"
+  ],
+  "WANNA": [
+   "want"
+  ],
+  "WIN": [
+   "win"
+  ],
+  "WINDY": [
+   "windy"
+  ],
+  "X RAY": [
+   "x-ray"
+  ],
+  "XRAY": [
+   "x-ray"
+  ],
+  "ZERO": [
+   "zero"
   ]
  }
 }

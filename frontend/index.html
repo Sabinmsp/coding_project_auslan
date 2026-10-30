@@ -7,323 +7,459 @@
      https://signs.example.com (set by build_dist.py --asset-base). The CDN
      must send Access-Control-Allow-Origin for the JSON files. -->
 <meta name="asset-base" content="">
+<meta name="color-scheme" content="light">
 <title>SignBridge</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='26' font-size='26'%3E%F0%9F%A4%9F%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232563EB'/%3E%3Cpath d='M7 22h18M10 22v-5a6 6 0 0 1 12 0v5' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E">
 <style>
-    * { box-sizing: border-box; }
+    /* ---- design tokens -------------------------------------------------
+       One accent. Status colours always come with an icon and words, never
+       colour alone. The --fig-* colours are read by the canvas renderer, so
+       the figure and its hand legend can never disagree. */
     :root {
-        --bg: #0d0f14; --surface: #151922; --raised: #1c212c; --line: #2a3140; --line2: #3a4356;
-        --ink: #f1f4f9; --dim: #a2abbd; --faint: #707a8e;
-        --body: #7ee8c8; --left: #ff9b78; --right: #74b9ff; --accent: #4c8dff; --accent-ink: #fff;
-        --ok: #3fc191; --warn: #f0b440; --spell: #8fb3ff; --bad: #f07067; --focus: #ffd75e;
-        --radius: 14px;
+        --bg: #F8FAFC; --surface: #FFFFFF; --subtle: #F1F5F9;
+        --ink: #111827; --muted: #64748B; --line: #E5E7EB;
+        --field: #7C8798;          /* form-field borders: 3.6:1 on white (WCAG 1.4.11) */
+        --accent: #2563EB; --accent-hover: #1D4ED8; --accent-soft: #EFF6FF; --on-accent: #FFFFFF;
+        --ok: #15803D; --warn: #B45309; --warn-soft: #FFFBEB; --spell: #475569; --bad: #B91C1C; --bad-soft: #FEF2F2;
+        --fig-body: #334155; --fig-fill: #E2E8F0; --fig-right: #2563EB; --fig-left: #EA580C;
+        --fig-head: #FFFFFF; --fig-face: #334155; --fig-lips: #E11D48;
+        --r-control: 10px; --r-surface: 16px;
+        --font: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
     }
-    html { background: var(--bg); }
-    body { margin: 0; background: var(--bg); color: var(--ink);
-           font: 16px/1.55 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Arial, sans-serif; }
-    :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+    * { box-sizing: border-box; }
+    html { background: var(--bg); -webkit-text-size-adjust: 100%; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font: 400 16px/1.5 var(--font);
+           -webkit-font-smoothing: antialiased; }
+    h1, h2, h3, p { margin: 0; }
     button, select, input, textarea { font: inherit; color: inherit; }
     button { cursor: pointer; }
     [hidden] { display: none !important; }
-    .wrap { max-width: 1320px; margin: 0 auto; padding: 0 22px; }
-    /* two columns: input + plan on the left, avatar on the right (sticky while the left scrolls) */
-    .shell { display: grid; gap: 16px 24px; align-items: start; padding-top: 20px;
-             grid-template-columns: minmax(330px, 430px) minmax(0, 1fr);
-             grid-template-areas: "input stage" "doc stage" "plan stage"; }
-    .hero { grid-area: input; } #docpanel { grid-area: doc; } #planpanel { grid-area: plan; }
-    #stagecol { grid-area: stage; position: sticky; top: 14px; }
-    /* the Advanced button, its panel and the notice sit below the grid, so the sticky avatar never covers them */
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden;
+               clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+    .skip { position: absolute; left: 16px; top: -64px; z-index: 10; background: var(--accent); color: var(--on-accent);
+            padding: 12px 16px; border-radius: var(--r-control); font-weight: 600; text-decoration: none; }
+    .skip:focus { top: 8px; }
+    svg.i { width: 20px; height: 20px; flex: none; }
+
+    /* ---- buttons ---- */
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 18px;
+           border-radius: var(--r-control); border: 1px solid var(--field); background: var(--surface); color: var(--ink);
+           font-size: 15px; font-weight: 600; line-height: 1; white-space: nowrap;
+           transition: background-color .15s, border-color .15s, color .15s; }
+    .btn:hover { background: var(--subtle); }
+    .btn-primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+    .btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+    .btn-quiet { border-color: transparent; background: transparent; color: var(--muted); }
+    .btn-quiet:hover { color: var(--ink); background: var(--subtle); }
+    .spinner { display: none; width: 16px; height: 16px; border-radius: 50%; border: 2px solid rgba(255,255,255,.45);
+               border-top-color: #fff; animation: spin .8s linear infinite; }
+    [aria-busy="true"] .spinner { display: inline-block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
     /* ---- header ---- */
-    header { border-bottom: 1px solid var(--line); background: var(--surface); }
-    header .wrap { display: flex; align-items: center; gap: 12px; height: 60px; }
-    .brand { font-size: 20px; font-weight: 800; letter-spacing: -.01em; margin: 0; display: flex; align-items: center; gap: 8px; }
-    .brand .logo { width: 30px; height: 30px; border-radius: 8px; background: var(--accent); display: grid; place-items: center; font-size: 17px; }
-    .brand small { font-size: 12px; font-weight: 600; color: var(--warn); border: 1px solid var(--warn); border-radius: 999px; padding: 0 8px; }
-    header nav { margin-left: auto; display: flex; gap: 4px; }
-    .link { background: none; border: 0; color: var(--dim); padding: 8px 12px; border-radius: 8px; font-size: 15px; }
-    .link:hover { color: var(--ink); background: var(--raised); }
+    .topbar { background: var(--surface); border-bottom: 1px solid var(--line); }
+    .topbar-inner { max-width: 1440px; margin: 0 auto; padding: 0 32px; height: 64px; display: flex; align-items: center; gap: 16px; }
+    .brand { display: flex; align-items: center; gap: 10px; font-size: 17px; font-weight: 700; letter-spacing: -.01em; }
+    .brand-mark { width: 32px; height: 32px; border-radius: 8px; background: var(--accent); color: #fff; display: grid; place-items: center; }
+    .nav { margin-left: auto; display: flex; gap: 4px; }
+    .nav button { min-height: 44px; padding: 0 12px; border: 0; border-radius: 8px; background: none;
+                  color: var(--muted); font-size: 14px; font-weight: 500; }
+    .nav button:hover { color: var(--ink); background: var(--subtle); }
 
-    /* ---- hero / input ---- */
-    .hero { text-align: left; padding: 0; }
-    .hero h2 { font-size: clamp(24px, 3vw, 30px); line-height: 1.2; margin: 0 0 6px; letter-spacing: -.02em; }
-    .hero p { color: var(--dim); margin: 0 0 14px; font-size: 15px; }
-    .inputcard { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; }
-    #sentence-input { width: 100%; min-height: 54px; resize: vertical; background: var(--raised); color: var(--ink);
-                      border: 1px solid var(--line2); border-radius: 10px; padding: 12px 14px; font-size: 18px; line-height: 1.45; }
-    #sentence-input::placeholder { color: var(--faint); }
-    .inputrow { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
-    .btn { border: 1px solid transparent; border-radius: 10px; padding: 10px 18px; font-weight: 700; font-size: 15px;
-           background: var(--raised); color: var(--ink); border-color: var(--line2); }
-    .btn:hover { filter: brightness(1.15); }
-    .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
-    .btn.big { padding: 13px 26px; font-size: 17px; }
-    #sentence-go { margin-left: auto; }
-    .examples { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; justify-content: flex-start; margin-top: 12px; }
-    .examples::before { content: "Try:"; color: var(--faint); font-size: 14px; margin-right: 2px; }
-    .examples button { font-size: 14px; padding: 5px 12px; border-radius: 999px; border: 1px solid var(--line2);
-                       background: transparent; color: var(--dim); }
-    .examples button:hover { color: var(--ink); border-color: var(--accent); }
+    /* ---- application grid: input 36%, viewer 64% ---- */
+    .app { max-width: 1440px; margin: 0 auto; padding: 32px; display: grid; gap: 32px; align-items: start;
+           grid-template-columns: minmax(320px, 36fr) minmax(0, 64fr); }
+    .side { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
 
-    /* ---- document panel ---- */
-    #docpanel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; }
-    #docpanel h3 { margin: 0 0 10px; font-size: 17px; }
-    .drop { display: block; position: relative; border: 2px dashed var(--line2); border-radius: 12px; padding: 18px; text-align: center;
-            color: var(--dim); cursor: pointer; background: var(--raised); }
-    .drop:hover, .drop.over { border-color: var(--accent); color: var(--ink); }
-    .drop strong { color: var(--ink); }
+    /* ---- input ---- */
+    .intro h1 { font-size: 30px; line-height: 1.2; font-weight: 700; letter-spacing: -.02em; }
+    .intro .lede { margin-top: 8px; color: var(--muted); font-size: 15px; }
+    .composer { margin-top: 20px; }
+    .or { display: block; font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+
+    /* ---- voice: the main way in ---- */
+    .voice { margin-top: 24px; display: flex; align-items: center; gap: 16px; padding: 16px; border: 1px solid var(--line);
+             border-radius: var(--r-surface); background: var(--surface); }
+    .mic { flex: none; display: inline-flex; align-items: center; gap: 10px; min-height: 56px; padding: 0 22px 0 18px;
+           border: 0; border-radius: 999px; background: var(--accent); color: var(--on-accent); font-size: 17px; font-weight: 700;
+           transition: background-color .15s; }
+    .mic svg.i { width: 24px; height: 24px; }
+    .mic:hover { background: var(--accent-hover); }
+    .mic.on { background: var(--bad); }
+    .mic.on svg { animation: pulse 1.2s ease-in-out infinite; }
+    .mic:disabled { background: var(--subtle); color: var(--muted); cursor: not-allowed; }
+    @keyframes pulse { 50% { opacity: .35; } }
+    .voice-text { min-width: 0; }
+    #live { font-size: 16px; color: var(--ink); overflow-wrap: anywhere; }
+    #live.interim { font-style: italic; color: var(--muted); }
+    #live.error { color: var(--bad); }
+    #mic-note { margin-top: 4px; font-size: 12px; color: var(--muted); }
+    #sentence-input { display: block; width: 100%; min-height: 132px; resize: vertical; padding: 14px 16px;
+                      font-size: 17px; line-height: 1.5; background: var(--surface); color: var(--ink);
+                      border: 1px solid var(--field); border-radius: 12px; }
+    #sentence-input::placeholder { color: var(--muted); opacity: 1; }
+    #sentence-input:focus-visible { outline: 2px solid var(--accent); outline-offset: 0; border-color: var(--accent); }
+    .composer-actions { display: flex; gap: 12px; margin-top: 16px; }
+    #sentence-go { flex: 1 1 auto; }
+    #input-hint { min-height: 0; margin-top: 8px; font-size: 14px; color: var(--warn); }
+    #input-hint:empty { display: none; }
+    .examples-label { margin-top: 24px; font-size: 13px; color: var(--muted); }
+    .examples { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+    .examples button { min-height: 44px; padding: 0 14px; border: 1px solid var(--line); border-radius: var(--r-control);
+                       background: var(--surface); color: var(--ink); font-size: 14px; text-align: left; }
+    .examples button:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ---- left-column panels ---- */
+    .panel { border-top: 1px solid var(--line); padding-top: 24px; min-width: 0; }
+    .panel h2 { font-size: 18px; font-weight: 600; letter-spacing: -.01em; }
+    .panel-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+    .muted { color: var(--muted); font-size: 14px; }
+    .hint { font-size: 13px; color: var(--muted); margin-top: 8px; }
+
+    /* document */
+    .drop { display: block; position: relative; margin-top: 16px; padding: 24px 16px; text-align: center; cursor: pointer;
+            border: 1px dashed var(--field); border-radius: 12px; background: var(--surface); color: var(--muted); font-size: 14px; }
+    .drop strong { color: var(--ink); font-weight: 600; }
+    .drop:hover, .drop.over { border-color: var(--accent); background: var(--accent-soft); }
+    .drop:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
     .drop input { position: absolute; width: 1px; height: 1px; opacity: 0; }
-    .drop:focus-within { outline: 3px solid var(--focus); outline-offset: 2px; }
-    .docrow { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 10px; font-size: 14px; color: var(--dim); }
-    #docprog { width: 100%; height: 8px; margin-top: 10px; accent-color: var(--accent); }
-    #docmsg { font-size: 14px; margin-top: 8px; color: var(--dim); }
-    #docmsg.error { color: #ffb4ab; }
-    #docstats { font-size: 15px; margin: 12px 0 8px; }
-    #docstats b { color: var(--ink); }
-    #docstats .hint { font-size: 13px; color: var(--faint); }
+    .drop .note { display: block; margin-top: 4px; font-size: 13px; }
+    .docrow { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; font-size: 14px; color: var(--muted); }
+    .docrow label { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; cursor: pointer; }
+    #docprog { width: 100%; height: 6px; margin-top: 12px; accent-color: var(--accent); }
+    #docmsg { font-size: 14px; margin-top: 8px; color: var(--muted); }
+    #docmsg:empty { display: none; }
+    #docmsg.error { color: var(--bad); }
+    #docstats { font-size: 14px; margin: 16px 0 8px; }
+    #docstats .hint { margin-top: 2px; }
     #points { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
-    #points li { border: 1px solid var(--line); border-radius: 10px; background: var(--raised); padding: 10px 12px; }
-    #points li.active { border-color: var(--accent); }
-    #points .pt { display: block; width: 100%; text-align: left; background: none; border: 0; padding: 0; font-size: 16px; line-height: 1.45; }
-    #points .pt::before { content: "▶ "; color: var(--accent); font-size: 12px; }
-    #points .meta { font-size: 12.5px; color: var(--faint); margin-top: 4px; display: flex; gap: 10px; flex-wrap: wrap; }
+    #points li { border: 1px solid var(--line); border-radius: 12px; background: var(--surface); padding: 12px 14px; }
+    #points li.active { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+    #points .pt { display: block; width: 100%; min-height: 44px; text-align: left; background: none; border: 0; padding: 0;
+                  font-size: 15px; line-height: 1.45; }
+    #points .meta { font-size: 13px; color: var(--muted); margin-top: 4px; display: flex; gap: 12px; flex-wrap: wrap; }
     #points .flag { color: var(--warn); }
-    #points details { font-size: 13px; color: var(--dim); margin: 4px 0 0; }
+    #points details { font-size: 13px; color: var(--muted); margin-top: 4px; }
 
-    /* ---- the stage (centre of the page) ---- */
-    #stagecol { scroll-margin-top: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
-    #captionbar { padding: 16px 20px 4px; text-align: center; min-height: 82px; }
-    #word { font-size: clamp(28px, 5vw, 44px); font-weight: 800; letter-spacing: .04em; text-transform: uppercase; line-height: 1.15;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    #sub { color: var(--dim); font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    #warn { margin: 6px 20px; padding: 8px 12px; border: 1px solid var(--bad); border-radius: 8px; background: #3a1d1d; color: #ffdcd6; font-size: 14px; }
-    #stage { position: relative; height: clamp(300px, 52vh, 600px); }
-    canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
-    #status { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; color: var(--dim);
-              font-size: 16px; text-align: center; padding: 24px; }
-    .handkey { position: absolute; right: 14px; top: 8px; display: flex; flex-direction: column; align-items: flex-end; gap: 1px;
-               font-size: 12px; color: var(--faint); pointer-events: none; }
-    .handkey i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; vertical-align: -1px; }
-    #sentence { padding: 4px 20px 8px; font-size: 18px; min-height: 38px;
-                display: flex; flex-wrap: wrap; justify-content: center; gap: 0 4px; }
-    #sentence .w { color: #5d6780; }
-    #sentence .w.active { color: var(--ink); font-weight: 700; }
+    /* sign sequence: one tile per sign, icon + words for status */
+    #steps { position: relative; display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; max-height: 212px; overflow-y: auto;
+             padding: 2px; }
+    #steps .tile { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; max-width: 100%; padding: 0 12px;
+                   border: 1px solid var(--line); border-radius: var(--r-control); background: var(--surface); color: var(--ink);
+                   font-size: 14px; font-weight: 600; letter-spacing: .02em; }
+    #steps button.tile:hover { border-color: var(--field); }
+    #steps .lbl { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px; }
+    #steps .ico { font-size: 12px; font-weight: 700; letter-spacing: 0; }
+    #steps .active { border-color: var(--accent); background: var(--accent-soft); box-shadow: inset 0 0 0 1px var(--accent); }
+    #steps .unavailable { border-style: dashed; color: var(--muted); }
+    .sign > .ico, .legend .sign { color: var(--ok); } .check > .ico, .legend .check { color: var(--warn); }
+    .spell > .ico, .legend .spell { color: var(--spell); } .unavailable > .ico, .legend .bad { color: var(--bad); }
+    .legend { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 13px; color: var(--muted); }
+    .legend b { font-size: 12px; margin-right: 4px; }
 
-    /* word strip: one tile per sign, ✓ signed / ABC fingerspelled / ⚠ check */
-    #steps { display: flex; gap: 6px; padding: 0 20px 14px; flex-wrap: wrap; justify-content: center; }
-    #steps button { min-width: 64px; max-width: 200px; border: 1px solid var(--line); border-radius: 10px; padding: 6px 12px 5px;
-                    background: var(--raised); color: var(--ink); display: flex; flex-direction: column; align-items: center; gap: 1px; }
-    #steps .lbl { font-weight: 700; font-size: 15px; letter-spacing: .03em; max-width: 176px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    #steps .ico { font-size: 12px; font-weight: 700; }
-    #steps .sign .ico { color: var(--ok); } #steps .check .ico { color: var(--warn); } #steps .spell .ico { color: var(--spell); }
-    #steps button.active { border-color: var(--accent); background: #22314d; }
-
-    /* ---- controls ---- */
-    #controls { border-top: 1px solid var(--line); padding: 12px 18px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: center; }
-    #controls .btn { min-width: 48px; min-height: 44px; }
-    #play { min-width: 110px; }
-    #scrub { flex: 1 1 200px; min-width: 140px; accent-color: var(--accent); height: 28px; }
-    #controls select { background: var(--raised); border: 1px solid var(--line2); border-radius: 8px; padding: 8px; }
-    #count { color: var(--dim); font-family: ui-monospace, monospace; font-size: 13px; min-width: 90px; text-align: right; }
-    label.toggle { color: var(--dim); font-size: 14px; cursor: pointer; user-select: none; }
-
-    .actions { display: flex; gap: 10px; justify-content: space-between; flex-wrap: wrap; margin: 16px 0; }
-    .notice { font-size: 13.5px; color: var(--faint); text-align: center; margin: 4px 0 28px; }
-    .notice button { background: none; border: 0; color: var(--dim); text-decoration: underline; padding: 0; font-size: inherit; }
-
-    /* ---- translation plan + vocabulary (left column) ---- */
-    #planpanel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; }
-    #planpanel h3 { margin: 0 0 10px; font-size: 13px; color: var(--dim); text-transform: uppercase; letter-spacing: .07em; }
-    #planpanel h3 .tag { text-transform: none; letter-spacing: 0; color: var(--warn); font-weight: 500; margin-left: 6px; }
-    #vocab { margin-top: 14px; display: grid; gap: 12px; }
-    #vocab h4 { margin: 0 0 5px; font-size: 12.5px; color: var(--dim); font-weight: 700; }
-    #vocab ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 5px; }
-    #vocab li { font-size: 13.5px; border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; background: var(--raised); }
-    #vocab .v-sign li { border-color: var(--ok); } #vocab .v-check li { border-color: var(--warn); }
-    #vocab .v-spell li { border-color: var(--spell); } #vocab .v-name li { border-color: var(--spell); border-style: dashed; }
-    #vocab .v-omit li { border-style: dashed; color: var(--faint); }
-    #vocab .why { font-size: 12px; color: var(--faint); }
-    #vocab .none { font-size: 13px; color: var(--faint); }
-
-    /* ---- fullscreen avatar ---- */
-    #stagecol:fullscreen, #stagecol:-webkit-full-screen { display: flex; flex-direction: column; background: var(--bg);
-        border: 0; border-radius: 0; overflow: auto; }
-    #stagecol:fullscreen #stage, #stagecol:-webkit-full-screen #stage { flex: 1; height: auto; min-height: 0; }
-
-    /* ---- advanced ---- */
-    #advanced { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-bottom: 28px; }
-    .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; min-width: 0; }
-    .card h3 { font-size: 13px; color: var(--dim); text-transform: uppercase; letter-spacing: .07em; margin: 0 0 10px; }
-    .card h3 + * { margin-top: 0; }
-    .card.wide { grid-column: 1 / -1; }
-    .opts { display: grid; gap: 6px; font-size: 14.5px; color: var(--dim); }
-    .opts label { cursor: pointer; }
-    .hint { font-size: 13px; color: var(--faint); margin: 6px 0 0; }
-    #libstat { font-size: 13px; color: var(--faint); margin: 8px 0 0; }
-    .plan { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 8px; }
-    .plan .empty { font-size: 14px; color: var(--faint); }
-    .chip { border: 1px solid var(--line); border-left-width: 4px; border-radius: 8px; padding: 4px 8px 5px; background: var(--raised); max-width: 100%; }
-    .chip .en { display: block; font-size: 12px; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 260px; }
-    .chip .st { font-weight: 700; color: var(--ink); }
-    .chip select { background: transparent; border: 0; padding: 0; max-width: 260px; font-weight: 700; font-size: 14px; }
-    .chip select option { background: var(--raised); color: var(--ink); }
+    /* translation details (collapsed by default) */
+    .details > summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px;
+                         list-style: none; cursor: pointer; font-size: 16px; font-weight: 600; border-radius: 8px; }
+    .details > summary::-webkit-details-marker { display: none; }
+    .details > summary .chev { transition: transform .15s; color: var(--muted); }
+    .details[open] > summary .chev { transform: rotate(180deg); }
+    .details-body { display: grid; gap: 20px; padding-top: 12px; }
+    .details h3 { font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 8px; }
+    #orig-text { font-size: 15px; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .plan { display: flex; flex-wrap: wrap; gap: 8px; }
+    .plan .empty { font-size: 14px; color: var(--muted); }
+    .chip { border: 1px solid var(--line); border-left-width: 3px; border-radius: 8px; padding: 6px 10px; background: var(--surface); max-width: 100%; }
+    .chip .en { display: block; font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 260px; }
+    .chip .st { font-weight: 600; color: var(--ink); }
+    .chip select { background: transparent; border: 0; padding: 2px 0; max-width: 260px; font-weight: 600; font-size: 14px; min-height: 32px; }
     .chip.sign { border-left-color: var(--ok); } .chip.spell { border-left-color: var(--spell); }
-    .chip.check { border-left-color: var(--warn); } .chip.omit { opacity: .55; }
+    .chip.check { border-left-color: var(--warn); } .chip.omit { opacity: .6; }
     .chip.omit select { text-decoration: line-through; }
     .chip.reviewed .en::after { content: " · chosen by you"; color: var(--ok); }
-    .chip.active { outline: 2px solid var(--ink); outline-offset: 1px; }
-    .legend { display: flex; flex-wrap: wrap; gap: 2px 12px; font-size: 12.5px; color: var(--dim); }
-    .legend i { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 4px; }
-    .legend .sign { background: var(--ok); } .legend .check { background: var(--warn); }
-    .legend .spell { background: var(--spell); } .legend .omit { background: #4a505c; }
-    .glabel { display: block; font-size: 13px; color: var(--dim); margin: 12px 0 4px; }
-    .glossline { width: 100%; font: 13px/1.4 ui-monospace, Menlo, monospace; padding: 8px 10px; background: var(--raised);
-                 color: var(--ink); border: 1px solid var(--line2); border-radius: 8px; }
-    #plan-notes { font-size: 13px; color: #e6c27a; margin-top: 8px; }
-    #plan-notes .summary { color: var(--dim); }
-    #reference { width: 100%; aspect-ratio: 4 / 3; border-radius: 10px; border: 1px solid var(--line); background: #000; display: block; object-fit: contain; }
-    .refnote { font-size: 12.5px; color: var(--faint); margin: 6px 0 0; }
-    #info dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 3px 12px; font-size: 14px; }
-    #info dt { color: var(--dim); } #info dd { margin: 0; overflow-wrap: anywhere; }
-    #info .why { font-size: 13px; color: var(--dim); margin: 8px 0 0; }
-    #alts { display: flex; flex-direction: column; gap: 5px; }
-    #alts button { text-align: left; font-size: 14px; padding: 7px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--raised); }
-    #alts button[aria-current="true"] { border-color: var(--accent); }
-    #alts button[disabled] { opacity: .5; cursor: default; }
-    #alts .none, #tracking .none { font-size: 13px; color: var(--faint); }
+    .chip.active { outline: 2px solid var(--accent); outline-offset: 1px; }
+    #plan-notes { font-size: 13px; color: var(--warn); display: grid; gap: 4px; }
+    #plan-notes:empty { display: none; }
+    #plan-notes .summary { color: var(--muted); }
+    #vocab { display: grid; gap: 16px; }
+    #vocab h4 { margin: 0 0 6px; font-size: 13px; font-weight: 600; }
+    #vocab ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+    #vocab li { font-size: 13px; border: 1px solid var(--line); border-radius: 6px; padding: 2px 8px; background: var(--surface); }
+    #vocab .v-sign h4 { color: var(--ok); } #vocab .v-check h4 { color: var(--warn); } #vocab .v-bad h4 { color: var(--bad); }
+    #vocab .v-omit li { border-style: dashed; color: var(--muted); }
+    #vocab .why, #vocab .none { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+    /* ---- the viewer: the largest thing on the page ---- */
+    .viewer { position: sticky; top: 24px; display: flex; flex-direction: column; min-width: 0; scroll-margin-top: 16px;
+              background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-surface); overflow: hidden; }
+    #warn { margin: 16px 16px 0; padding: 10px 14px; border-radius: var(--r-control); background: var(--bad-soft);
+            color: var(--bad); font-size: 14px; border: 1px solid #FECACA; }
+    #stage { position: relative; height: clamp(320px, calc(100vh - 310px), 780px); }
+    canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+    #status { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+              gap: 16px; padding: 32px; text-align: center; color: var(--muted); font-size: 15px; pointer-events: none; }
+    #status-text { max-width: 44ch; }
+    #status-action { pointer-events: auto; }
+
+    .nowbar { border-top: 1px solid var(--line); padding: 16px 24px; display: flex; align-items: flex-start; gap: 16px; }
+    .now { flex: 1 1 auto; min-width: 0; }
+    .now-line { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+    #word-label { flex: none; font-size: 14px; color: var(--muted); }
+    #word { font-size: 22px; font-weight: 700; letter-spacing: .02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    #sub { margin-top: 2px; font-size: 14px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    #sentence { margin-top: 8px; font-size: 14px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 0 5px;
+                max-height: 3.1em; overflow: hidden; }
+    #sentence:empty { display: none; }
+    #sentence .w.active { color: var(--ink); font-weight: 600; text-decoration: underline; text-decoration-color: var(--accent);
+                          text-decoration-thickness: 2px; text-underline-offset: 4px; }
+    .handkey { flex: none; list-style: none; margin: 4px 0 0; padding: 0; display: grid; gap: 2px; font-size: 12px; color: var(--muted); }
+    .handkey i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; }
+
+    /* playback toolbar */
+    #controls { border-top: 1px solid var(--line); padding: 10px 16px; display: flex; align-items: center; gap: 4px; }
+    .icon-btn { display: grid; place-items: center; width: 44px; height: 44px; flex: none; border: 0; border-radius: var(--r-control);
+                background: transparent; color: var(--ink); transition: background-color .15s; }
+    .icon-btn:hover { background: var(--subtle); }
+    #play { width: 48px; height: 48px; border-radius: 12px; background: var(--accent); color: var(--on-accent); margin: 0 4px; }
+    #play:hover { background: var(--accent-hover); }
+    #scrub { flex: 1 1 auto; min-width: 80px; height: 44px; margin: 0 12px; accent-color: var(--accent); cursor: pointer; }
+    #count { flex: none; min-width: 84px; font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; text-align: right; }
+    #speed { flex: none; min-height: 44px; margin-left: 8px; padding: 0 10px; border: 1px solid var(--field); border-radius: var(--r-control);
+             background: var(--surface); font-size: 14px; font-weight: 600; cursor: pointer; }
+
+    /* full screen: the figure fills the screen, captions and controls stay */
+    .viewer:fullscreen, .viewer:-webkit-full-screen { border: 0; border-radius: 0; height: 100%; }
+    .viewer:fullscreen #stage, .viewer:-webkit-full-screen #stage { flex: 1; height: auto; min-height: 0; }
+
+    /* ---- below the grid: advanced settings + notice ---- */
+    .below { max-width: 1440px; margin: 0 auto; padding: 0 32px 48px; }
+    .actions { display: flex; justify-content: flex-end; border-top: 1px solid var(--line); padding-top: 16px; margin-bottom: 16px; }
+    #advanced { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-bottom: 32px; }
+    .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-surface); padding: 20px; min-width: 0; }
+    .card h3 { font-size: 15px; font-weight: 600; margin: 0 0 12px; }
+    .card.wide { grid-column: 1 / -1; }
+    .opts { display: grid; gap: 4px; font-size: 14px; }
+    .opts label { display: flex; align-items: center; gap: 10px; min-height: 36px; cursor: pointer; }
+    .opts input, .docrow input { width: 18px; height: 18px; accent-color: var(--accent); }
+    #libstat { font-size: 13px; color: var(--muted); margin-top: 12px; }
+    .keys { font-size: 13px; color: var(--muted); margin-top: 8px; }
+    .glabel { display: block; font-size: 14px; color: var(--muted); margin-bottom: 8px; }
+    .glossline { width: 100%; min-height: 44px; font: 14px/1.4 var(--mono); padding: 10px 12px; background: var(--surface);
+                 border: 1px solid var(--field); border-radius: var(--r-control); }
+    #reference { width: 100%; aspect-ratio: 4 / 3; border-radius: 12px; background: #0F172A; display: block; object-fit: contain; }
+    .refnote { font-size: 13px; color: var(--muted); margin-top: 8px; }
+    #info dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; font-size: 14px; }
+    #info dt { color: var(--muted); } #info dd { margin: 0; overflow-wrap: anywhere; }
+    #info .why { font-size: 13px; color: var(--muted); margin-top: 8px; }
+    #alts { display: flex; flex-direction: column; gap: 6px; }
+    #alts button { text-align: left; min-height: 40px; font-size: 14px; padding: 8px 12px; border-radius: 8px;
+                   border: 1px solid var(--line); background: var(--surface); }
+    #alts button[aria-current="true"] { border-color: var(--accent); background: var(--accent-soft); }
+    #alts button[disabled] { cursor: default; }
+    #alts button[disabled]:not([aria-current]) { opacity: .55; }
+    #alts .none, #tracking .none { font-size: 13px; color: var(--muted); }
     #tracking ul { margin: 0; padding-left: 18px; font-size: 14px; }
-    .words { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 6px; }
-    .words button { padding: 7px 6px; font-size: 13px; font-weight: 700; border: 1px solid var(--line); border-radius: 8px;
-                    background: var(--raised); text-transform: uppercase; }
-    .words button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); }
-    .words button.pending { color: var(--faint); border-style: dashed; }
+    .words { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 8px; }
+    .words button { min-height: 40px; padding: 6px; font-size: 13px; font-weight: 600; border: 1px solid var(--line);
+                    border-radius: 8px; background: var(--surface); text-transform: uppercase; }
+    .words button:hover { border-color: var(--field); }
+    .words button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+    .words button.pending { color: var(--muted); border-style: dashed; }
     .words button.flagged::after { content: " ⚠"; color: var(--warn); }
-    .keys { font-size: 13px; color: var(--faint); margin: 0; }
+    .notice { font-size: 13px; color: var(--muted); text-align: center; max-width: 72ch; margin: 0 auto; }
+    .notice button { background: none; border: 0; padding: 0; color: var(--accent); text-decoration: underline; font-size: inherit; }
 
     /* ---- dialogs ---- */
-    dialog { background: var(--surface); color: var(--ink); border: 1px solid var(--line2); border-radius: var(--radius);
-             max-width: 560px; width: calc(100% - 32px); padding: 22px 24px; }
-    dialog::backdrop { background: rgba(0, 0, 0, .6); }
-    dialog h2 { margin: 0 0 10px; font-size: 21px; }
-    dialog ul { padding-left: 20px; } dialog li { margin-bottom: 4px; }
-    dialog form { text-align: right; margin-top: 12px; }
+    dialog { background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: var(--r-surface);
+             max-width: 560px; width: calc(100% - 32px); padding: 24px; box-shadow: 0 12px 32px rgba(15, 23, 42, .12); }
+    dialog::backdrop { background: rgba(15, 23, 42, .4); }
+    dialog h2 { font-size: 20px; margin-bottom: 12px; }
+    dialog p, dialog li { font-size: 15px; color: #374151; }
+    dialog p + p, dialog p + ul { margin-top: 8px; }
+    dialog ul { padding-left: 20px; margin: 8px 0 0; } dialog li { margin-bottom: 6px; }
+    dialog form { text-align: right; margin-top: 16px; }
+    kbd { font: 12px var(--mono); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; padding: 0 5px; background: var(--subtle); }
 
-    @media (max-width: 1000px) {
-        .shell { grid-template-columns: minmax(280px, 340px) minmax(0, 1fr); gap: 14px 16px; }
-    }
-    @media (max-width: 820px) {
-        /* one column: input, avatar, then the document and plan */
-        .shell { grid-template-columns: minmax(0, 1fr); padding-top: 14px;
-                 grid-template-areas: "input" "stage" "doc" "plan"; }
-        #stagecol { position: static; }
-    }
-    @media (max-width: 720px) {
-        .wrap { padding: 0 14px; }
-        .brand small { display: none; }
-        #sentence-go { margin-left: 0; width: 100%; }
-        #advanced { grid-template-columns: 1fr; }
-        #stage { height: 56vh; min-height: 300px; }
-        #controls { gap: 8px; padding: 10px; }
+    /* ---- tablet ---- */
+    @media (max-width: 1100px) {
+        .app { padding: 24px; gap: 24px; grid-template-columns: minmax(300px, 40fr) minmax(0, 60fr); }
+        .below { padding: 0 24px 40px; }
+        .topbar-inner { padding: 0 24px; }
         #count { display: none; }
-        .handkey { font-size: 11px; }
     }
-    @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+    /* ---- phone: one column -- input, then the figure, then everything else ---- */
+    @media (max-width: 860px) {
+        .app { display: flex; flex-direction: column; align-items: stretch; padding: 16px; gap: 24px; }
+        .side { display: contents; }
+        .intro { order: 1; } .viewer { order: 2; position: static; }
+        #docpanel { order: 3; } #seqpanel { order: 4; } #details { order: 5; }
+        #stage { height: clamp(280px, 52vh, 520px); }
+        .intro h1 { font-size: 26px; }
+        .composer-actions { flex-direction: column; }
+        .voice { flex-direction: column; align-items: stretch; text-align: center; }
+        .mic { justify-content: center; }
+        .composer-actions .btn { width: 100%; }
+        .below { padding: 0 16px 32px; }
+        .topbar-inner { padding: 0 16px; }
+        .nowbar { padding: 12px 16px; flex-direction: column; gap: 8px; }
+        .handkey { display: flex; gap: 12px; margin: 0; }
+        #controls { flex-wrap: wrap; padding: 8px; justify-content: space-between; }
+        #scrub { order: 10; flex-basis: 100%; margin: 0 4px; }
+        #speed { margin-left: auto; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        /* decorative transitions only: sign playback is content and keeps running */
+        *, *::before, *::after { transition: none !important; scroll-behavior: auto !important; }
+        .spinner { animation-duration: 2.4s; }
+        .mic.on svg { animation: none; }
+    }
 </style>
 </head>
 <body>
+<a class="skip" href="#sentence-input">Skip to the text box</a>
 
-<header>
-    <div class="wrap">
-        <h1 class="brand"><span class="logo" aria-hidden="true">🤟</span>SignBridge <small>prototype</small></h1>
-        <nav>
-            <button class="link" id="about-open">About</button>
-            <button class="link" id="help-open">Help</button>
+<header class="topbar">
+    <div class="topbar-inner">
+        <div class="brand">
+            <span class="brand-mark" aria-hidden="true"><svg class="i" viewBox="0 0 24 24"><path d="M3.5 17h17M6.5 17v-3.5a5.5 5.5 0 0 1 11 0V17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></span>
+            SignBridge
+        </div>
+        <nav class="nav" aria-label="Information">
+            <button id="help-open">How it works</button>
+            <button id="about-open">About</button>
         </nav>
     </div>
 </header>
 
-<div id="announce" class="sr-only" aria-live="polite" role="status"
-     style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden"></div>
-<main>
-<div class="wrap shell">
-    <section class="hero">
-        <h2>Turn text into sign animation</h2>
-        <p>Type English, or upload a PDF. Recorded Auslan signs play on the figure.</p>
-        <div class="inputcard">
-            <label for="sentence-input" class="sr-only" style="position:absolute;left:-9999px">English text</label>
-            <textarea id="sentence-input" rows="1" placeholder="Type something here… e.g. Please pay your bill tomorrow"
-                      autocomplete="off" enterkeyhint="go"></textarea>
-            <div class="inputrow">
-                <button class="btn" id="upload-pdf">📄 Upload PDF</button>
-                <button id="sentence-go" class="btn primary big">▶ Translate &amp; Play</button>
+<div id="announce" class="sr-only" aria-live="polite" role="status"></div>
+<main class="app">
+    <div class="side">
+        <section class="intro" aria-labelledby="title">
+            <h1 id="title">Translate to Auslan</h1>
+            <p class="lede" id="lede">Speak or type English to see recorded Auslan signs played on a figure.</p>
+            <div class="voice">
+                <button id="mic" class="mic" aria-pressed="false" aria-describedby="live mic-note" title="Speak (M)">
+                    <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    <span id="mic-label">Speak</span></button>
+                <div class="voice-text">
+                    <p id="live" aria-live="polite">Press <strong>Speak</strong> and say a short sentence.</p>
+                    <p id="mic-note">Your browser turns speech into text (Chrome and Edge send the audio to their speech
+                        service). SignBridge does not record or keep audio.</p>
+                </div>
             </div>
-        </div>
-        <div class="examples" id="examples"></div>
-    </section>
+            <div class="composer">
+                <label for="sentence-input" class="or">or type</label>
+                <textarea id="sentence-input" rows="4" placeholder="Type English here…" aria-describedby="lede input-hint"
+                          autocomplete="off" enterkeyhint="go"></textarea>
+                <p id="input-hint" aria-live="polite"></p>
+                <div class="composer-actions">
+                    <button id="sentence-go" class="btn btn-primary" title="Translate (Enter)">
+                        <span class="spinner" aria-hidden="true"></span>Translate</button>
+                    <button id="upload-pdf" class="btn">
+                        <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V4M7.5 8.5 12 4l4.5 4.5M5 20h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        Upload PDF</button>
+                </div>
+            </div>
+            <p class="examples-label" id="examples-label">Try an example</p>
+            <div class="examples" id="examples" role="group" aria-labelledby="examples-label"></div>
+        </section>
 
-    <section id="docpanel" hidden aria-label="Document">
-        <h3>Document</h3>
-        <label class="drop" id="drop">
-            <input type="file" id="pdf-input" accept="application/pdf,.pdf">
-            <strong>Drop a PDF here</strong> or click to choose<br>
-            <span style="font-size:13px">Read in your browser; the file is not uploaded. With the AI switch on,
-                short excerpts are sent to the AI service.</span>
-        </label>
-        <div class="docrow">
-            <button class="btn" id="sample-pdf">Try a sample handbook</button>
-            <label title="Rewrite the key points in plain English with Claude, if this server has it set up. Every number and date is checked against the PDF. Without it, the offline summary is used."><input type="checkbox" id="use-ai" checked> AI plain-English summary</label>
-        </div>
-        <progress id="docprog" max="1" value="0" hidden></progress>
-        <div id="docmsg" aria-live="polite"></div>
-        <div id="docstats"></div>
-        <ol id="points" aria-label="Key points: select one to sign it"></ol>
-    </section>
+        <section id="docpanel" class="panel" hidden aria-labelledby="doc-title">
+            <h2 id="doc-title">Document</h2>
+            <label class="drop" id="drop">
+                <input type="file" id="pdf-input" accept="application/pdf,.pdf">
+                <strong>Drop a PDF here</strong> or choose a file
+                <span class="note">Read in your browser; the file is not uploaded. With the AI summary on,
+                    short excerpts are sent to the AI service.</span>
+            </label>
+            <div class="docrow">
+                <button class="btn" id="sample-pdf">Try a sample handbook</button>
+                <label title="Rewrite the key points in plain English with Claude, if this server has it set up. Every number and date is checked against the PDF. Without it, the offline summary is used."><input type="checkbox" id="use-ai" checked> AI plain-English summary</label>
+            </div>
+            <progress id="docprog" max="1" value="0" hidden></progress>
+            <div id="docmsg" aria-live="polite"></div>
+            <div id="docstats"></div>
+            <ol id="points" aria-label="Key points: select one to sign it"></ol>
+        </section>
 
-    <section id="planpanel" aria-label="Translation plan">
-        <h3>Translation plan <span class="tag">rule-based · editable</span></h3>
-        <div id="plan" class="plan" aria-live="polite"><span class="empty">Type something above, or pick an example.</span></div>
-        <div class="legend"><span><i class="sign"></i>✓ Sign</span><span><i class="check"></i>⚠ Check</span>
-            <span><i class="spell"></i>✋ Fingerspelled</span><span><i class="omit"></i>— Omitted</span></div>
-        <p class="hint">✓ means the motion data passed automated checks, not that a signer verified it. Use a step's menu to change it.</p>
-        <div id="plan-notes" aria-live="polite"></div>
-        <div id="vocab" aria-label="Vocabulary in this sentence"></div>
-    </section>
+        <section id="seqpanel" class="panel" hidden aria-labelledby="seq-title">
+            <div class="panel-head">
+                <h2 id="seq-title">Sign sequence</h2>
+                <span class="muted" id="seq-count"></span>
+            </div>
+            <div id="steps" role="group" aria-label="Signs in this text: select one to jump to it"></div>
+            <ul class="legend" aria-label="What the markers mean">
+                <li><b class="sign" aria-hidden="true">✓</b>Available sign</li>
+                <li><b class="spell" aria-hidden="true">ABC</b>Fingerspelled</li>
+                <li><b class="check" aria-hidden="true">⚠</b>Needs review</li>
+                <li><b class="bad" aria-hidden="true">✕</b>Unavailable</li>
+            </ul>
+        </section>
 
-    <section id="stagecol" aria-label="Signing avatar">
-        <div id="captionbar">
-            <div id="word">—</div>
-            <div id="sub">select a sign</div>
-        </div>
+        <details id="details" class="panel details" hidden>
+            <summary>Translation details
+                <svg class="i chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+            <div class="details-body">
+                <div>
+                    <h3>Original text</h3>
+                    <p id="orig-text"></p>
+                </div>
+                <div>
+                    <h3>Step-by-step plan</h3>
+                    <div id="plan" class="plan" aria-live="polite"><span class="empty">Type something above, or pick an example.</span></div>
+                    <p class="hint">Rule-based and editable: change any step with its menu and the sequence replays with your choice.</p>
+                </div>
+                <div id="plan-notes" aria-live="polite"></div>
+                <div id="vocab" aria-label="Words in this text"></div>
+                <p class="hint">“Available sign” means the recorded motion passed automated tracking checks. It does not mean
+                    a fluent Auslan signer has reviewed it.</p>
+            </div>
+        </details>
+    </div>
+
+    <section id="stagecol" class="viewer" aria-label="Signing avatar">
         <div id="warn" role="alert" hidden></div>
         <div id="stage">
             <canvas id="canvas" role="img" aria-label="Figure signing the current sign"></canvas>
-            <div id="status" role="status">loading the sign library…</div>
-            <div class="handkey" aria-hidden="true"><span><i style="background:var(--right)"></i>signer's right hand</span>
-                <span><i style="background:var(--left)"></i>signer's left hand</span></div>
+            <div id="status" role="status"><p id="status-text">Loading the sign library…</p>
+                <button id="status-action" class="btn" hidden></button></div>
         </div>
-        <div id="sentence"></div>
-        <div id="steps" role="group" aria-label="Signs in this sentence: select one to jump to it"></div>
-        <div id="controls" aria-label="Playback">
-            <button id="prev" class="btn" aria-label="previous sign" title="previous sign (←)">⏮</button>
-            <button id="play" class="btn primary" title="play / pause (Space)">▶ Play</button>
-            <button id="next" class="btn" aria-label="next sign" title="next sign (→)">⏭</button>
-            <button id="replay" class="btn" title="replay from the start (Home)">↻ Replay</button>
+        <div class="nowbar">
+            <div class="now">
+                <p class="now-line"><span id="word-label">Nothing playing yet</span> <span id="word"></span></p>
+                <p id="sub"></p>
+                <div id="sentence"></div>
+            </div>
+            <ul class="handkey" aria-label="Hand colours">
+                <li><i style="background:var(--fig-right)"></i>Signer's right hand</li>
+                <li><i style="background:var(--fig-left)"></i>Signer's left hand</li>
+            </ul>
+        </div>
+        <div id="controls" role="group" aria-label="Playback controls">
+            <button id="prev" class="icon-btn" aria-label="previous sign" title="Previous sign (←)">
+                <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h2v14H6zM19 5.6v12.8L9.4 12z" fill="currentColor"/></svg></button>
+            <button id="play" class="icon-btn" aria-label="Play" title="Play (Space)">
+                <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg></button>
+            <button id="next" class="icon-btn" aria-label="next sign" title="Next sign (→)">
+                <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 5h2v14h-2zM5 5.6v12.8l9.6-6.4z" fill="currentColor"/></svg></button>
+            <button id="replay" class="icon-btn" aria-label="Restart" title="Restart (Home)">
+                <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3M4.5 4.5v4h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
             <input type="range" id="scrub" min="0" max="0" value="0" step="1" aria-label="position in the sentence">
-            <select id="speed" aria-label="playback speed">
+            <span id="count" aria-hidden="true">0.0 / 0.0s</span>
+            <select id="speed" aria-label="playback speed" title="Playback speed">
                 <option value="0.5">0.5×</option><option value="0.75">0.75×</option>
                 <option value="1" selected>1×</option><option value="1.25">1.25×</option><option value="1.5">1.5×</option>
             </select>
-            <label class="toggle"><input type="checkbox" id="loop" checked> loop</label>
-            <button id="fullscreen" class="btn" aria-label="full screen" title="full screen (F)">⛶</button>
-            <span id="count" aria-live="off">—</span>
+            <button id="fullscreen" class="icon-btn" aria-label="full screen" title="Full screen (F)">
+                <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         </div>
     </section>
-</div>
+</main>
 
-<div class="wrap">
+<div class="below">
     <div class="actions">
-        <span class="legend" aria-label="what the tiles mean"><span>✓ signed</span><span>⚠ check: best guess</span><span>ABC fingerspelled</span></span>
-        <button class="btn" id="adv-toggle" aria-expanded="false" aria-controls="advanced">⚙ Advanced settings</button>
+        <button class="btn btn-quiet" id="adv-toggle" aria-expanded="false" aria-controls="advanced">Advanced settings</button>
     </div>
 
     <section id="advanced" hidden aria-label="Advanced settings">
@@ -331,24 +467,27 @@
             <h3>Options</h3>
             <div class="opts">
                 <label title="Time words first; wh-word last in a question. Common Auslan patterns, applied mechanically -- not a grammar.">
-                    <input type="checkbox" id="order" checked> simplified Auslan word order</label>
+                    <input type="checkbox" id="order" checked> Simplified Auslan word order</label>
                 <label title="Cut each clip's leading/trailing rest pose so signs flow into each other.">
-                    <input type="checkbox" id="trim" checked> trim rest between signs</label>
+                    <input type="checkbox" id="trim" checked> Trim rest between signs</label>
                 <label title="Inside a fingerspelled word, play only each letter's held handshape (max 0.9 s) instead of the whole recording with its rise and fall. H and J keep their full recording: they involve movement.">
-                    <input type="checkbox" id="compact" checked> compact fingerspelling</label>
+                    <input type="checkbox" id="compact" checked> Compact fingerspelling</label>
                 <label title="Remove single-frame tracking spikes (3-frame median). Off = the raw MediaPipe data.">
-                    <input type="checkbox" id="despike" checked> remove tracking spikes</label>
+                    <input type="checkbox" id="despike" checked> Remove tracking spikes</label>
                 <label title="Draw the face (eyebrows, eyes, lips) from the recording. Off: a plain head outline.">
-                    <input type="checkbox" id="face"> show face</label>
+                    <input type="checkbox" id="face"> Show face</label>
+                <label title="Start again from the beginning when the sequence ends.">
+                    <input type="checkbox" id="loop" checked> Loop playback</label>
             </div>
             <p id="libstat" aria-live="polite">loading…</p>
-            <p class="keys">Keys: Space play/pause · ← → previous/next sign · Home replay · F full screen</p>
+            <p class="keys">Keys: <kbd>M</kbd> speak · <kbd>Space</kbd> play/pause · <kbd>←</kbd> <kbd>→</kbd> previous/next sign ·
+                <kbd>Home</kbd> restart · <kbd>F</kbd> full screen</p>
         </div>
         <div class="card">
             <h3>Source recording</h3>
             <section>
-                <video id="reference" muted playsinline preload="auto" aria-label="Original corpus video of the current sign"></video>
-                <p class="refnote" id="refnote">The corpus video the motion was extracted from, kept in step with the avatar.</p>
+                <video id="reference" muted playsinline preload="auto" aria-label="Original video of the current sign"></video>
+                <p class="refnote" id="refnote">The recording the motion was extracted from, kept in step with the figure.</p>
             </section>
         </div>
         <div class="card wide">
@@ -363,7 +502,7 @@
         <div class="card">
             <h3>Alternatives</h3>
             <div id="alts"><span class="none">—</span></div>
-            <h3 style="margin-top:14px">Tracking</h3>
+            <h3 style="margin-top:16px">Tracking</h3>
             <div id="tracking"><span class="none">—</span></div>
         </div>
         <div class="card">
@@ -379,34 +518,44 @@
     <p class="notice">Prototype: signs are chosen automatically, some words are fingerspelled, and sign order and
         meaning may be imperfect. Not checked by a fluent Auslan signer. <button id="about-link">Learn more</button></p>
 </div>
-</main>
 
 <dialog id="about" aria-labelledby="about-title">
     <h2 id="about-title">About SignBridge</h2>
-    <p>SignBridge turns English text, typed or from a PDF, into a sequence of recorded Auslan signs played on a 2D figure.
-        The motion comes from 3,215 recorded dictionary signs, tracked with MediaPipe.</p>
-    <p><strong>It is not an Auslan translator.</strong></p>
+    <p>SignBridge turns English, spoken, typed or from a PDF, into a sequence of recorded Auslan signs played on a 2D figure.
+        The motion comes from about 3,300 recorded signs (a dictionary corpus and Auslan Signbank), tracked with MediaPipe.</p>
+    <p><strong>It is not an Auslan translator</strong> and does not replace a qualified Auslan interpreter. Auslan is a
+        language of its own, with its own grammar; it is not English on the hands.</p>
     <ul>
         <li>Signs are chosen automatically, word by word, with a few simple ordering rules. Auslan grammar
             (use of space, facial grammar, classifiers) is not modelled.</li>
-        <li>Words without a usable sign are fingerspelled. ⚠ marks a best guess among several meanings.</li>
-        <li>Sign order and meaning may be imperfect.</li>
+        <li>Words without a usable recorded sign are fingerspelled. Fingerspelling is a fallback, not the natural sign.</li>
+        <li>“Needs review” marks a best guess among several meanings, or motion tracking flagged by automated checks.</li>
         <li>Nothing here has been verified by a fluent Auslan signer or Deaf community members.</li>
+        <li>Sources: about 3,200 signs from a recorded Auslan dictionary corpus, and 89 from
+            <a href="https://auslan.org.au" target="_blank" rel="noopener">Auslan Signbank</a> (CC BY-NC-ND 4.0, non-commercial;
+            each sign's Signbank page is kept for attribution). Fingerspelling letters A–Z partly from Signbank.</li>
+        <li>Voice input uses your browser's own speech recognition. SignBridge does not record, store or upload audio,
+            but Chrome and Edge send it to their speech service to turn it into text.</li>
     </ul>
-    <form method="dialog"><button class="btn primary">Close</button></form>
+    <form method="dialog"><button class="btn btn-primary">Close</button></form>
 </dialog>
 <dialog id="help" aria-labelledby="help-title">
-    <h2 id="help-title">How to use it</h2>
+    <h2 id="help-title">How it works</h2>
     <ul>
-        <li>Type a sentence and press <strong>Translate &amp; Play</strong> (or Enter).</li>
-        <li>The tiles under the figure show each sign: <strong>✓</strong> signed, <strong>⚠</strong> best guess,
-            <strong>ABC</strong> fingerspelled. Select a tile to jump to it.</li>
+        <li>Press <strong>Speak</strong> (or <kbd>M</kbd>) and say a short English sentence. When you stop, the words
+            appear as text and the signs play. Press again or <kbd>Esc</kbd> to stop early. Works in Chrome, Edge and Safari.</li>
+        <li>Or type text and press <strong>Translate</strong> (or <kbd>Enter</kbd>; <kbd>Shift</kbd>+<kbd>Enter</kbd> adds a line).</li>
+        <li>The figure plays each sign in turn. Below it you can see the sign being shown, and the matching English words.</li>
+        <li>The <strong>sign sequence</strong> lists every sign: <strong>✓</strong> available sign, <strong>ABC</strong>
+            fingerspelled because no recorded sign is available, <strong>⚠</strong> needs review, <strong>✕</strong> unavailable.
+            Select one to jump to it.</li>
         <li><strong>Upload PDF</strong> to get the document's key points; select a point to sign it.</li>
-        <li>Keys: <strong>Space</strong> play/pause, <strong>← →</strong> previous/next sign, <strong>Home</strong> replay.</li>
-        <li><strong>Advanced settings</strong> shows the sign plan (and lets you change any sign), the source
-            recording, and tracking details.</li>
+        <li>Keys: <kbd>M</kbd> speak, <kbd>Space</kbd> play/pause, <kbd>←</kbd> <kbd>→</kbd> previous/next sign, <kbd>Home</kbd> restart,
+            <kbd>F</kbd> full screen.</li>
+        <li><strong>Translation details</strong> shows how each word was handled and lets you change it.
+            <strong>Advanced settings</strong> has the source recording, the gloss line and playback options.</li>
     </ul>
-    <form method="dialog"><button class="btn primary">Close</button></form>
+    <form method="dialog"><button class="btn btn-primary">Close</button></form>
 </dialog>
 
 <script type="module">
@@ -431,10 +580,17 @@ import { Player, stepSpans } from "./src/player.js";
 import { createRenderer, computeLayout } from "./src/renderer.js";
 import { readPdf } from "./src/document.js";
 import { summarize, checkPoint } from "./src/summarize.js";
+import { Listener, asSentence } from "./src/speech.js";
 
 const $ = id => document.getElementById(id);
 const canvas = $("canvas");
 const renderer = createRenderer(canvas);     // drawing only (src/renderer.js)
+// the figure's colours are the page's --fig-* tokens, so the drawing and the hand legend match
+{
+    const css = getComputedStyle(document.documentElement), v = name => css.getPropertyValue(name).trim();
+    renderer.setTheme({ body: v("--fig-body"), fill: v("--fig-fill"), right: v("--fig-right"), left: v("--fig-left"),
+                        head: v("--fig-head"), face: v("--fig-face"), lips: v("--fig-lips") });
+}
 const video = $("reference");
 const ASSET_BASE = (document.querySelector('meta[name="asset-base"]')?.content || ".").replace(/\/$/, "");
 // the reference video is OPTIONAL: the figure plays from motion data alone.
@@ -443,11 +599,11 @@ const ASSET_BASE = (document.querySelector('meta[name="asset-base"]')?.content |
 let videoFailed = null;
 video.addEventListener("error", () => {
     videoFailed = video.getAttribute("src");
-    $("refnote").textContent = "Source video unavailable. The avatar plays from motion data only.";
+    $("refnote").textContent = "Source video unavailable. The figure plays from motion data only.";
     player.markDirty();
 });
 video.addEventListener("loadeddata", () => {
-    $("refnote").textContent = "The corpus video the motion was extracted from, kept in step with the avatar.";
+    $("refnote").textContent = "The recording the motion was extracted from, kept in step with the figure.";
 });
 const wordEl = $("word");
 const subEl = $("sub");
@@ -455,9 +611,15 @@ const scrub = $("scrub");
 const countEl = $("count");
 const loopEl = $("loop");
 const playBtn = $("play");
+const ICON = {
+    play: '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg>',
+    pause: '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" fill="currentColor"/></svg>',
+};
 // ONE clock for the figure, captions, scrubber, tiles and video (src/player.js)
 const player = new Player({ onState: on => {
-    playBtn.textContent = on ? "❚❚ Pause" : "▶ Play";
+    playBtn.innerHTML = on ? ICON.pause : ICON.play;
+    playBtn.setAttribute("aria-label", on ? "Pause" : "Play");
+    playBtn.title = on ? "Pause (Space)" : "Play (Space)";
     if (on) videoClip = -1;                  // force a video re-sync
     else video.pause();
 } });
@@ -474,17 +636,28 @@ let scrubStep = 1;         // ms of timeline per pixel of slider: smaller moves 
 function setText(el, text) {
     if (el.textContent !== text) el.textContent = text;
 }
-// a message over the stage (loading, nothing to show, errors); null hides it
-function setStatus(text) {
+// a message over the stage (loading, nothing to show, errors); null hides it.
+// `action` ({label, run}) adds the obvious next step, e.g. "Try again".
+function setStatus(text, action = null) {
     const el = $("status");
     el.hidden = !text;
-    if (text) el.textContent = text;
+    if (!text) return;
+    $("status-text").textContent = text;
+    const b = $("status-action");
+    b.hidden = !action;
+    if (action) { b.textContent = action.label; b.onclick = action.run; }
 }
-const EXAMPLES = ["I love Australia.", "My name is Sabin.", "Welcome to the university.",
-                  "The examination starts tomorrow.", "Thank you for helping me.", "Please pay your bill tomorrow."];
+const EXAMPLES = ["Hello, how are you?", "Thank you for helping me.", "Welcome to Australia."];
 let libOpts = null;        // what the Library was built from (rebuilt by the spike switch)
 let stepTimes = [];        // [{n, t0, t1}] per plan step on the current timeline
+let failedSteps = new Set();   // plan steps whose motion could not be loaded ("unavailable")
 let buildSeq = 0, videoClip = -1, activeStep = -1;
+
+// The Translate button shows a spinner only when loading is noticeable
+function setBusy(on) {
+    $("sentence-go").setAttribute("aria-busy", String(on));
+}
+function inputHint(text) { setText($("input-hint"), text || ""); }
 
 // ======================================================
 // FINGERSPELLING PROGRESS
@@ -588,32 +761,42 @@ async function clipsFor(step) {
 async function playPlan(p) {
     const seq = ++buildSeq;
     currentPlan = p;
+    failedSteps = new Set();
     renderPlan();
     pause();
-    subEl.textContent = "loading…";
+    subEl.textContent = "Loading…";
     const toLoad = p.steps.filter(s => s.kind !== "omit").length;
     // only say so if loading is noticeable (cached signs resolve at once)
-    const slow = setTimeout(() => { if (seq === buildSeq) setStatus(`loading ${toLoad} sign${toLoad === 1 ? "" : "s"}…`); }, 150);
+    const slow = setTimeout(() => {
+        if (seq !== buildSeq) return;
+        setBusy(true);
+        setStatus(`Loading ${toLoad} sign${toLoad === 1 ? "" : "s"}…`);
+    }, 150);
     const results = await Promise.allSettled(p.steps.map(clipsFor));
     clearTimeout(slow);
     if (seq !== buildSeq) return;            // superseded by a newer request
+    setBusy(false);
     const clips = [], failed = [];
     results.forEach((r, i) => r.status === "fulfilled" ? clips.push(...r.value)
                                                        : failed.push(p.steps[i]));
+    failedSteps = new Set(failed.map(s => s.n));
     if (failed.length) {
         addNote(`could not load: ${failed.map(s => s.gloss || s.en).join(", ")}`);
+        renderVocab(p);
     }
     if (!clips.length) {
         tl = null;
         player.clear();
         renderer.clear();
-        wordEl.textContent = "—";
-        subEl.textContent = "nothing to sign";
-        countEl.textContent = "—";
+        setText($("word-label"), "Nothing playing");
+        wordEl.textContent = "";
+        subEl.textContent = "Nothing to sign";
+        countEl.textContent = "0.0 / 0.0s";
         stepTimes = []; renderSteps(); showStepInfo(null);
-        setStatus(failed.length ? "These signs could not be loaded. Check that the server is running and " +
-                                  "assets/signs/motion/ is present, then try again."
-                                : "Nothing to sign: every word was omitted. Try another sentence.");
+        setStatus(failed.length ? "These signs could not be loaded. Check your connection and that the server " +
+                                  "is running, then try again."
+                                : "Nothing to sign: every word was left out. Try another sentence.",
+                  failed.length ? { label: "Try again", run: () => playPlan(currentPlan) } : null);
         return;
     }
     setStatus(null);
@@ -713,9 +896,11 @@ function caption(s) {
     if (unreliable) setText(warn, `⚠ Unreliable tracking: this sign's motion data failed automated ` +
         `checks (${(step.flags || []).join(", ")}). Shown only because it was chosen from the menu.`);
 
+    const label = $("word-label");
     if (c.kind === "phrase") {
         const m = c.motion;
         if (s.local === null) return;
+        setText(label, "Fingerspelling");
         if (m.words) drawSentenceProgress(m.words, m.letters, s.local);
         else {
             setText(wordEl, c.label);
@@ -724,13 +909,15 @@ function caption(s) {
         return;
     }
     if (step.kind === "sign") {
+        setText(label, "Currently showing");
         setText(wordEl, step.gloss);
-        // plain words here; the full reasoning is in Advanced -> Current sign
-        const notes = [step.uncertain ? "⚠ Best guess: one of several possible signs"
-                       : step.status ? "⚠ Sign · motion tracking flagged for review" : "✓ Sign"];
+        // plain words here; the full reasoning is in Translation details
+        const notes = [step.uncertain ? "⚠ Needs review: best guess among several possible signs"
+                       : step.status ? "⚠ Needs review: motion tracking flagged by automated checks" : "✓ Recorded sign"];
         if (step.en && step.en.toLowerCase() !== step.gloss.toLowerCase()) notes.push(`for “${step.en}”`);
         setText(subEl, notes.join(" "));
     } else if (step.kind === "spell") {
+        setText(label, "Fingerspelling");
         setText(wordEl, step.letters.join(""));
         setText(subEl, `${stateText(step)} (${SPELL_SHORT[step.reason] || "no sign available"}): ` + step.letters
             .map((l, i) => i === c.li ? l : l.toLowerCase()).join(" – "));
@@ -741,10 +928,18 @@ function setActiveStep(n) {
     activeStep = n;
     for (const chip of document.querySelectorAll("#plan .chip"))
         chip.classList.toggle("active", +chip.dataset.n === n);
-    for (const b of document.querySelectorAll("#steps button")) {
+    const bar = $("steps");
+    for (const b of bar.querySelectorAll("button")) {
         const on = +b.dataset.n === n;
         b.classList.toggle("active", on);
         if (on) b.setAttribute("aria-current", "step"); else b.removeAttribute("aria-current");
+        // keep the active tile in view inside the (scrollable) sequence -- by
+        // moving the list only, never the page, which may be scrolled elsewhere
+        if (on && bar.scrollHeight > bar.clientHeight) {
+            const top = b.offsetTop, bottom = top + b.offsetHeight;
+            if (top < bar.scrollTop) bar.scrollTop = top - 4;
+            else if (bottom > bar.scrollTop + bar.clientHeight) bar.scrollTop = bottom - bar.clientHeight + 4;
+        }
     }
     const step = currentPlan.steps[n];
     showStepInfo(step);
@@ -754,16 +949,25 @@ function setActiveStep(n) {
                  (stepTimes.length ? `, ${pos} of ${stepTimes.length}` : "") + (step.uncertain ? ", best guess" : "");
     $("announce").textContent = said;
     scrub.setAttribute("aria-valuetext", said);
+    canvas.setAttribute("aria-label", `Figure ${said.charAt(0).toLowerCase()}${said.slice(1)}`);
     const el = $("sentence");
     if (currentPlan.tokens && currentPlan.tokens.length) {
         el.innerHTML = "";
         el.dataset.key = "";
-        currentPlan.tokens.forEach((t, i) => {
+        // long text: a window of words around the active one, so the current
+        // word is always on screen without the caption growing
+        const toks = currentPlan.tokens, at = step.src && step.src.length ? step.src[0] : 0;
+        const from = toks.length > 14 ? Math.max(0, Math.min(at - 6, toks.length - 14)) : 0;
+        const to = Math.min(toks.length, from + 14);
+        if (from > 0) el.appendChild(Object.assign(document.createElement("span"), { textContent: "…" }));
+        toks.slice(from, to).forEach((t, k) => {
+            const i = from + k;
             const w = document.createElement("span");
             w.className = "w" + (step.src && step.src.includes(i) ? " active" : "");
             w.textContent = t;
             el.appendChild(w);
         });
+        if (to < toks.length) el.appendChild(Object.assign(document.createElement("span"), { textContent: "…" }));
     } else if (step.kind !== "phrase") {
         el.innerHTML = "";
         el.dataset.key = "";
@@ -788,10 +992,10 @@ function setActiveStep(n) {
 // One indicator for every step, with icon AND text (never colour alone).
 // "Sign" means AUTOMATED checks passed -- not that a signer verified it.
 const STATES = {
-    sign:  { icon: "✓", label: "Sign", note: "automated checks passed" },
-    check: { icon: "⚠", label: "Check", note: "review required" },
-    spell: { icon: "✋", label: "Fingerspelled", note: "no usable sign available" },
-    omit:  { icon: "—", label: "Omitted", note: "omitted by the current planner" },
+    sign:  { icon: "✓", label: "Available sign", note: "recorded sign; automated tracking checks passed" },
+    check: { icon: "⚠", label: "Needs review", note: "best guess, or tracking flagged" },
+    spell: { icon: "✋", label: "Fingerspelled", note: "no usable recorded sign" },
+    omit:  { icon: "—", label: "Left out", note: "left out by the current planner" },
 };
 function stateOf(step) {
     if (step.kind === "omit") return "omit";
@@ -823,26 +1027,45 @@ function detailOf(step) {
     return d.join(" · ");
 }
 
-// ---- the step strip under the stage: one segment per step, sized by time
+// ---- the sign sequence (left column): one tile per step, in plan order.
+// A tile jumps to its sign; a step whose motion could not be loaded is shown
+// as "unavailable" (not a button: there is nothing to jump to).
 function renderSteps() {
     const bar = $("steps");
     bar.innerHTML = "";
-    if (!tl || !stepTimes.length) return;
-    for (const seg of stepTimes) {
-        const step = tl.plan.steps[seg.n];
+    const plan = tl ? tl.plan : currentPlan;
+    const segs = new Map(stepTimes.map(s => [s.n, s]));
+    let tiles = 0;
+    for (const step of plan ? plan.steps : []) {
+        const seg = segs.get(step.n);
+        if (!seg && !failedSteps.has(step.n)) continue;          // left-out words have no tile
+        const label = step.kind === "sign" ? step.gloss : step.kind === "spell" ? step.letters.join("")
+                    : step.kind === "phrase" ? (step.en || "").toUpperCase() : (step.en || "");
+        tiles++;
+        if (!seg) {
+            const span = document.createElement("span");
+            span.className = "tile unavailable";
+            span.title = `${label}: could not be loaded`;
+            span.append(Object.assign(document.createElement("span"), { className: "lbl", textContent: label }),
+                        Object.assign(document.createElement("span"), { className: "ico", textContent: "✕" }),
+                        Object.assign(document.createElement("span"), { className: "sr-only", textContent: ", unavailable" }));
+            bar.appendChild(span);
+            continue;
+        }
+        const st = stateOf(step);
         const b = document.createElement("button");
         b.dataset.n = seg.n;
-        b.className = stateOf(step);
-        const label = step.kind === "sign" ? step.gloss : step.kind === "spell" ? step.letters.join("") : (step.en || "");
-        const st = stateOf(step);
+        b.className = `tile ${st}`;
         b.append(Object.assign(document.createElement("span"), { className: "lbl", textContent: label }),
                  Object.assign(document.createElement("span"), { className: "ico", "ariaHidden": "true",
                      textContent: st === "sign" ? "✓" : st === "check" ? "⚠" : "ABC" }));
-        b.title = `${stateText(step)} · ${label} — ${detailOf(step)}`;
+        b.title = `${STATES[st].label} · ${label} — ${detailOf(step)}`;
         b.setAttribute("aria-label", `jump to ${label}, ${STATES[st].label}`);
         b.addEventListener("click", () => jumpTo(seg.t0));
         bar.appendChild(b);
     }
+    $("seqpanel").hidden = !tiles;
+    setText($("seq-count"), tiles ? `${tiles} sign${tiles === 1 ? "" : "s"}` : "");
 }
 
 // ---- the right-hand panel: what is playing, what else it could be
@@ -909,6 +1132,8 @@ function chipClass(step) {
 
 function renderPlan() {
     const p = currentPlan;
+    $("details").hidden = false;
+    $("orig-text").textContent = p.text || "—";
     const el = $("plan");
     el.innerHTML = "";
     for (const step of p.steps) {
@@ -961,8 +1186,8 @@ function renderPlan() {
     const notes = $("plan-notes");
     notes.innerHTML = "";
     const n = k => p.steps.filter(s => stateOf(s) === k).length;
-    const summary = [`✓ ${n("sign")} signed`, `⚠ ${n("check")} to check`,
-                     `✋ ${n("spell")} fingerspelled`, `— ${n("omit")} omitted`];
+    const summary = [`✓ ${n("sign")} available`, `⚠ ${n("check")} needs review`,
+                     `✋ ${n("spell")} fingerspelled`, `— ${n("omit")} left out`];
     if (!hasPhrase) addNote(summary.join(" · "), "summary");
     for (const s of p.notes || []) addNote(s);
     const pending = p.steps.filter(s => s.pending);
@@ -991,17 +1216,19 @@ function renderVocab(p) {
         box.appendChild(d);
     };
     const uniq = a => [...new Set(a)];
-    const signs = p.steps.filter(s => s.kind === "sign");
-    group("v-sign", "Signs available", uniq(signs.filter(s => !s.uncertain && !s.status).map(s => s.gloss)));
-    group("v-check", "Signs to check (best guess or tracking flagged)",
+    const loaded = s => !failedSteps.has(s.n);
+    const signs = p.steps.filter(s => s.kind === "sign" && loaded(s));
+    group("v-sign", "Available recorded signs", uniq(signs.filter(s => !s.uncertain && !s.status).map(s => s.gloss)));
+    group("v-check", "Needs review (best guess, or tracking flagged)",
           uniq(signs.filter(s => s.uncertain || s.status).map(s => `⚠ ${s.gloss}` + (s.en && s.en.toLowerCase() !== s.gloss.toLowerCase() ? ` ← ${s.en}` : ""))));
-    const spelled = p.steps.filter(s => s.kind === "spell");
-    group("v-spell", "No sign available, so fingerspelled",
+    const spelled = p.steps.filter(s => s.kind === "spell" && loaded(s));
+    group("v-spell", "Fingerspelled: no recorded sign available",
           uniq(spelled.filter(s => s.reason !== "name" && s.reason !== "requested")
               .map(s => `${(s.en || s.letters.join("")).toLowerCase()} (${SPELL_SHORT[s.reason] || "no sign"})`)));
     group("v-name", "Names, fingerspelled", uniq(spelled.filter(s => s.reason === "name").map(s => s.en || s.letters.join(""))));
+    group("v-bad", "Unavailable: could not be loaded", uniq(p.steps.filter(s => !loaded(s)).map(s => s.gloss || s.en)));
     group("v-omit", "Left out by the current planner", uniq(p.steps.filter(s => s.kind === "omit").map(s => s.en)),
-          "Omitted by these rules; not a claim that Auslan has no sign.");
+          "Left out by these rules; not a claim that Auslan has no sign.");
     if (!box.children.length) box.appendChild(Object.assign(document.createElement("p"), { className: "none", textContent: "Nothing to show yet." }));
 }
 
@@ -1165,11 +1392,16 @@ function clearPressed() {
     for (const b of document.querySelectorAll(".words button")) b.setAttribute("aria-pressed", "false");
 }
 
+let pendingText = null;    // text being prepared right now: a second click is not a second request
 function playTyped() {
     const text = $("sentence-input").value.trim();
-    if (!text || !lib) return;
+    if (!text) { inputHint("Type something to translate first."); return; }
+    inputHint("");
+    if (!lib || text === pendingText) return;
     clearPressed();
-    playPlan(makePlan(text, lib, { auslanOrder: $("order").checked }));
+    pendingText = text;
+    playPlan(makePlan(text, lib, { auslanOrder: $("order").checked }))
+        .finally(() => { if (pendingText === text) pendingText = null; });
     // bring the figure into view if it is below the fold (phones, short screens)
     const r = $("stagecol").getBoundingClientRect();
     if (r.top > innerHeight * 0.45 || r.bottom < 80)
@@ -1218,9 +1450,44 @@ function playQuick(name) {
 }
 
 $("sentence-go").addEventListener("click", playTyped);
+
+// ---- voice: speech -> the same text path as typing ----
+const mic = $("mic");
+function setLive(text, kind = "") {
+    const el = $("live");
+    el.className = kind;
+    el.textContent = text;
+}
+const listener = new Listener({
+    onState: s => {
+        const on = s === "listening";
+        mic.classList.toggle("on", on);
+        mic.setAttribute("aria-pressed", String(on));
+        $("mic-label").textContent = on ? "Listening… press to stop" : "Speak";
+        if (on) setLive("Listening… say a short sentence in English.", "interim");
+    },
+    onInterim: t => setLive(t, "interim"),
+    onFinal: t => {
+        const text = asSentence(t);
+        setLive(`Heard: “${text}”`);
+        $("sentence-input").value = text;
+        playTyped();
+    },
+    onError: (code, msg) => setLive(msg, "error"),
+});
+if (!listener.supported || !window.isSecureContext) {
+    mic.disabled = true;
+    setLive(window.isSecureContext ? "Voice input isn't available in this browser (use Chrome, Edge or Safari). You can type instead."
+                                   : "Voice input needs a secure (https) page. You can type instead.", "error");
+}
+mic.addEventListener("click", () => {
+    if (!lib) { setLive("The sign library is still loading. Try again in a moment.", "error"); return; }
+    listener.toggle();
+});
 $("sentence-input").addEventListener("keydown", e => {
     if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); playTyped(); }   // Shift+Enter: new line
 });
+$("sentence-input").addEventListener("input", () => inputHint(""));
 // header dialogs, the document panel and the advanced drawer
 for (const [btn, dlg] of [["about-open", "about"], ["about-link", "about"], ["help-open", "help"]])
     $(btn).addEventListener("click", () => $(dlg).showModal());
@@ -1229,7 +1496,7 @@ $("adv-toggle").addEventListener("click", () => {
     const open = $("advanced").hidden;
     $("advanced").hidden = !open;
     $("adv-toggle").setAttribute("aria-expanded", String(open));
-    $("adv-toggle").textContent = open ? "⚙ Hide advanced settings" : "⚙ Advanced settings";
+    $("adv-toggle").textContent = open ? "Hide advanced settings" : "Advanced settings";
     if (open) $("advanced").scrollIntoView({ behavior: "smooth", block: "nearest" });
 });
 $("glossline").addEventListener("keydown", e => {
@@ -1286,9 +1553,11 @@ $("speed").addEventListener("change", () => {
 window.addEventListener("keydown", e => {
     // never while typing in a field (a space there must stay a space), and
     // never steal keys a focused control already handles
+    if (e.key === "Escape" && listener.state === "listening") { listener.cancel(); setLive("Stopped. Nothing was translated."); return; }
     if (e.target.closest("input, select, textarea, button, summary") || e.metaKey || e.ctrlKey || e.altKey) return;
     const act = { " ": () => playBtn.click(), ArrowLeft: () => stepBy(-1), ArrowRight: () => stepBy(1),
-                  Home: () => $("replay").click(), f: toggleFullscreen, F: toggleFullscreen }[e.key];
+                  Home: () => $("replay").click(), f: toggleFullscreen, F: toggleFullscreen,
+                  m: () => mic.click(), M: () => mic.click() }[e.key];
     if (!act) return;
     e.preventDefault();
     act();
@@ -1313,6 +1582,7 @@ window.auslan = {
     seek: t => player.seek(t),
     openPdf: f => openPdf(f),
     get points() { return docPoints; },
+    get listening() { return listener.state === "listening"; },
 };
 
 (async function start() {
@@ -1343,7 +1613,7 @@ window.auslan = {
         video.closest("section").hidden = true;
     }
     lib = new Library({ ...libOpts, despike: $("despike").checked });
-    setStatus("Type a sentence or pick an example.");
+    setStatus(listener.supported && window.isSecureContext ? "Press Speak, type a sentence, or pick an example." : "Type a sentence or pick an example.");
     for (const text of EXAMPLES) {
         const b = document.createElement("button");
         b.textContent = text;
@@ -1352,7 +1622,7 @@ window.auslan = {
     }
 
     const c = manifest.counts;
-    $("libstat").textContent = !c ? "" : `${c.available.toLocaleString()} of ${c.signs.toLocaleString()} corpus signs ` +
+    $("libstat").textContent = !c ? "" : `${c.available.toLocaleString()} of ${c.signs.toLocaleString()} recorded signs ` +
           (lib.partial ? "in this web demo" : "extracted") +
           (c.available < c.signs && !lib.partial ? " (extraction in progress — reload for more)" : "") +
           ` · A–Z fingerspelling` +
@@ -1377,7 +1647,7 @@ window.auslan = {
         button.addEventListener("click", () => playQuick(name));
         (signs[name].fingerspell ? fsGrid : grid).appendChild(button);
     }
-    subEl.textContent = "type a sentence, or pick a sign";
+    subEl.textContent = "";
 
     // ?text=... plans and plays a sentence; ?gloss=... plays an exact gloss
     // line (what llm_plan.py prints). Shareable links to a specific sentence.

@@ -66,7 +66,7 @@ msg = J("document.getElementById('status').textContent")
 check("missing library: a helpful message, not a blank page",
       not J("document.getElementById('status').hidden") and "serve.py" in msg, msg[:70])
 load()
-check("ready: the stage invites input", "Type a sentence" in J("document.getElementById('status').textContent"))
+check("ready: the stage invites input", "type a sentence" in J("document.getElementById('status').textContent").lower())
 
 # ---- E2E 1: single sign -------------------------------------------------------
 J("auslan.say('hello')"); wait_playing(); time.sleep(0.4)
@@ -135,7 +135,8 @@ check("blank input: ignored, no error", not J("window.__errs"))
 # ---- E2E 6: rapid switching via the example buttons --------------------------------
 J("[...document.querySelectorAll('#examples button')].forEach(b => b.click())"); wait_playing(); time.sleep(0.6)
 check("E2E rapid switching: the last example wins",
-      J("auslan.plan.text") == "Please pay your bill tomorrow." and J("auslan.timeline.plan === auslan.plan"), J("auslan.plan.text"))
+      J("auslan.plan.text") == J("[...document.querySelectorAll('#examples button')].at(-1).textContent")
+      and J("auslan.timeline.plan === auslan.plan"), J("auslan.plan.text"))
 
 # ---- E2E 7/8/9: pause/resume, speed 1.5, scrub ------------------------------------------
 J("document.getElementById('play').click()"); time.sleep(0.2); tp = J("auslan.t"); time.sleep(0.4)

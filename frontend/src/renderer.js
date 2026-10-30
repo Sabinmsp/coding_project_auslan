@@ -17,7 +17,8 @@ const POSE = {
     L_SHOULDER: 11, R_SHOULDER: 12, L_ELBOW: 13, R_ELBOW: 14,
     L_WRIST: 15, R_WRIST: 16, L_HIP: 23, R_HIP: 24
 };
-const TORSO = [[11, 12], [11, 23], [12, 24], [23, 24]];
+const PALM = [0, 1, 5, 9, 13, 17];          // wrist, thumb base, finger bases
+const TIPS = [4, 8, 12, 16, 20];
 const HAND_LINKS = [
     [0,1],[1,2],[2,3],[3,4],
     [0,5],[5,6],[6,7],[7,8],
@@ -92,18 +93,33 @@ export function project(x, y, layout, W, H) {
 }
 
 
+// Colours only; the page passes its own (index.html --fig-* tokens).
+const DEFAULT_THEME = { body: "#334155", fill: "#E2E8F0", right: "#2563EB", left: "#EA580C",
+                        head: "#FFFFFF", face: "#334155", lips: "#E11D48" };
+
 export function createRenderer(canvas) {
     const ctx = canvas.getContext("2d");
     let faceTopo = null;       // assets/signs/face_topology.json
     let showFace = false;      // face landmarks from the recording, or a plain head outline
+    let theme = { ...DEFAULT_THEME };
 
     function limb(a, b, width, colour) {
         ctx.strokeStyle = colour;
         ctx.lineWidth = width;
-        ctx.lineCap = "round";
         ctx.beginPath();
         ctx.moveTo(a[0], a[1]);
         ctx.lineTo(b[0], b[1]);
+        ctx.stroke();
+    }
+
+    // shoulder -> elbow -> wrist as ONE stroke: the elbow is a round joint,
+    // not two overlapping line ends
+    function arm(points, width, colour) {
+        ctx.strokeStyle = colour;
+        ctx.lineWidth = width;
+        ctx.beginPath();
+        ctx.moveTo(points[0][0], points[0][1]);
+        for (const q of points.slice(1)) ctx.lineTo(q[0], q[1]);
         ctx.stroke();
     }
 
@@ -122,18 +138,23 @@ export function createRenderer(canvas) {
         const p = frame.pose;
         const P = i => project(p[i].x, p[i].y, layout, W, H);
         const unit = Math.min(W, H);
-        const thick = unit * 0.022;
+        // Line widths follow the FIGURE's size on screen (the layout box), not
+        // the canvas's: the figure looks the same in a wide viewer, on a tall
+        // phone and in full screen.
+        const boxScale = Math.min(W / (layout.maxX - layout.minX), H / (layout.maxY - layout.minY));
+        const thick = Math.max(2, (layout.maxY - layout.minY) * boxScale * 0.021);
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
 
         // ---- torso as a filled shape, so the figure reads as a body -----
         const ls = P(POSE.L_SHOULDER), rs = P(POSE.R_SHOULDER);
         const lh = P(POSE.L_HIP), rh = P(POSE.R_HIP);
-        ctx.fillStyle = "rgba(126,232,200,0.13)";
         ctx.beginPath();
         ctx.moveTo(ls[0], ls[1]); ctx.lineTo(rs[0], rs[1]);
         ctx.lineTo(rh[0], rh[1]); ctx.lineTo(lh[0], lh[1]);
-        ctx.closePath(); ctx.fill();
-
-        for (const [a, b] of TORSO) limb(P(a), P(b), thick * 0.8, "#7ee8c8");
+        ctx.closePath();
+        ctx.fillStyle = theme.fill; ctx.fill();
+        ctx.strokeStyle = theme.body; ctx.lineWidth = thick * 0.8; ctx.stroke();
         // The pose model and the hand model each estimate the wrist. Drawing the
         // forearm to one and the hand from the other left a visible gap, so
         // when a hand is present and attached (its wrist within 0.35 shoulder
@@ -147,10 +168,8 @@ export function createRenderer(canvas) {
             return Math.hypot(root[0] - w[0], root[1] - w[1]) <= 0.35 * swPx ? root : w;
         };
         const wristL = wristFor("left_hand", POSE.L_WRIST), wristR = wristFor("right_hand", POSE.R_WRIST);
-        limb(P(POSE.L_SHOULDER), P(POSE.L_ELBOW), thick, "#ff8f6b");
-        limb(P(POSE.L_ELBOW), wristL, thick, "#ff8f6b");
-        limb(P(POSE.R_SHOULDER), P(POSE.R_ELBOW), thick, "#6fb4ff");
-        limb(P(POSE.R_ELBOW), wristR, thick, "#6fb4ff");
+        arm([P(POSE.L_SHOULDER), P(POSE.L_ELBOW), wristL], thick, theme.left);
+        arm([P(POSE.R_SHOULDER), P(POSE.R_ELBOW), wristR], thick, theme.right);
 
         // ---- head ------------------------------------------------------
         const nose = P(POSE.NOSE);
@@ -159,38 +178,54 @@ export function createRenderer(canvas) {
         // sign library, so a head without face landmarks (letters) is the same
         // size as one with them
         const headR = Math.max(unit * 0.02, Math.hypot(nose[0] - neck[0], nose[1] - neck[1]) * 0.49);
-        limb(neck, nose, thick * 0.7, "#7ee8c8");
+        limb(neck, nose, thick * 0.7, theme.body);
         if (frame.face && faceTopo && showFace) {
             drawFace(frame.face, layout, W, H, thick);
         } else {
-            ctx.fillStyle = "#0f1318";
-            ctx.strokeStyle = "#7ee8c8";
+            ctx.fillStyle = theme.head;
+            ctx.strokeStyle = theme.body;
             ctx.lineWidth = thick * 0.55;
             ctx.beginPath();
             ctx.arc(nose[0], nose[1], headR, 0, Math.PI * 2);
             ctx.fill(); ctx.stroke();
         }
 
-        for (const i of [POSE.L_SHOULDER, POSE.R_SHOULDER, POSE.L_ELBOW, POSE.R_ELBOW])
-            dot(P(i), thick * 0.52, "#cfe8ff");
-
         // ---- hands -----------------------------------------------------
-        for (const [key, colour, wristIndex] of
-             [["left_hand", "#ff8f6b", POSE.L_WRIST], ["right_hand", "#6fb4ff", POSE.R_WRIST]]) {
+        // Every finger joint the tracker measured is drawn; the bones are one
+        // path per hand, so joints are round and a translucent (held) hand has
+        // no darker blots where segments overlap. The palm (wrist + the base
+        // of each finger) is tinted so the hand reads as a hand -- a fill
+        // between measured points, adding no position the data does not have.
+        for (const [key, colour, wrist] of [["left_hand", theme.left, wristL], ["right_hand", theme.right, wristR]]) {
             const h = frame[key];
             if (!h || h.length !== 21) {
-                dot(wristIndex === POSE.L_WRIST ? wristL : wristR, thick * 0.6, colour);
+                dot(wrist, thick * 0.6, colour);
                 continue;
             }
-            const Q = i => project(h[i].x, h[i].y, layout, W, H);
+            const q = h.map(lm => project(lm.x, lm.y, layout, W, H));
             // a HELD hand (tracking lost for a moment, see timeline.js) is drawn
             // translucent and without fingertip highlights: visibly not measured
             const held = frame.held && frame.held[key] !== undefined ? frame.held[key] : null;
-            if (held !== null) ctx.globalAlpha = 0.65 * held;
-            for (const [a, b] of HAND_LINKS) limb(Q(a), Q(b), thick * 0.42, colour);
-            for (let i = 0; i < 21; i++) {
-                const tip = (i % 4 === 0 && i > 0) && held === null;
-                dot(Q(i), thick * (tip ? 0.30 : 0.20), tip ? "#ffffff" : colour);
+            const alpha = held !== null ? 0.65 * held : 1;
+            ctx.globalAlpha = alpha * 0.16;
+            ctx.fillStyle = colour;
+            ctx.beginPath();
+            PALM.forEach((i, k) => k ? ctx.lineTo(q[i][0], q[i][1]) : ctx.moveTo(q[i][0], q[i][1]));
+            ctx.closePath(); ctx.fill();
+            ctx.globalAlpha = alpha;
+            ctx.strokeStyle = colour;
+            ctx.lineWidth = thick * 0.42;
+            ctx.beginPath();
+            for (const [a, b] of HAND_LINKS) { ctx.moveTo(q[a][0], q[a][1]); ctx.lineTo(q[b][0], q[b][1]); }
+            ctx.stroke();
+            if (held === null) {
+                // fingertips: a light centre ringed in the hand's colour, easy to follow
+                ctx.lineWidth = thick * 0.16;
+                for (const i of TIPS) {
+                    ctx.beginPath();
+                    ctx.arc(q[i][0], q[i][1], thick * 0.3, 0, Math.PI * 2);
+                    ctx.fillStyle = theme.head; ctx.fill(); ctx.stroke();
+                }
             }
             ctx.globalAlpha = 1;
         }
@@ -203,8 +238,8 @@ export function createRenderer(canvas) {
     // face -- letters and the pre-stitched phrases fall back to the circle.
     function drawFace(face, layout, W, H, thick) {
         const F = i => project(face[i].x, face[i].y, layout, W, H);
-        ctx.fillStyle = "#0f1318";
-        ctx.strokeStyle = "#7ee8c8";
+        ctx.fillStyle = theme.head;
+        ctx.strokeStyle = theme.body;
         ctx.lineWidth = thick * 0.45;
         ctx.beginPath();
         faceTopo.oval_loop.forEach((i, k) => {
@@ -223,11 +258,11 @@ export function createRenderer(canvas) {
             ctx.stroke();
         };
         const parts = faceTopo.parts;
-        lines(parts.left_eyebrow, thick * 0.3, "#e8ecf3");
-        lines(parts.right_eyebrow, thick * 0.3, "#e8ecf3");
-        lines(parts.left_eye, thick * 0.16, "#cfe8ff");
-        lines(parts.right_eye, thick * 0.16, "#cfe8ff");
-        lines(parts.lips, thick * 0.2, "#f2a3b6");
+        lines(parts.left_eyebrow, thick * 0.3, theme.face);
+        lines(parts.right_eyebrow, thick * 0.3, theme.face);
+        lines(parts.left_eye, thick * 0.16, theme.face);
+        lines(parts.right_eye, thick * 0.16, theme.face);
+        lines(parts.lips, thick * 0.2, theme.lips);
     }
 
 
@@ -236,5 +271,7 @@ export function createRenderer(canvas) {
         clear() { ctx.clearRect(0, 0, canvas.width, canvas.height); },
         setFaceTopology(t) { faceTopo = t; },
         setShowFace(v) { showFace = !!v; },
+        // colours only; an empty value keeps the default
+        setTheme(t) { for (const [k, v] of Object.entries(t || {})) if (v) theme[k] = v; },
     };
 }

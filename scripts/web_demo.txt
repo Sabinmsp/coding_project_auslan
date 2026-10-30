@@ -11,6 +11,15 @@ I love Australia.
 Welcome to the university.
 Students must attend classes.
 The examination starts tomorrow.
+# The judging demo (docs/DEMO_SCRIPT.md), spoken and typed:
+I need to see a doctor.
+Nice to meet you.
+I am deaf.
+Welcome to Australia.
+Where is the toilet?
+See you tomorrow.
+Can you help me?
+I don't want to pay the bill tomorrow.
 # The sample handbook (frontend/samples/sample_handbook.pdf):
 Welcome to the university. This handbook explains what you need to know in your first year.
 Please read it carefully and keep it for reference during your studies.

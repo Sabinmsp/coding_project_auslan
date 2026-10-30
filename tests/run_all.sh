@@ -30,6 +30,7 @@ if curl -s -o /dev/null "http://localhost:$PORT/"; then
     run "browser: motion-only playback (all MP4s blocked)" python3 tests/browser/test_motion_only.py "$PORT"
     run "browser: main screen, advanced drawer, keyboard" python3 tests/browser/test_ui.py "$PORT"
     run "browser: stress, rapid input, slow device" python3 tests/browser/test_stress.py "$PORT"
+    run "browser: voice -> transcript -> signs (scripted speech engine)" python3 tests/browser/test_voice.py "$PORT"
 else
     echo "== browser tests SKIPPED: nothing on port $PORT (start: python3 backend/serve.py $PORT)"
 fi

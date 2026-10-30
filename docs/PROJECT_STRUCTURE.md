@@ -24,6 +24,7 @@ auslan-ai-clean/
 ├── frontend/                  THE WEB APP (static; this is what gets deployed)
 │   ├── index.html             page, styles, rendering, playback, PDF flow
 │   ├── src/
+│   │   ├── speech.js          voice -> text (browser Web Speech API; knows nothing about signs)
 │   │   ├── planner.js         English -> sign plan (rules, every step explained)
 │   │   ├── library.js         manifest lookup, lazy loading, cache, normalising, spike removal
 │   │   ├── timeline.js        many clips -> one timeline, transitions, held hands

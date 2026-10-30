@@ -1,15 +1,16 @@
-# SignBridge: an Auslan-supported document assistant (prototype)
+# SignBridge: speak, type or upload English, see recorded Auslan signs (prototype)
 
-Drop in a long PDF (a university handbook, a notice, a bill). The app reads
-it in the browser, picks out the key points with their page numbers, puts
-them in plainer English, and lets you select any point to see it played with
-recorded Auslan signs on a 2D figure, with the source video alongside.
-Words without a sign are fingerspelled and labelled.
+Press **Speak** and say a sentence, type one, or drop in a PDF. Recorded
+Auslan signs play in sequence on a 2D figure. Words without a sign are
+fingerspelled and labelled. For a PDF the app first picks out the key
+points (with page numbers); select a point to sign it.
 
 It is an **accessibility prototype, not an Auslan translator**: signs follow
 a simplified rule-based order, and nothing has been checked by Deaf signers.
 
 ```
+voice ─► browser speech recognition (speech.js, Web Speech API) ─► transcript ─┐
+typed text ────────────────────────────────────────────────────────────────────┤
 PDF ─► text per page (pdf.js, in the browser) ─► key points + pages (offline summariser)
     ─► [optional] plain-English rewrite by Claude, every fact re-checked against the PDF
     ─► select a point ─► sign plan (planner.js) ─► sign library / fingerspelling ─► 2D figure
@@ -27,6 +28,9 @@ python3 backend/serve.py 8003     # http://localhost:8003
 
 Code Fair notes (what changed, test results, limits, deploying):
 [docs/CODE_FAIR_REPORT.md](docs/CODE_FAIR_REPORT.md).
+Judging: [docs/JUDGING_READINESS.md](docs/JUDGING_READINESS.md) (evidence per criterion) and
+[docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md) (the 5 November demo).
+Voice input needs Chrome, Edge or Safari on `https://` or `localhost`.
 
 Needs nothing but Python 3 to view. `?text=I go home tomorrow` in the URL
 plans and plays a sentence; `?gloss=hello fs:SABIN` plays an exact sign
@@ -64,6 +68,7 @@ Run from this folder. `V=../.venv-1/bin/python` below.
 | finish a full run: validate, rescue, re-validate, rebuild `dist/`, write `datasets/processed/final_status.txt` | `caffeinate -i sh scripts/finish_library.sh` |
 | check extraction against the video | `$V scripts/qa_overlay.py hello --random 12 --low` |
 | add videos from a folder (`thank_you.mp4` -> THANK YOU) | `python3 scripts/ingest.py --folder DIR` then `$V scripts/build_library.py` |
+| add the Auslan Signbank signs (`datasets/raw/labels/signbank_signs.json`); re-run after any re-ingest | `python3 scripts/add_signbank_signs.py --build` |
 | extract one video to the original motion format | `$V backend/extract_motion.py clip.mp4 out.json` |
 | run the tests | see below |
 | summarise a PDF's key excerpts with Claude, from the command line | `python3 backend/summarize_llm.py excerpts.json` (needs `pip install anthropic` + `ANTHROPIC_API_KEY`) |
@@ -104,7 +109,9 @@ correct Auslan.
 `datasets/videos/rgb`, labelled by `datasets/raw/labels/Test_ITW.json`.
 **All 3,215 are extracted and playable (2026-10-26)**: 2,543 pass the
 automated checks, 602 are flagged for review and 70 are unreliable (typed
-text fingerspells those). Every other word is fingerspelled from 26 letter clips.
+text fingerspells those). 89 more signs come from Auslan Signbank
+(`scripts/add_signbank_signs.py`), and 5 corpus signs get a Signbank take.
+Every other word is fingerspelled from 26 letter clips.
 Details, including two large unused data sources:
 [docs/DATASET_REPORT.md](docs/DATASET_REPORT.md).
 
@@ -112,8 +119,8 @@ Details, including two large unused data sources:
 
 The sign plan is rule-based and has not been reviewed by an Auslan user.
 The figure cannot add grammatical facial expressions. Many everyday words
-(GOOD, WANT, NAME, PLEASE, SORRY, TODAY...) have no sign in this corpus and
+(GOOD, NAME, PLEASE, SORRY, TODAY...) have no sign in this corpus and
 are fingerspelled. Nothing here has yet been evaluated with Deaf viewers.
-13 fingerspelling letters come from Auslan Signbank (CC BY-NC-ND 4.0:
-non-commercial, attribution); the licence of the `rgb/` corpus should be
+13 fingerspelling letters and 89 signs come from Auslan Signbank (CC BY-NC-ND 4.0:
+non-commercial, attribution -- each sign's page URL is in the catalog); the licence of the `rgb/` corpus should be
 confirmed before public deployment.

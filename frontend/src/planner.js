@@ -433,6 +433,12 @@ function planSentence(tokens, question, lex, auslanOrder) {
                           (i + n >= words.length || words[i + n].src !== span[n - 1].src);
             let key = keyOf(span.map(x => x.w)), cands = lex.candidates(key);
             if (!cands.length && whole && asTyped !== key) { key = asTyped; cands = lex.candidates(key); }
+            // "not good" is the corpus's NO GOOD: two negated signs are labelled
+            // with NO (GOOD (NO GOOD), BOTHER (NO BOTHER)); only those phrase signs
+            if (!cands.length && n > 1 && key.startsWith("NOT ")) {
+                const no = lex.candidates("NO " + key.slice(4)).filter(c => c.kind === "phrase");
+                if (no.length) { key = "NO " + key.slice(4); cands = no; }
+            }
             if (!cands.length) continue;
             if (n > 1) {
                 const c = chooseSign(cands, key, contextWords);

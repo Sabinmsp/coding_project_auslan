@@ -28,6 +28,8 @@ datasets/processed/final_status.txt
 # Large datasets are symlinks into the original workspace: the LINKS are
 # tracked, never their contents
 datasets/videos/rgb/
+# Auslan Signbank videos -- re-downloaded by scripts/add_signbank_signs.py
+datasets/videos/signbank/
 
 # Python / OS / editor
 __pycache__/

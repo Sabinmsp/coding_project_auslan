@@ -20,9 +20,11 @@ MANIFEST = json.loads(paths.MANIFEST.read_text())
 class Catalog(unittest.TestCase):
     def test_every_gloss_once_ids_unique(self):
         labels = json.loads(paths.LABELS.read_text())
-        self.assertEqual(sorted({s["gloss"] for s in CATALOG["signs"].values()}),
-                         sorted(set(labels.values())))
-        self.assertEqual(len(CATALOG["signs"]), len(set(labels.values())))
+        corpus = [s["gloss"] for s in CATALOG["signs"].values() if s.get("source") != "signbank"]
+        self.assertEqual(sorted(set(corpus)), sorted(set(labels.values())))
+        self.assertEqual(len(corpus), len(set(labels.values())))
+        glosses = [s["gloss"] for s in CATALOG["signs"].values()]     # + scripts/add_signbank_signs.py
+        self.assertEqual(len(glosses), len(set(glosses)))
 
     def test_every_take_has_a_file(self):
         for s in CATALOG["signs"].values():

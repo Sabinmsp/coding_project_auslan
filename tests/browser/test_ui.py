@@ -94,10 +94,13 @@ check("and closes again", not visible("#glossline"))
 
 # left panel: plan + vocabulary lists
 J("auslan.say('Where is the hospital? My name is Sabin. I love Australia')"); time.sleep(1.2)
-check("translation plan shows a chip per step, on the left", J("document.querySelectorAll('#plan .chip').length") >= 8 and visible("#plan"))
+check("sign sequence shown on the left after translating", visible("#seqpanel") and visible("#steps button"))
+check("translation details collapsed by default", visible("#details") and not J("document.getElementById('details').open"))
+J("document.getElementById('details').open = true"); time.sleep(0.2)
+check("translation details: a chip per step", J("document.querySelectorAll('#plan .chip').length") >= 8 and visible("#plan"))
 vocab = J("document.getElementById('vocab').innerText")
 check("vocabulary lists: signs, no-sign words, names, left-out words",
-      all(k in vocab for k in ("Signs available", "No sign available", "Names, fingerspelled", "Left out by the current planner"))
+      all(k in vocab for k in ("Available recorded signs", "no recorded sign", "Names, fingerspelled", "Left out by the current planner"))
       and "Sabin" in vocab and "hospital" in vocab.lower(), vocab[:90].replace("\n", " | "))
 check("screen reader is told which sign is on", "of" in J("document.getElementById('announce').textContent"),
       J("document.getElementById('announce').textContent"))

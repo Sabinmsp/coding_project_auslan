@@ -1,0 +1,1063 @@
+{
+ "source": "Auslan Signbank (https://auslan.org.au), CC BY-NC-ND 4.0 -- attribution: the page URL of each sign",
+ "chosen": "2026-10-29: for words of a children's everyday-communication vocabulary with no usable sign in the corpus; an entry is used only if Signbank gives the word as its first keyword or as an English equivalent in the definition, then checked by hand for the everyday meaning",
+ "signs": [
+  {
+   "gloss": "AFTERNOON",
+   "keys": [
+    "AFTERNOON"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/afternoon-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/24/24720_1.mp4",
+   "for": [
+    "afternoon"
+   ]
+  },
+  {
+   "gloss": "ALLOW",
+   "keys": [
+    "ALLOW"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/allow-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/38/38410_1.mp4",
+   "for": [
+    "allow"
+   ]
+  },
+  {
+   "gloss": "ANYONE",
+   "keys": [
+    "ANYONE"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/anyone-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/28/28000_1.mp4",
+   "for": [
+    "anyone"
+   ]
+  },
+  {
+   "gloss": "ART",
+   "keys": [
+    "ART",
+    "CRAFT"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/art-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/auslan/49/49130.mp4",
+   "for": [
+    "art",
+    "craft"
+   ]
+  },
+  {
+   "gloss": "AWAKE",
+   "keys": [
+    "AWAKE",
+    "WAKE"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/awake-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/auslan/63/63380.mp4",
+   "for": [
+    "awake",
+    "wake"
+   ]
+  },
+  {
+   "gloss": "BELONG",
+   "keys": [
+    "BELONG"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/belong-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/26/26870_1.mp4",
+   "for": [
+    "belong"
+   ]
+  },
+  {
+   "gloss": "BLEND",
+   "keys": [
+    "BLEND"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/blend-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/auslan/10/10870.mp4",
+   "for": [
+    "blend"
+   ]
+  },
+  {
+   "gloss": "BROWN",
+   "keys": [
+    "BROWN"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/brown-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/auslan/32/32650.mp4",
+   "for": [
+    "brown"
+   ]
+  },
+  {
+   "gloss": "BUBBLY",
+   "keys": [
+    "BUBBLY"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/bubbly-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/93/9360_1.mp4",
+   "for": [
+    "bubbly"
+   ]
+  },
+  {
+   "gloss": "CAMP",
+   "keys": [
+    "CAMP"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/camp-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/48/48100_1.mp4",
+   "for": [
+    "camp"
+   ]
+  },
+  {
+   "gloss": "CHICKEN",
+   "keys": [
+    "CHICKEN",
+    "HEN"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/chicken-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/51/51190_1.mp4",
+   "for": [
+    "hen"
+   ]
+  },
+  {
+   "gloss": "COLOUR",
+   "keys": [
+    "COLOUR",
+    "COLORED",
+    "COLOR",
+    "COLOURED"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/colour-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/12/12710_1.mp4",
+   "for": [
+    "colored"
+   ]
+  },
+  {
+   "gloss": "CONFUSE",
+   "keys": [
+    "CONFUSE"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/confuse-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/auslan/11/11390.mp4",
+   "for": [
+    "confuse"
+   ]
+  },
+  {
+   "gloss": "CROCODILE",
+   "keys": [
+    "CROCODILE"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/crocodile-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/38/38630_1.mp4",
+   "for": [
+    "crocodile"
+   ]
+  },
+  {
+   "gloss": "CUCUMBER",
+   "keys": [
+    "CUCUMBER"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/cucumber-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/46/46330_1.mp4",
+   "for": [
+    "cucumber"
+   ]
+  },
+  {
+   "gloss": "CULTIVATE",
+   "keys": [
+    "CULTIVATE"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/cultivate-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/23/2310_1.mp4",
+   "for": [
+    "cultivate"
+   ]
+  },
+  {
+   "gloss": "DAMP",
+   "keys": [
+    "DAMP"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/damp-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/34/34030_1.mp4",
+   "for": [
+    "damp"
+   ]
+  },
+  {
+   "gloss": "DEEP",
+   "keys": [
+    "DEEP"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/deep-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/Gloss/15/1551.mp4",
+   "for": [
+    "deep"
+   ]
+  },
+  {
+   "gloss": "DELIVER",
+   "keys": [
+    "DELIVER"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/deliver-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/auslan/59/59220.mp4",
+   "for": [
+    "deliver"
+   ]
+  },
+  {
+   "gloss": "DIG",
+   "keys": [
+    "DIG"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/dig-2.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/59/59340_1.mp4",
+   "for": [
+    "dig"
+   ]
+  },
+  {
+   "gloss": "DIGGER",
+   "keys": [
+    "DIGGER"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/digger-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/29/29800_1.mp4",
+   "for": [
+    "digger"
+   ]
+  },
+  {
+   "gloss": "DIRTY",
+   "keys": [
+    "DIRTY"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/dirty-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/27/27710_1.mp4",
+   "for": [
+    "dirty"
+   ]
+  },
+  {
+   "gloss": "DRIP",
+   "keys": [
+    "DRIP"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/drip-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/auslan/14/14370.mp4",
+   "for": [
+    "drip"
+   ]
+  },
+  {
+   "gloss": "ELECTRIC",
+   "keys": [
+    "ELECTRIC"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/electric-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/Gloss/42/423.mp4",
+   "for": [
+    "electric"
+   ]
+  },
+  {
+   "gloss": "EQUAL",
+   "keys": [
+    "EQUAL"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/equal-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/41/41050_1.mp4",
+   "for": [
+    "equal"
+   ]
+  },
+  {
+   "gloss": "EVERYBODY",
+   "keys": [
+    "EVERYBODY"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/everybody-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/26/26200_1.mp4",
+   "for": [
+    "everybody"
+   ]
+  },
+  {
+   "gloss": "FAMILY",
+   "keys": [
+    "FAMILY"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/family-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/27/27750_1.mp4",
+   "for": [
+    "family"
+   ]
+  },
+  {
+   "gloss": "FAVOURITE",
+   "keys": [
+    "FAVOURITE",
+    "FAVORITE"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/favourite-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/auslan/39/39730.mp4",
+   "for": [
+    "favorite"
+   ]
+  },
+  {
+   "gloss": "FLAP",
+   "keys": [
+    "FLAP"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/flap-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/auslan/35/35920.mp4",
+   "for": [
+    "flap"
+   ]
+  },
+  {
+   "gloss": "FLATTEN",
+   "keys": [
+    "FLATTEN"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/flatten-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/39/39230_1.mp4",
+   "for": [
+    "flatten"
+   ]
+  },
+  {
+   "gloss": "FREEZER",
+   "keys": [
+    "FREEZER"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/freezer-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/auslan/27/27230.mp4",
+   "for": [
+    "freezer"
+   ]
+  },
+  {
+   "gloss": "GLAD",
+   "keys": [
+    "GLAD"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/glad-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/auslan/42/42800.mp4",
+   "for": [
+    "glad"
+   ]
+  },
+  {
+   "gloss": "GOODBYE",
+   "keys": [
+    "GOODBYE",
+    "GOOD BYE",
+    "BYE"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/good-bye-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/24/24820_1.mp4",
+   "for": [
+    "goodbye"
+   ]
+  },
+  {
+   "gloss": "GUEST",
+   "keys": [
+    "GUEST"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/guest-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/34/34110_1.mp4",
+   "for": [
+    "guest"
+   ]
+  },
+  {
+   "gloss": "HALVE",
+   "keys": [
+    "HALVE"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/halve-2.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/43/43190_1.mp4",
+   "for": [
+    "halve"
+   ]
+  },
+  {
+   "gloss": "HELMET",
+   "keys": [
+    "HELMET"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/helmet-2.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/45/45670_1.mp4",
+   "for": [
+    "helmet"
+   ]
+  },
+  {
+   "gloss": "HOPE",
+   "keys": [
+    "HOPE"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/hope-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/40/40140_1.mp4",
+   "for": [
+    "hope"
+   ]
+  },
+  {
+   "gloss": "HURT",
+   "keys": [
+    "HURT"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/hurt-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/Gloss/53/5341.mp4",
+   "for": [
+    "hurt"
+   ]
+  },
+  {
+   "gloss": "JAR",
+   "keys": [
+    "JAR"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/jar-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/31/31100_1.mp4",
+   "for": [
+    "jar"
+   ]
+  },
+  {
+   "gloss": "KETTLE",
+   "keys": [
+    "KETTLE"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/kettle-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/65/65910_1.mp4",
+   "for": [
+    "kettle"
+   ]
+  },
+  {
+   "gloss": "KEY",
+   "keys": [
+    "KEY"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/key-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/62/62610_1.mp4",
+   "for": [
+    "key"
+   ]
+  },
+  {
+   "gloss": "KNOWLEDGEABLE",
+   "keys": [
+    "KNOWLEDGEABLE"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/knowledgeable-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/Gloss/19/1904.mp4",
+   "for": [
+    "knowledgeable"
+   ]
+  },
+  {
+   "gloss": "LAZY",
+   "keys": [
+    "LAZY"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/lazy-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/65/65590_1.mp4",
+   "for": [
+    "lazy"
+   ]
+  },
+  {
+   "gloss": "LUCKY",
+   "keys": [
+    "LUCKY"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/lucky-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/50/50710_1.mp4",
+   "for": [
+    "lucky"
+   ]
+  },
+  {
+   "gloss": "MAP",
+   "keys": [
+    "MAP",
+    "CHART"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/map-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/auslan/17/17150.mp4",
+   "for": [
+    "map",
+    "chart"
+   ]
+  },
+  {
+   "gloss": "METAL",
+   "keys": [
+    "METAL"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/metal-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/auslan/13/13990.mp4",
+   "for": [
+    "metal"
+   ]
+  },
+  {
+   "gloss": "MIXTURE",
+   "keys": [
+    "MIXTURE"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/mixture-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/30/30480_1.mp4",
+   "for": [
+    "mixture"
+   ]
+  },
+  {
+   "gloss": "NEAT",
+   "keys": [
+    "NEAT"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/neat-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/19/19200_1.mp4",
+   "for": [
+    "neat"
+   ]
+  },
+  {
+   "gloss": "NERVOUS",
+   "keys": [
+    "NERVOUS"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/nervous-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/27/27500_1.mp4",
+   "for": [
+    "nervous"
+   ]
+  },
+  {
+   "gloss": "NEST",
+   "keys": [
+    "NEST"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/nest-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/46/46290_1.mp4",
+   "for": [
+    "nest"
+   ]
+  },
+  {
+   "gloss": "NONE",
+   "keys": [
+    "NONE"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/none-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/34/3420_1.mp4",
+   "for": [
+    "none"
+   ]
+  },
+  {
+   "gloss": "ODD",
+   "keys": [
+    "ODD"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/odd-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/auslan/30/30070.mp4",
+   "for": [
+    "odd"
+   ]
+  },
+  {
+   "gloss": "ORGANISE",
+   "keys": [
+    "ORGANISE",
+    "ORGANIZE"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/organise-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/Gloss-3471.mp4",
+   "for": [
+    "organise"
+   ]
+  },
+  {
+   "gloss": "OUTLINE",
+   "keys": [
+    "OUTLINE"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/outline-2.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/Gloss/74/7476_FWjksCf.mp4",
+   "for": [
+    "outline"
+   ]
+  },
+  {
+   "gloss": "PADDLE",
+   "keys": [
+    "PADDLE"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/paddle-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/58/58300_1.mp4",
+   "for": [
+    "paddle"
+   ]
+  },
+  {
+   "gloss": "PICNIC",
+   "keys": [
+    "PICNIC"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/picnic-3.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/54/5490_1.mp4",
+   "for": [
+    "picnic"
+   ]
+  },
+  {
+   "gloss": "PLASTICINE",
+   "keys": [
+    "PLASTICINE",
+    "PLASTICENE"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/plasticine-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/42/42520_1.mp4",
+   "for": [
+    "plasticine"
+   ]
+  },
+  {
+   "gloss": "PLEASURE",
+   "keys": [
+    "PLEASURE"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/pleasure-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/46/46180_1.mp4",
+   "for": [
+    "pleasure"
+   ]
+  },
+  {
+   "gloss": "PRETTY",
+   "keys": [
+    "PRETTY"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/pretty-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/32/32900_1.mp4",
+   "for": [
+    "pretty"
+   ]
+  },
+  {
+   "gloss": "PUMPKIN",
+   "keys": [
+    "PUMPKIN"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/pumpkin-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/30/30190_1.mp4",
+   "for": [
+    "pumpkin"
+   ]
+  },
+  {
+   "gloss": "PURPLE",
+   "keys": [
+    "PURPLE"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/purple-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/21/21480_1.mp4",
+   "for": [
+    "purple"
+   ]
+  },
+  {
+   "gloss": "QUEEN",
+   "keys": [
+    "QUEEN"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/queen-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/29/29030_1.mp4",
+   "for": [
+    "queen"
+   ]
+  },
+  {
+   "gloss": "RACE",
+   "keys": [
+    "RACE"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/race-2.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/auslan/10/10750.mp4",
+   "for": [
+    "race"
+   ]
+  },
+  {
+   "gloss": "REASON",
+   "keys": [
+    "REASON"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/reason-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/51/51490_1.mp4",
+   "for": [
+    "reason"
+   ]
+  },
+  {
+   "gloss": "RING",
+   "keys": [
+    "RING"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/ring-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/auslan/13/13400.mp4",
+   "for": [
+    "ring"
+   ]
+  },
+  {
+   "gloss": "ROTATE",
+   "keys": [
+    "ROTATE"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/rotate-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/auslan/10/10900.mp4",
+   "for": [
+    "rotate"
+   ]
+  },
+  {
+   "gloss": "RUIN",
+   "keys": [
+    "RUIN"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/ruin-2.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/63/63130.mp4",
+   "for": [
+    "ruin"
+   ]
+  },
+  {
+   "gloss": "SAVE",
+   "keys": [
+    "SAVE"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/save-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/42/42980_1.mp4",
+   "for": [
+    "save"
+   ]
+  },
+  {
+   "gloss": "SEED",
+   "keys": [
+    "SEED",
+    "SEEDS"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/seed-2.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/22/2210_1.mp4",
+   "for": [
+    "seeds"
+   ]
+  },
+  {
+   "gloss": "SEEM",
+   "keys": [
+    "SEEM"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/seem-2.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/16/16691_1.mp4",
+   "for": [
+    "seem"
+   ]
+  },
+  {
+   "gloss": "SHOE",
+   "keys": [
+    "SHOE"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/shoe-2.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/auslan/46/46610.mp4",
+   "for": [
+    "shoe"
+   ]
+  },
+  {
+   "gloss": "SPELL",
+   "keys": [
+    "SPELL"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/spell-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/auslan/15/1500.mp4",
+   "for": [
+    "spell"
+   ]
+  },
+  {
+   "gloss": "SPOT",
+   "keys": [
+    "SPOT"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/spot-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/12/12620_1.mp4",
+   "for": [
+    "spot"
+   ]
+  },
+  {
+   "gloss": "SPRAIN",
+   "keys": [
+    "SPRAIN"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/sprain-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/auslan/58/58150.mp4",
+   "for": [
+    "sprain"
+   ]
+  },
+  {
+   "gloss": "SPRING",
+   "keys": [
+    "SPRING"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/spring-2.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/56/56050_1.mp4",
+   "for": [
+    "spring"
+   ]
+  },
+  {
+   "gloss": "STACK",
+   "keys": [
+    "STACK"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/stack-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/36/36610_1.mp4",
+   "for": [
+    "stack"
+   ]
+  },
+  {
+   "gloss": "STEAM",
+   "keys": [
+    "STEAM"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/steam-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/auslan/25/25580.mp4",
+   "for": [
+    "steam"
+   ]
+  },
+  {
+   "gloss": "STING",
+   "keys": [
+    "STING",
+    "STUNG"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/sting-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/44/4480_1.mp4",
+   "for": [
+    "stung"
+   ]
+  },
+  {
+   "gloss": "STUCK",
+   "keys": [
+    "STUCK"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/stuck-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/53/53240_1.mp4",
+   "for": [
+    "stuck"
+   ]
+  },
+  {
+   "gloss": "THICK",
+   "keys": [
+    "THICK"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/thick-2.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/44/44490_1.mp4",
+   "for": [
+    "thick"
+   ]
+  },
+  {
+   "gloss": "THINKING",
+   "keys": [
+    "THINKING"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/thinking-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/Gloss/68/6854.mp4",
+   "for": [
+    "thinking"
+   ]
+  },
+  {
+   "gloss": "THOUGHTFUL",
+   "keys": [
+    "THOUGHTFUL"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/thoughtful-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/auslan/50/5040.mp4",
+   "for": [
+    "thoughtful"
+   ]
+  },
+  {
+   "gloss": "TIGHTEN",
+   "keys": [
+    "TIGHTEN"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/tighten-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/32/32910_1.mp4",
+   "for": [
+    "tighten"
+   ]
+  },
+  {
+   "gloss": "TONIGHT",
+   "keys": [
+    "TONIGHT"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/tonight-2.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/66/6630_1.mp4",
+   "for": [
+    "tonight"
+   ]
+  },
+  {
+   "gloss": "TRAY",
+   "keys": [
+    "TRAY"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/tray-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/32/32020_1.mp4",
+   "for": [
+    "tray"
+   ]
+  },
+  {
+   "gloss": "TREASURE",
+   "keys": [
+    "TREASURE"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/treasure-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/21/2130_1.mp4",
+   "for": [
+    "treasure"
+   ]
+  },
+  {
+   "gloss": "TWELVE",
+   "keys": [
+    "TWELVE"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/twelve-2.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/63/63780.mp4",
+   "for": [
+    "twelve"
+   ]
+  },
+  {
+   "gloss": "UNDERNEATH",
+   "keys": [
+    "UNDERNEATH"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/underneath-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/41/41270_1.mp4",
+   "for": [
+    "underneath"
+   ]
+  },
+  {
+   "gloss": "VALUABLE",
+   "keys": [
+    "VALUABLE"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/valuable-2.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/61/61630_1.mp4",
+   "for": [
+    "valuable"
+   ]
+  },
+  {
+   "gloss": "WANT",
+   "keys": [
+    "WANT",
+    "WANNA"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/want-2.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/auslan/34/34540.mp4",
+   "for": [
+    "wanna"
+   ]
+  },
+  {
+   "gloss": "WIN",
+   "keys": [
+    "WIN"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/win-3.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/auslan/24/24260.mp4",
+   "for": [
+    "win"
+   ]
+  },
+  {
+   "gloss": "WINDY",
+   "keys": [
+    "WINDY"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/windy-2.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/auslan/35/35720.mp4",
+   "for": [
+    "windy"
+   ]
+  },
+  {
+   "gloss": "X-RAY",
+   "keys": [
+    "X RAY",
+    "XRAY"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/x-ray-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/Gloss/66/6675.mp4",
+   "for": [
+    "xray"
+   ]
+  },
+  {
+   "gloss": "ZERO",
+   "keys": [
+    "ZERO"
+   ],
+   "page": "https://auslan.org.au/dictionary/words/zero-1.html",
+   "video": "https://object-store.rc.nectar.org.au/v1/AUTH_92e2f9b70316412697cddc6f3ac0ee4e/staticauslanorgau/mp4video/73/730_1.mp4",
+   "for": [
+    "zero"
+   ]
+  }
+ ],
+ "aliases": {
+  "HR": "hour",
+  "SQ": "square"
+ }
+}

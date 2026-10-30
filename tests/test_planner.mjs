@@ -59,11 +59,13 @@ test("negation uses the corpus's own negated sign", () => {
 });
 
 test("WANT / GOOD / KNOW never resolve to their NEGATED signs", () => {
-    for (const w of ["want", "good", "know"]) {
+    for (const w of ["good", "know"]) {
         const s = P(`I ${w}`).steps[1];
         assert.equal(s.kind, "spell", `${w} must be spelled, got ${s.id}`);
     }
+    assert.equal(P("I want").steps[1].id, "want");       // plain WANT, from Auslan Signbank
     assert.deepEqual(shape(P("no good")), ["good-no-good"]);
+    assert.deepEqual(shape(P("it is not good")).slice(-1), ["good-no-good"]);   // "not good" = NO GOOD
 });
 
 test("specific sense needs evidence in the sentence", () => {
@@ -135,7 +137,7 @@ test("a sign not yet extracted is fingerspelled, and says the sign exists", () =
 
 test("pending multi-word sign falls back word by word, never run-together", () => {
     const p = plan("I don't want it", lexicon(["want-not-want"]));
-    assert.deepEqual(shape(p).slice(0, 4), ["i", "-don't", "not", "fs:WANT"]);
+    assert.deepEqual(shape(p).slice(0, 4), ["i", "-don't", "not", "want"]);
     assert.equal(p.steps[2].pending, "want-not-want");
     assert.match(p.steps[2].why, /NOT WANT\) would fit better/);
 });
@@ -200,7 +202,7 @@ test("keywords: a loosely listed sign is spelled and offered; a strong one plays
 });
 
 test("keywords never reach a negated sign through its bare word", () => {
-    assert.equal(K("I want it").steps[1].kind, "spell");      // no WANT (NOT WANT)
+    assert.equal(K("I want it").steps[1].id, "want");         // plain WANT, never WANT (NOT WANT)
     for (const [text, banned] of [["I know", "know-not-know"], ["good", "good-no-good"],
                                   ["I like it", "like-not-like"], ["I have", "be-not-be"]]) {
         assert.ok(K(text).steps.every(s => s.id !== banned), `${text} -> ${banned}`);
